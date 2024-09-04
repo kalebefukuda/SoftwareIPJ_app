@@ -15,6 +15,7 @@ class CustomTextField extends StatefulWidget {
   });
 
   @override
+  // ignore: library_private_types_in_public_api
   _CustomTextFieldState createState() => _CustomTextFieldState();
 }
 
@@ -41,7 +42,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.9), // Fundo branco com opacidade
         border: Border.all(
-          color: _focusNode.hasFocus ?  Color(0xFF015B40) : Colors.transparent, // Cor da borda quando focada ou não
+          color: _focusNode.hasFocus ?  const Color(0xFF015B40) : Colors.transparent, // Cor da borda quando focada ou não
           width: _focusNode.hasFocus ? 2.0 : 1.0, // Espessura da borda mais fina
         ),
         borderRadius: BorderRadius.circular(25), // Define o raio da borda
