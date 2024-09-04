@@ -11,7 +11,7 @@ class CustomTextField extends StatefulWidget {
     required this.hintText,
     required this.obscureText,
     required this.controller,
-    this.icon,
+    this.icon, int? width,
   });
 
   @override

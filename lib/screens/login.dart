@@ -40,7 +40,7 @@ class LoginScreen extends StatelessWidget {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0), // Efeito fosco
               child: Container(
-                color: Colors.black.withOpacity(0.2), // Leve camada de opacidade
+                color: Colors.white.withOpacity(0.2), // Leve camada de opacidade
               ),
             ),
           ),
@@ -67,29 +67,31 @@ class LoginScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const SizedBox(height: 150), // Espaço entre a logo e os campos
-                      CustomTextField(
-                        controller: loginController,
-                        hintText: 'Login',
-                        obscureText: false,
-                        icon: SvgPicture.asset( // Usando o ícone SVG
-                          'assets/user-round.svg',
-                          // ignore: deprecated_member_use
-                          color: const Color(0xFF015B40), // Define a cor do ícone
-                          width: 24,
-                          height: 24,
+                      // Campo de Login com largura ajustada
+                      SizedBox(
+                        width: 300, // Ajuste a largura do campo de texto aqui
+                        child: CustomTextField(
+                          controller: loginController,
+                          hintText: 'Login',
+                          obscureText: false,
+                          icon: SvgPicture.asset( // Usando o ícone SVG
+                            'assets/user-round.svg',
+                            height: 24,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 20),
-                      CustomTextField(
-                        controller: passwordController,
-                        hintText: 'Senha',
-                        obscureText: true,
-                        icon: SvgPicture.asset( // Usando o ícone SVG
-                          'assets/lock.svg',
-                          // ignore: deprecated_member_use
-                          color: const Color(0xFF015B40), // Define a cor do ícone
-                          width: 24,
-                          height: 24,
+                      // Campo de Senha com largura ajustada
+                      SizedBox(
+                        width: 300, // Ajuste a largura do campo de texto aqui
+                        child: CustomTextField(
+                          controller: passwordController,
+                          hintText: 'Senha',
+                          obscureText: true,
+                          icon: SvgPicture.asset( // Usando o ícone SVG
+                            'assets/lock.svg',
+                            height: 24,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 40), // Espaço antes do botão de login
