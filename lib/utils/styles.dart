@@ -5,7 +5,7 @@ class AppStyles {
   static final TextStyle titleStyle = GoogleFonts.poppins(
     fontSize: 28,
     fontWeight: FontWeight.bold,
-    color: Color(0xFF015B40),
+    color: const Color(0xFF015B40),
   );
 
   static final TextStyle errorTextStyle = GoogleFonts.poppins(
