@@ -26,101 +26,100 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          // Imagem de fundo com efeito fosco
-          Positioned.fill(
+    return Stack(
+      children: [
+        // Imagem de fundo com efeito fosco
+        Positioned.fill(
+          child: Image.asset(
+            'assets/Igreja_Fundo_Login.jpg',
+            fit: BoxFit.cover,
+          ),
+        ),
+        Positioned.fill(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0), // Efeito fosco
+            child: Container(
+              color: Colors.white.withOpacity(0.2), // Leve camada de opacidade
+            ),
+          ),
+        ),
+        // Logo da empresa
+        Positioned(
+          top: 100,
+          left: 0,
+          right: 0,
+          child: Center(
             child: Image.asset(
-              'assets/Igreja_Fundo_Login.jpg',
-              fit: BoxFit.cover,
+              'assets/Logo_IPB.png',
+              height: 100,
             ),
           ),
-          Positioned.fill(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0), // Efeito fosco
-              child: Container(
-                color: Colors.white.withOpacity(0.2), // Leve camada de opacidade
-              ),
-            ),
-          ),
-          // Logo da empresa
-          Positioned(
-            top: 100,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Image.asset(
-                'assets/Logo_IPB.png',
-                height: 100,
-              ),
-            ),
-          ),
-          // Formulário de login
-          Center(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                child: Form(
-                  key: formKey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 150), // Espaço entre a logo e os campos
-                      // Campo de Login com largura ajustada
-                      SizedBox(
-                        width: 300, // Ajuste a largura do campo de texto aqui
-                        child: CustomTextField(
-                          controller: loginController,
-                          hintText: 'Login',
-                          obscureText: false,
-                          icon: SvgPicture.asset( // Usando o ícone SVG
-                            'assets/user-round.svg',
-                            height: 24,
-                          ),
+        ),
+        // Formulário de login
+        Center(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40.0),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 150), // Espaço entre a logo e os campos
+                    // Campo de Login com largura ajustada
+                    SizedBox(
+                      width: 300, // Ajuste a largura do campo de texto aqui
+                      child: CustomTextField(
+                        controller: loginController,
+                        hintText: 'Login',
+                        obscureText: false,
+                        icon: SvgPicture.asset( // Usando o ícone SVG
+                          'assets/user-round.svg',
+                          height: 24,
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      // Campo de Senha com largura ajustada
-                      SizedBox(
-                        width: 300, // Ajuste a largura do campo de texto aqui
-                        child: CustomTextField(
-                          controller: passwordController,
-                          hintText: 'Senha',
-                          obscureText: true,
-                          icon: SvgPicture.asset( // Usando o ícone SVG
-                            'assets/lock.svg',
-                            height: 24,
-                          ),
+                    ),
+                    const SizedBox(height: 20),
+                    // Campo de Senha com largura ajustada
+                    SizedBox(
+                      width: 300, // Ajuste a largura do campo de texto aqui
+                      child: CustomTextField(
+                        controller: passwordController,
+                        hintText: 'Senha',
+                        obscureText: true,
+                        icon: SvgPicture.asset( // Usando o ícone SVG
+                          'assets/lock.svg',
+                          height: 24,
                         ),
                       ),
-                      const SizedBox(height: 40), // Espaço antes do botão de login
-                      CustomButton(
-                        text: 'Entrar',
-                        onPressed: () => login(context),
-                      ),
-                      const SizedBox(height: 20),
-                      ValueListenableBuilder(
-                        valueListenable: errorMessage,
-                        builder: (context, value, child) {
-                          return Text(
-                            value,
-                            style: const TextStyle(
-                              color: Colors.red,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 40), // Espaço antes do botão de login
+                    CustomButton(
+                      text: 'Entrar',
+                      onPressed: () => login(context),
+                    ),
+                    const SizedBox(height: 20),
+                    ValueListenableBuilder(
+                      valueListenable: errorMessage,
+                      builder: (context, value, child) {
+                        return Text(
+                          textAlign: TextAlign.center, // Centraliza o texto horizontalmente
+                          value,
+                          style: const TextStyle(
+                            color: Colors.red,
+                            fontSize: 14,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
