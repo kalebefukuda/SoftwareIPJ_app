@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart'; // Adicione esta linha
+import 'package:google_fonts/google_fonts.dart'; // Fontes do Google
 import 'screens/login.dart';
 
 void main() {
@@ -17,7 +17,9 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         textTheme: GoogleFonts.poppinsTextTheme(),
       ),
-      home: LoginScreen(),
+      home: Scaffold(
+        body: LoginScreen(), // Inclui a tela de login como o corpo do Scaffold
+      ),
     );
   }
 }
