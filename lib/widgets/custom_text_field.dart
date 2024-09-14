@@ -4,71 +4,80 @@ class CustomTextField extends StatefulWidget {
   final String hintText;
   final bool obscureText;
   final TextEditingController controller;
-  final Widget? icon; // Pode ser qualquer Widget, como um ícone SVG
+  final Widget? icon;
+  final Color? fillColor;
 
   const CustomTextField({
     super.key,
     required this.hintText,
     required this.obscureText,
     required this.controller,
-    this.icon, int? width,
+    this.icon,
+    this.fillColor = const Color(0xFFE7E7E7), // Valor padrão para cor de preenchimento
   });
 
   @override
-  // ignore: library_private_types_in_public_api
   _CustomTextFieldState createState() => _CustomTextFieldState();
 }
 
 class _CustomTextFieldState extends State<CustomTextField> {
-  final FocusNode _focusNode = FocusNode(); // FocusNode para detectar o foco
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     _focusNode.addListener(() {
-      setState(() {}); // Atualiza o estado quando o foco muda
+      setState(() {});
     });
   }
 
   @override
   void dispose() {
-    _focusNode.dispose(); // Libera o FocusNode quando o widget é removido
+    _focusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.9), // Fundo branco com opacidade
-        border: Border.all(
-          color: _focusNode.hasFocus ?  const Color(0xFF015B40) : Colors.transparent, // Cor da borda quando focada ou não
-          width: _focusNode.hasFocus ? 2.0 : 1.0, // Espessura da borda mais fina
-        ),
-        borderRadius: BorderRadius.circular(25), // Define o raio da borda
-      ),
-      child: TextFormField(
-        controller: widget.controller,
-        obscureText: widget.obscureText,
-        focusNode: _focusNode, // Associa o FocusNode ao campo de texto
-        decoration: InputDecoration(
-          labelText: widget.hintText,
-          floatingLabelStyle: const TextStyle(
-            fontSize: 16, // Tamanho ajustado do rótulo flutuante
-            color: Color(0xFF015B40), // Cor do rótulo flutuante
+    final bool isFocused = _focusNode.hasFocus;
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(15), // Aplica o radius diretamente no ClipRRect
+      child: Container(
+        decoration: BoxDecoration(
+          color: widget.fillColor, // Aplica a cor de fundo
+          borderRadius: BorderRadius.circular(15), // Aplica o radius ao container
+          border: Border.all(
+            color: isFocused ? const Color(0xFF015B40) : Colors.transparent,
+            width: isFocused ? 2.0 : 1.0,
           ),
-          border: InputBorder.none, // Remove a borda interna padrão
-          prefixIcon: widget.icon != null
-              ? Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: widget.icon,
-                )
-              : null,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12), // Reduzido para campos mais finos
-          filled: true,
-          fillColor: Colors.transparent, // Tornar o campo de entrada transparente
         ),
-        style: const TextStyle(fontSize: 16),
+        child: TextFormField(
+          controller: widget.controller,
+          obscureText: widget.obscureText,
+          focusNode: _focusNode,
+          decoration: InputDecoration(
+            labelText: widget.hintText,
+            floatingLabelStyle: const TextStyle(
+              fontSize: 16,
+              color: Color(0xFF015B40), // Cor do rótulo quando o campo está focado
+            ),
+            labelStyle: Theme.of(context).textTheme.bodyMedium, // Cor inicial para o rótulo
+            border: InputBorder.none, // Remove a borda interna padrão
+            prefixIcon: widget.icon != null
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: widget.icon,
+                  )
+                : null,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            filled: true,
+            fillColor: Colors.transparent, // O preenchimento será feito pelo container externo
+          ),
+          style: _focusNode.hasFocus || widget.controller.text.isNotEmpty
+              ? Theme.of(context).textTheme.bodyLarge // Texto preto/branco quando focado ou preenchido
+              : Theme.of(context).textTheme.bodyMedium, // Texto cinza quando não está preenchido
+        ),
       ),
     );
   }

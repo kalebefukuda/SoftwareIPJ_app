@@ -1,7 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'dart:io'; // Para lidar com o arquivo de imagem selecionado
+import 'package:image_picker/image_picker.dart'; // Pacote para selecionar a imagem
+import '../utils/constants/text_font.dart';
+import '../utils/constants/app_colors.dart';
+import '../widgets/custom_text_field.dart';
+import '../widgets/custom_button.dart';
+import '../widgets/local.dart'; // Importe o widget personalizado
 
-class CreateMembersScreen extends StatelessWidget {
+
+class CreateMembersScreen extends StatefulWidget {
+  const CreateMembersScreen({super.key});
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _CreateMembersScreenState createState() => _CreateMembersScreenState();
+}
+
+class _CreateMembersScreenState extends State<CreateMembersScreen> {
   // Controladores para cada campo de texto
+  final TextEditingController cityController = TextEditingController();
+  final TextEditingController stateController = TextEditingController();
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController fatherNameController = TextEditingController();
   final TextEditingController motherNameController = TextEditingController();
@@ -37,66 +56,167 @@ class CreateMembersScreen extends StatelessWidget {
   final TextEditingController electionElderDateController = TextEditingController();
   final TextEditingController reelectionElderDateController = TextEditingController();
 
-  CreateMembersScreen({super.key});
+  File? _selectedImage;
+  final ImagePicker _picker = ImagePicker();
+
+  // Função para pegar a imagem da galeria
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path); // Atualiza o estado com a imagem selecionada
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cadastro de Membros'),
+        toolbarHeight: 90,
+        backgroundColor: Appcolors.green,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.chevron_left,
+            size: 30,
+            color: Appcolors.white,
+          ),
+        ),
+        title: const Text('Cadastro', style: TextFonts.poppinsMedium),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            buildSectionTitle('Informações Pessoais'),
-            buildTextField('Nome Completo', fullNameController),
-            buildTextField('Nome do Pai', fatherNameController),
-            buildTextField('Nome da Mãe', motherNameController),
-            buildTextField('Data de Nascimento', dobController),
-            buildTextField('Telefone', phoneController),
-            buildTextField('Celular', mobileController),
-            buildTextField('Email', emailController),
-            buildTextField('Endereço', addressController),
-            buildTextField('Complemento', complementController),
-            buildTextField('CEP', cepController),
-            buildTextField('Bairro', districtController),
-            buildTextField('Localização Atual', currentLocationController),
-            buildTextField('Local de Nascimento', birthPlaceController),
-            buildTextField('Profissão', professionController),
-            buildTextField('Escolaridade', educationController),
-            buildTextField('Religião Procedente', religionController),
-            buildTextField('Estado Civil', maritalStatusController),
-            buildSectionTitle('Informações de Admissão'),
-            buildTextField('Data de Admissão', admissionDateController),
-            buildTextField('Forma de Admissão', admissionFormController),
-            buildTextField('Oficiante de Admissão', admissionOfficerController),
-            buildSectionTitle('Informações de Batismo'),
-            buildTextField('Data de Batismo', baptismDateController),
-            buildTextField('Oficiante de Batismo', baptismOfficerController),
-            buildSectionTitle('Profissão de Fé'),
-            buildTextField('Data de Profissão de Fé', faithProfessionDateController),
-            buildTextField('Oficiante de Profissão de Fé', faithProfessionOfficerController),
-            buildSectionTitle('Informações de Demissão'),
-            buildTextField('Data de Demissão', demissionDateController),
-            buildTextField('Forma de Demissão', demissionFormController),
-            buildTextField('Oficiante de Demissão', demissionOfficerController),
-            buildSectionTitle('Outras Informações'),
-            buildTextField('Data de Rol Separado', separatedRollDateController),
-            buildTextField('Data de Disciplina', disciplineDateController),
-            buildTextField('Motivo de Disciplina', disciplineReasonController),
-            buildSectionTitle('Eleições'),
-            buildTextField('Data de Eleição de Diácono', electionDeaconDateController),
-            buildTextField('Data de Reeleição de Diácono', reelectionDeaconDateController),
-            buildTextField('Data de Eleição de Presbítero', electionElderDateController),
-            buildTextField('Data de Reeleição de Presbítero', reelectionElderDateController),
+            // Adicionando o círculo de foto no início
+            MouseRegion(
+              cursor: SystemMouseCursors.click, // Define o cursor como 'pointer' ao passar o mouse
+              child: GestureDetector(
+                onTap: _pickImage, // Função para selecionar a imagem
+                child: CircleAvatar(
+                  radius: 100,
+                  backgroundColor: const Color(0xFFE7E7E7),
+                  child: _selectedImage == null
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SvgPicture.asset(
+                              'assets/images/user-round.svg',
+                              height: 80,
+                              width: 80,
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Insira sua foto',
+                              style: TextFonts.poppinsGreenMedium,
+                            ),
+                          ],
+                        )
+                      : ClipOval(
+                          child: Image.file(
+                            _selectedImage!,
+                            width: 180,
+                            height: 180,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 30),
+            buildSectionTitle(context, 'Informações Pessoais'), // Usa o estilo do tema
+            const SizedBox(height: 10),
+            CustomTextField(
+              controller: fullNameController,
+              hintText: 'Nome Completo',
+              obscureText: false,
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: CustomTextField(
+                    controller: fatherNameController,
+                    hintText: 'Nome do Pai',
+                    obscureText: false,
+                  ),
+                ),
+                const SizedBox(width: 10), // Espaço entre os dois campos
+                Expanded(
+                  child: CustomTextField(
+                    controller: motherNameController,
+                    hintText: 'Nome da Mãe',
+                    obscureText: false,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            LocalField(
+              cityController: cityController,
+              stateController: stateController,
+              obscureText: false,
+            ),
+            const SizedBox(height: 10),
+            CustomTextField(
+              controller: dobController,
+              hintText: 'Data de Nascimento',
+              obscureText: false,
+            ),
+            const SizedBox(height: 10),
+            CustomTextField(
+              controller: phoneController,
+              hintText: 'Telefone',
+              obscureText: false,
+            ),
+            const SizedBox(height: 10),
+            CustomTextField(
+              controller: mobileController,
+              hintText: 'Celular',
+              obscureText: false,
+            ),
+            const SizedBox(height: 10),
+            CustomTextField(
+              controller: emailController,
+              hintText: 'Email',
+              obscureText: false,
+            ),
+            const SizedBox(height: 10),
+            CustomTextField(
+              controller: addressController,
+              hintText: 'Endereço',
+              obscureText: false,
+            ),
+            const SizedBox(height: 10),
+            CustomTextField(
+              controller: complementController,
+              hintText: 'Complemento',
+              obscureText: false,
+            ),
+            const SizedBox(height: 10),
+            CustomTextField(
+              controller: cepController,
+              hintText: 'CEP',
+              obscureText: false,
+            ),
+            const SizedBox(height: 10),
+            CustomTextField(
+              controller: districtController,
+              hintText: 'Bairro',
+              obscureText: false,
+            ),
             const SizedBox(height: 20),
-            ElevatedButton(
+            CustomButton(
+              text: 'Salvar',
               onPressed: () {
                 // Adicione a lógica de cadastro aqui
               },
-              child: const Text('Salvar'),
             ),
           ],
         ),
@@ -104,27 +224,13 @@ class CreateMembersScreen extends StatelessWidget {
     );
   }
 
-  Widget buildSectionTitle(String title) {
+  // Função que utiliza o estilo do tema para os títulos
+  Widget buildSectionTitle(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12.0),
       child: Text(
         title,
-        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  Widget buildTextField(String labelText, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: labelText,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-        ),
+        style: Theme.of(context).textTheme.titleLarge, // Usa o estilo definido no tema
       ),
     );
   }
