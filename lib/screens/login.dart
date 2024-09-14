@@ -19,8 +19,7 @@ class LoginScreen extends StatelessWidget {
     if (usuario == "ipj" && senha == "ipj") {
       Navigator.pushReplacementNamed(context, '/home');
     } else {
-      errorMessage.value =
-          "Usuário ou senha incorreto! Verifique suas informações e tente novamente.";
+      errorMessage.value = "Usuário ou senha incorreto! Verifique suas informações e tente novamente.";
     }
   }
 
@@ -31,7 +30,7 @@ class LoginScreen extends StatelessWidget {
         // Imagem de fundo com efeito fosco
         Positioned.fill(
           child: Image.asset(
-            'assets/Igreja_Fundo_Login.jpg',
+            'assets/images/Igreja_Fundo_Login.jpg',
             fit: BoxFit.cover,
           ),
         ),
@@ -50,7 +49,7 @@ class LoginScreen extends StatelessWidget {
           right: 0,
           child: Center(
             child: Image.asset(
-              'assets/Logo_IPB.png',
+              'assets/images/Logo_IPB.png',
               height: 100,
             ),
           ),
@@ -73,10 +72,11 @@ class LoginScreen extends StatelessWidget {
                         controller: loginController,
                         hintText: 'Login',
                         obscureText: false,
-                        icon: SvgPicture.asset( // Usando o ícone SVG
-                          'assets/user-round.svg',
+                        icon: SvgPicture.asset(
+                          // Usando o ícone SVG
+                          'assets/images/user.svg',
                           height: 24,
-                        ),
+                        ), fillColor: null,
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -87,8 +87,9 @@ class LoginScreen extends StatelessWidget {
                         controller: passwordController,
                         hintText: 'Senha',
                         obscureText: true,
-                        icon: SvgPicture.asset( // Usando o ícone SVG
-                          'assets/lock.svg',
+                        icon: SvgPicture.asset(
+                          // Usando o ícone SVG
+                          'assets/images/lock.svg',
                           height: 24,
                         ),
                       ),
