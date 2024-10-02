@@ -15,12 +15,25 @@ class CustomButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 32.0),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.0),
+      style: ButtonStyle(
+        padding: WidgetStateProperty.all(
+          const EdgeInsets.symmetric(vertical: 16.0, horizontal: 32.0),
         ),
-        backgroundColor: const Color(0xFF015B40),
+        shape: WidgetStateProperty.all(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+        ),
+        backgroundColor: WidgetStateProperty.all(const Color(0xFF015B40)), // Cor padrão do botão
+        // Definir overlayColor para a cor quando o botão é pressionado
+        overlayColor: WidgetStateProperty.resolveWith<Color?>(
+          (Set<WidgetState> states) {
+            if (states.contains(WidgetState.pressed)) {
+              return const Color(0xFF017D5B); // Cor do botão quando é clicado
+            }
+            return null;
+          },
+        ),
       ),
       child: Text(
         text,
