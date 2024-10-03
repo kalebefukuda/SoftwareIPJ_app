@@ -42,6 +42,10 @@ class App extends StatelessWidget {
           fillColor: Color(0xFFE7E7E7), // Cor de fundo dos campos no modo claro
           filled: true, // Garante que a cor de fundo seja aplicada
         ),
+        // Adiciona uma cor para a logo no modo claro
+        iconTheme: const IconThemeData(
+          color: Colors.black, // Cor preta para o ícone (logo) no modo claro
+        ),
       ),
       darkTheme: ThemeData(
         fontFamily: 'Poppins', // Define a Poppins como fonte padrão
@@ -64,6 +68,10 @@ class App extends StatelessWidget {
         inputDecorationTheme: const InputDecorationTheme(
           fillColor: Color(0xFF1F1F1F), // Cor de fundo dos campos no modo escuro
           filled: true, // Garante que a cor de fundo seja aplicada
+        ),
+        // Adiciona uma cor para a logo no modo escuro
+        iconTheme: const IconThemeData(
+          color: Colors.white, // Cor branca para o ícone (logo) no modo escuro
         ),
       ),
       themeMode: ThemeMode.system, // Altere para ThemeMode.system para seguir o tema do sistema
