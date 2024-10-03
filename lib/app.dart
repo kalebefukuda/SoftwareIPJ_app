@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '/screens/create_members.dart';
+import './screens/login.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -66,7 +67,7 @@ class App extends StatelessWidget {
         ),
       ),
       themeMode: ThemeMode.system, // Altere para ThemeMode.system para seguir o tema do sistema
-      home: const CreateMembersScreen(),
+      home: LoginScreen(),
     );
   }
 }
