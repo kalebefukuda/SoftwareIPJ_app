@@ -117,7 +117,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                 onTap: _pickImage, // Função para selecionar a imagem
                 child: CircleAvatar(
                   radius: 100,
-                  backgroundColor: const Color(0xFFE7E7E7),
+                  backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
                   child: _selectedImage == null
                       ? Column(
                           mainAxisAlignment: MainAxisAlignment.center,
