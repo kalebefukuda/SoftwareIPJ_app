@@ -27,7 +27,7 @@ class Report extends StatelessWidget {
       ),
       body: ListView(  // Substituímos Column por ListView para permitir a rolagem
         padding: const EdgeInsets.all(16.0),
-        children: [
+        children: const [
           CardReport("Lista de\nAniversariantes"),
           CardReport("Lista de Chamada\nAssembleia"),
           CardReport("Lista de\nComungantes Mas"),
