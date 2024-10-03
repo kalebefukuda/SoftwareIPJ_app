@@ -33,7 +33,12 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(  // O Scaffold envolve a tela, fornecendo a estrutura Material
+    // Pega a cor do fundo do tema e adiciona a opacidade
+    final Color backgroundWithOpacity = Theme.of(context)
+        .scaffoldBackgroundColor
+        .withOpacity(0.7); // Define a opacidade de 80%
+
+    return Scaffold(
       body: Stack(
         children: [
           // Imagem de fundo com efeito fosco
@@ -47,7 +52,7 @@ class LoginScreen extends StatelessWidget {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0), // Efeito fosco
               child: Container(
-                color: Colors.white.withOpacity(0.2), // Leve camada de opacidade
+                color: backgroundWithOpacity, // Aplica a cor com opacidade
               ),
             ),
           ),
