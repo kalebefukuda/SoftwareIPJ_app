@@ -5,13 +5,12 @@ class LocalField extends StatefulWidget {
   final TextEditingController cityController;
   final TextEditingController stateController;
   final Widget? icon;
-  final Color? fillColor;
 
   // Definimos os estados diretamente no widget
   final List<String> states = [
-    'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA',
-    'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN',
-    'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
+    'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS',
+    'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC',
+    'SP', 'SE', 'TO'
   ];
 
   LocalField({
@@ -20,7 +19,6 @@ class LocalField extends StatefulWidget {
     required this.stateController,
     required this.obscureText,
     this.icon,
-    this.fillColor = const Color(0xFFE7E7E7), // Valor padrão para cor de preenchimento
   });
 
   @override
@@ -60,10 +58,10 @@ class _LocalFieldState extends State<LocalField> {
             borderRadius: BorderRadius.circular(15),
             child: Container(
               decoration: BoxDecoration(
-                color: widget.fillColor, // Aplica a cor de fundo
+                color: Theme.of(context).inputDecorationTheme.fillColor, // Aplica a cor de fundo do tema
                 borderRadius: BorderRadius.circular(15),
                 border: Border.all(
-                  color: _cityFocusNode.hasFocus ? const Color(0xFF015B40) : Colors.transparent,
+                  color: _cityFocusNode.hasFocus ? Theme.of(context).primaryColor : Colors.transparent, // Usa a cor primária do tema
                   width: _cityFocusNode.hasFocus ? 2.0 : 1.0,
                 ),
               ),
@@ -74,9 +72,9 @@ class _LocalFieldState extends State<LocalField> {
                 decoration: InputDecoration(
                   labelText: 'Cidade',
                   labelStyle: Theme.of(context).textTheme.bodyMedium,
-                  floatingLabelStyle: const TextStyle(
+                  floatingLabelStyle: TextStyle(
                     fontSize: 16,
-                    color: Color(0xFF015B40), // Cor do rótulo quando o campo está focado
+                    color: Theme.of(context).primaryColor, // Usa a cor primária do tema quando o campo está focado
                   ),
                   border: InputBorder.none, // Remove a borda interna padrão
                   prefixIcon: widget.icon != null
@@ -106,10 +104,10 @@ class _LocalFieldState extends State<LocalField> {
             child: Container(
               height: 52, // Ajusta a altura para combinar com o campo de cidade
               decoration: BoxDecoration(
-                color: widget.fillColor, // Aplica a cor de fundo
+                color: Theme.of(context).inputDecorationTheme.fillColor, // Aplica a cor de fundo do tema
                 borderRadius: BorderRadius.circular(15),
                 border: Border.all(
-                  color: _stateFocusNode.hasFocus ? const Color(0xFF015B40) : Colors.transparent,
+                  color: _stateFocusNode.hasFocus ? Theme.of(context).primaryColor : Colors.transparent, // Usa a cor primária do tema
                   width: _stateFocusNode.hasFocus ? 2.0 : 1.0,
                 ),
               ),
@@ -118,9 +116,9 @@ class _LocalFieldState extends State<LocalField> {
                 decoration: InputDecoration(
                   labelText: 'UF',
                   labelStyle: Theme.of(context).textTheme.bodyMedium,
-                  floatingLabelStyle: const TextStyle(
+                  floatingLabelStyle: TextStyle(
                     fontSize: 16,
-                    color: Color(0xFF015B40), // Cor do rótulo quando o campo está focado
+                    color: Theme.of(context).primaryColor, // Cor do rótulo quando o campo está focado
                   ),
                   border: InputBorder.none, // Remove a borda interna padrão
                   contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -129,11 +127,11 @@ class _LocalFieldState extends State<LocalField> {
                 ),
                 value: widget.stateController.text.isEmpty ? null : widget.stateController.text, // Valor padrão (nenhum selecionado)
                 icon: const Padding(
-                  padding: EdgeInsets.only(right: 0 ), // Ajusta a seta para o lado direito
+                  padding: EdgeInsets.only(right: 0), // Ajusta a seta para o lado direito
                   child: Icon(Icons.arrow_drop_down, size: 24), // Ícone de seta para baixo
                 ),
                 iconSize: 24,
-                iconEnabledColor: const Color(0xFF015B40),
+                iconEnabledColor: Theme.of(context).primaryColor, // Usa a cor primária para o ícone
                 style: _stateFocusNode.hasFocus || widget.stateController.text.isNotEmpty
                     ? Theme.of(context).textTheme.bodyLarge // Texto preto/branco quando focado ou preenchido
                     : Theme.of(context).textTheme.bodyMedium, // Texto cinza quando não preenchido
@@ -147,7 +145,7 @@ class _LocalFieldState extends State<LocalField> {
                     child: Text(value),
                   );
                 }).toList(),
-                dropdownColor: widget.fillColor, // Ajusta a cor do dropdown
+                dropdownColor: Theme.of(context).inputDecorationTheme.fillColor, // Ajusta a cor do dropdown
               ),
             ),
           ),

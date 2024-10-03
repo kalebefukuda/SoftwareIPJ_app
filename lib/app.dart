@@ -45,7 +45,7 @@ class App extends StatelessWidget {
       darkTheme: ThemeData(
         fontFamily: 'Poppins', // Define a Poppins como fonte padrão
         scaffoldBackgroundColor: const Color.fromARGB(255, 0, 0, 0), // Cor de fundo para o modo escuro
-        primaryColor: const Color.fromARGB(255, 113, 75, 75), // Cor primária para o modo escuro
+        primaryColor: const Color.fromARGB(255, 0, 145, 101), // Cor do rótulo quando o campo está focado
         brightness: Brightness.dark, // Define o brilho como escuro
         textTheme: const TextTheme(
           bodyLarge: TextStyle(color: Colors.white, fontSize: 14), // Texto branco quando preenchido no modo escuro
