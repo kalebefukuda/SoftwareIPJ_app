@@ -7,7 +7,7 @@ import '../utils/constants/app_colors.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/local.dart'; // Importe o widget personalizado
-
+import '../widgets/custom_drop_down.dart'; // Campo de dropdown
 
 class CreateMembersScreen extends StatefulWidget {
   const CreateMembersScreen({super.key});
@@ -19,42 +19,53 @@ class CreateMembersScreen extends StatefulWidget {
 
 class _CreateMembersScreenState extends State<CreateMembersScreen> {
   // Controladores para cada campo de texto
-  final TextEditingController cityController = TextEditingController();
-  final TextEditingController stateController = TextEditingController();
-  final TextEditingController fullNameController = TextEditingController();
-  final TextEditingController fatherNameController = TextEditingController();
-  final TextEditingController motherNameController = TextEditingController();
-  final TextEditingController dobController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController mobileController = TextEditingController();
+  final TextEditingController nomeCompletoController = TextEditingController();
+  final TextEditingController comunganteController = TextEditingController();
+  final TextEditingController numeroRolController = TextEditingController();
+  final TextEditingController dataNascimentoController = TextEditingController();
+  final TextEditingController sexoController = TextEditingController();
+  final TextEditingController cidadeNascimentoController = TextEditingController();
+  final TextEditingController estadoNascimentoController = TextEditingController();
+  final TextEditingController nomePaiontroller = TextEditingController();
+  final TextEditingController nomeMaeController = TextEditingController();
+  final TextEditingController escolaridadeController = TextEditingController();
+  final TextEditingController profissaoController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
-  final TextEditingController addressController = TextEditingController();
-  final TextEditingController complementController = TextEditingController();
+  final TextEditingController telefoneController = TextEditingController();
+  final TextEditingController celularController = TextEditingController();
   final TextEditingController cepController = TextEditingController();
-  final TextEditingController districtController = TextEditingController();
-  final TextEditingController currentLocationController = TextEditingController();
-  final TextEditingController birthPlaceController = TextEditingController();
-  final TextEditingController professionController = TextEditingController();
-  final TextEditingController educationController = TextEditingController();
-  final TextEditingController religionController = TextEditingController();
-  final TextEditingController maritalStatusController = TextEditingController();
-  final TextEditingController admissionDateController = TextEditingController();
-  final TextEditingController admissionFormController = TextEditingController();
-  final TextEditingController admissionOfficerController = TextEditingController();
-  final TextEditingController baptismDateController = TextEditingController();
-  final TextEditingController baptismOfficerController = TextEditingController();
-  final TextEditingController faithProfessionDateController = TextEditingController();
-  final TextEditingController faithProfessionOfficerController = TextEditingController();
-  final TextEditingController demissionDateController = TextEditingController();
-  final TextEditingController demissionFormController = TextEditingController();
-  final TextEditingController demissionOfficerController = TextEditingController();
-  final TextEditingController separatedRollDateController = TextEditingController();
-  final TextEditingController disciplineDateController = TextEditingController();
-  final TextEditingController disciplineReasonController = TextEditingController();
-  final TextEditingController electionDeaconDateController = TextEditingController();
-  final TextEditingController reelectionDeaconDateController = TextEditingController();
-  final TextEditingController electionElderDateController = TextEditingController();
-  final TextEditingController reelectionElderDateController = TextEditingController();
+  final TextEditingController bairroController = TextEditingController();
+  final TextEditingController enderecotController = TextEditingController();
+  final TextEditingController complementoController = TextEditingController();
+  final TextEditingController cidadeAtualController = TextEditingController();
+  final TextEditingController estadoAtualController = TextEditingController();
+  final TextEditingController residenciaController = TextEditingController();
+  final TextEditingController estadoCivilController = TextEditingController();
+  final TextEditingController religiaoController = TextEditingController();
+  final TextEditingController dataBatismoController = TextEditingController();
+  final TextEditingController oficianteBatismoController = TextEditingController();
+  final TextEditingController dataProfissaoController = TextEditingController();
+  final TextEditingController oficianteProfissaoController = TextEditingController();
+  final TextEditingController dataAdmissaoController = TextEditingController();
+  final TextEditingController ataAdmissaoController = TextEditingController();
+  final TextEditingController formaAdmissaoController = TextEditingController();
+  final TextEditingController dataDemissaoController = TextEditingController();
+  final TextEditingController ataDemissaoController = TextEditingController();
+  final TextEditingController formaDemissaoController = TextEditingController();
+  final TextEditingController dataRolSeparadoController = TextEditingController();
+  final TextEditingController ataRolSeparadoController = TextEditingController();
+  final TextEditingController casamentoRolSeparadoController = TextEditingController();
+  final TextEditingController dataDiscRolSeparadoController = TextEditingController();
+  final TextEditingController ataDiscRolSeparadoController = TextEditingController();
+  final TextEditingController discRolSeparadoController = TextEditingController();
+  final TextEditingController dataDiacController = TextEditingController();
+  final TextEditingController reeleitoDiac1Controller = TextEditingController();
+  final TextEditingController reeleitoDiac2Controller = TextEditingController();
+  final TextEditingController reeleitoDiac3Controller = TextEditingController();
+  final TextEditingController dataPresbController = TextEditingController();
+  final TextEditingController reeleitoPresb1Controller = TextEditingController();
+  final TextEditingController reeleitoPresb2Controller = TextEditingController();
+  final TextEditingController reeleitoPresb3Controller = TextEditingController();
 
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
@@ -75,7 +86,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 90,
-        backgroundColor: Appcolors.green,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);
@@ -86,14 +97,19 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
             color: Appcolors.white,
           ),
         ),
-        title: const Text('Cadastro', style: TextFonts.poppinsMedium),
+        title: Text(
+          'Cadastro',
+          style: Theme.of(context).textTheme.titleLarge, // Usa o estilo do tema para o AppBar
+        ),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(30.0),
         child: Column(
+          mainAxisSize: MainAxisSize.min, // Ajusta o tamanho para que o conteúdo não se expanda indefinidamente
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            const SizedBox(height: 30),
             // Adicionando o círculo de foto no início
             MouseRegion(
               cursor: SystemMouseCursors.click, // Define o cursor como 'pointer' ao passar o mouse
@@ -131,92 +147,474 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
             ),
             const SizedBox(height: 30),
             buildSectionTitle(context, 'Informações Pessoais'), // Usa o estilo do tema
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
             CustomTextField(
-              controller: fullNameController,
+              controller: nomeCompletoController,
               hintText: 'Nome Completo',
               obscureText: false,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
             Row(
               children: [
-                Expanded(
-                  child: CustomTextField(
-                    controller: fatherNameController,
-                    hintText: 'Nome do Pai',
-                    obscureText: false,
+                Flexible(
+                  child: CustomDropdown(
+                    labelText: 'Comungante',
+                    controller: comunganteController,
+                    items: const [
+                      'SIM',
+                      'NÃO'
+                    ],
+                    hintText: 'Comungante',
                   ),
                 ),
-                const SizedBox(width: 10), // Espaço entre os dois campos
-                Expanded(
+                const SizedBox(width: 20), // Espaço entre os dois campos
+                Flexible(
                   child: CustomTextField(
-                    controller: motherNameController,
-                    hintText: 'Nome da Mãe',
+                    controller: numeroRolController,
+                    hintText: 'Numero de Rol',
                     obscureText: false,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Flexible(
+                  child: CustomDropdown(
+                    labelText: 'Sexo',
+                    controller: sexoController,
+                    items: const [
+                      'Masculino',
+                      'Feminino'
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 20), // Espaço entre os dois campos
+                Flexible(
+                  child: CustomTextField(
+                    controller: dataNascimentoController,
+                    hintText: 'Data de nascimento',
+                    obscureText: false,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
             LocalField(
-              cityController: cityController,
-              stateController: stateController,
-              obscureText: false,
-            ),
-            const SizedBox(height: 10),
-            CustomTextField(
-              controller: dobController,
-              hintText: 'Data de Nascimento',
-              obscureText: false,
-            ),
-            const SizedBox(height: 10),
-            CustomTextField(
-              controller: phoneController,
-              hintText: 'Telefone',
-              obscureText: false,
-            ),
-            const SizedBox(height: 10),
-            CustomTextField(
-              controller: mobileController,
-              hintText: 'Celular',
-              obscureText: false,
-            ),
-            const SizedBox(height: 10),
-            CustomTextField(
-              controller: emailController,
-              hintText: 'Email',
-              obscureText: false,
-            ),
-            const SizedBox(height: 10),
-            CustomTextField(
-              controller: addressController,
-              hintText: 'Endereço',
-              obscureText: false,
-            ),
-            const SizedBox(height: 10),
-            CustomTextField(
-              controller: complementController,
-              hintText: 'Complemento',
-              obscureText: false,
-            ),
-            const SizedBox(height: 10),
-            CustomTextField(
-              controller: cepController,
-              hintText: 'CEP',
-              obscureText: false,
-            ),
-            const SizedBox(height: 10),
-            CustomTextField(
-              controller: districtController,
-              hintText: 'Bairro',
+              cityController: cidadeNascimentoController,
+              stateController: estadoNascimentoController,
               obscureText: false,
             ),
             const SizedBox(height: 20),
+            CustomTextField(
+              controller: nomePaiontroller,
+              hintText: 'Nome do Pai',
+              obscureText: false,
+            ),
+            const SizedBox(height: 20),
+            CustomTextField(
+              controller: nomeMaeController,
+              hintText: 'Nome da Mãe',
+              obscureText: false,
+            ),
+            const SizedBox(height: 20),
+            CustomTextField(
+              controller: escolaridadeController,
+              hintText: 'Escolaridade',
+              obscureText: false,
+            ),
+            const SizedBox(height: 20),
+            CustomTextField(
+              controller: profissaoController,
+              hintText: 'Profissão',
+              obscureText: false,
+            ),
+            const SizedBox(height: 20),
+            CustomTextField(
+              controller: emailController,
+              hintText: 'E-mail',
+              obscureText: false,
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Flexible(
+                  child: CustomTextField(
+                    controller: telefoneController,
+                    hintText: 'Telefone',
+                    obscureText: false,
+                  ),
+                ),
+                const SizedBox(width: 20), // Espaço entre os dois campos
+                Flexible(
+                  child: CustomTextField(
+                    controller: celularController,
+                    hintText: 'Celular',
+                    obscureText: false,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 30),
+            buildSectionTitle(context, 'Localização Atual'), // Usa o estilo do tema
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Flexible(
+                  child: CustomTextField(
+                    controller: cepController,
+                    hintText: 'CEP',
+                    obscureText: false,
+                  ),
+                ),
+                const SizedBox(width: 20), // Espaço entre os dois campos
+                Flexible(
+                  child: CustomTextField(
+                    controller: bairroController,
+                    hintText: 'Bairro',
+                    obscureText: false,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            CustomTextField(
+              controller: enderecotController,
+              hintText: 'Endereço',
+              obscureText: false,
+            ),
+            const SizedBox(height: 20),
+            CustomTextField(
+              controller: complementoController,
+              hintText: 'Complemento',
+              obscureText: false,
+            ),
+            const SizedBox(height: 20),
+            LocalField(
+              cityController: cidadeAtualController,
+              stateController: estadoAtualController,
+              obscureText: false,
+            ),
+            const SizedBox(height: 30),
+            buildSectionTitle(context, 'Outras informações'),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Flexible(
+                  child: CustomDropdown(
+                    labelText: 'Local Residência',
+                    controller: residenciaController,
+                    items: const [
+                      'Sede',
+                      'Fora'
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 20), // Espaço entre os dois campos
+                Flexible(
+                  child: CustomDropdown(
+                    labelText: 'Estado Civil',
+                    controller: estadoCivilController,
+                    items: const [
+                      'Solteiro(a)',
+                      'Casado(a)',
+                      'Viuvo(a)',
+                      'Divorciado(a)',
+                      'Outros'
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            CustomDropdown(
+                labelText: 'Religião Procedente',
+                items: const [
+                  'Reformada',
+                  'Pentecostal',
+                  'Neo-Pentecostal',
+                  'Católica Romana',
+                  'Espiritismos e Assemelhados',
+                  'Outros'
+                ],
+                controller: religiaoController),
+            const SizedBox(height: 30),
+            buildSectionTitle(context, 'Batismo'),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Flexible(
+                  flex: 1,
+                  child: CustomTextField(
+                    controller: dataBatismoController,
+                    hintText: 'Data',
+                    obscureText: false,
+                  ),
+                ),
+                const SizedBox(width: 20), // Espaço entre os dois campos
+                Flexible(
+                  flex: 2,
+                  child: CustomTextField(
+                    controller: oficianteBatismoController,
+                    hintText: 'Oficiante',
+                    obscureText: false,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 30),
+            buildSectionTitle(context, 'Profissão de Fé'),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Flexible(
+                  flex: 1,
+                  child: CustomTextField(
+                    controller: dataProfissaoController,
+                    hintText: 'Data',
+                    obscureText: false,
+                  ),
+                ),
+                const SizedBox(width: 20), // Espaço entre os dois campos
+                Flexible(
+                  flex: 2,
+                  child: CustomTextField(
+                    controller: oficianteProfissaoController,
+                    hintText: 'Oficiante',
+                    obscureText: false,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 30),
+            buildSectionTitle(context, 'Admissão'),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Flexible(
+                  flex: 1,
+                  child: CustomTextField(
+                    controller: dataAdmissaoController,
+                    hintText: 'Data',
+                    obscureText: false,
+                  ),
+                ),
+                const SizedBox(width: 20), // Espaço entre os dois campos
+                Flexible(
+                  flex: 2,
+                  child: CustomTextField(
+                    controller: ataAdmissaoController,
+                    hintText: 'Ata',
+                    obscureText: false,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Flexible(
+              child: CustomDropdown(
+                labelText: 'Forma',
+                controller: formaAdmissaoController,
+                items: const [
+                  'Transferência',
+                  'Batismo',
+                  'Profissão de Fé',
+                  'Batismo e Profissão de Fé',
+                  'Jurisdição a pedido',
+                  'Jurisdição Ex-Officio',
+                  'Restauração',
+                  'Designação e Presbitério'
+                ],
+              ),
+            ),
+            const SizedBox(height: 30),
+            buildSectionTitle(context, 'Demissão'),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Flexible(
+                  flex: 1,
+                  child: CustomTextField(
+                    controller: dataDemissaoController,
+                    hintText: 'Data',
+                    obscureText: false,
+                  ),
+                ),
+                const SizedBox(width: 20), // Espaço entre os dois campos
+                Flexible(
+                  flex: 2,
+                  child: CustomTextField(
+                    controller: ataDemissaoController,
+                    hintText: 'Ata',
+                    obscureText: false,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Flexible(
+              child: CustomDropdown(
+                labelText: 'Forma',
+                controller: formaDemissaoController,
+                items: const [
+                  'Transferência',
+                  'Batismo',
+                  'Profissão de Fé',
+                  'Batismo e Profissão de Fé',
+                  'Jurisdição a pedido',
+                  'Jurisdição Ex-Officio',
+                  'Restauração',
+                  'Designação e Presbitério'
+                ],
+              ),
+            ),
+            const SizedBox(height: 30),
+            buildSectionTitle(context, 'Rol Separado'),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Flexible(
+                  child: CustomTextField(
+                    controller: dataRolSeparadoController,
+                    hintText: 'Data',
+                    obscureText: false,
+                  ),
+                ),
+                const SizedBox(width: 20), // Espaço entre os dois campos
+                Flexible(
+                  child: CustomTextField(
+                    controller: ataRolSeparadoController,
+                    hintText: 'Ata',
+                    obscureText: false,
+                  ),
+                ),
+                const SizedBox(width: 20), // Espaço entre os dois campos
+                Flexible(
+                  child: CustomTextField(
+                    controller: casamentoRolSeparadoController,
+                    hintText: 'Casamento',
+                    obscureText: false,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Flexible(
+                  child: CustomTextField(
+                    controller: dataDiscRolSeparadoController,
+                    hintText: 'Data Disc.',
+                    obscureText: false,
+                  ),
+                ),
+                const SizedBox(width: 20), // Espaço entre os dois campos
+                Flexible(
+                  child: CustomTextField(
+                    controller: ataDiscRolSeparadoController,
+                    hintText: 'Ata Disc.',
+                    obscureText: false,
+                  ),
+                ),
+                const SizedBox(width: 20), // Espaço entre os dois campos
+                Flexible(
+                  child: CustomTextField(
+                    controller: discRolSeparadoController,
+                    hintText: 'Disciplina',
+                    obscureText: false,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 30),
+            buildSectionTitle(context, 'Eleições Diácono'),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Flexible(
+                  child: CustomTextField(
+                    controller: dataDiacController,
+                    hintText: 'Data',
+                    obscureText: false,
+                  ),
+                ),
+                const SizedBox(width: 20), // Espaço entre os dois campos
+                Flexible(
+                  child: CustomTextField(
+                    controller: reeleitoDiac1Controller,
+                    hintText: 'Reeleito em',
+                    obscureText: false,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Flexible(
+                  child: CustomTextField(
+                    controller: reeleitoDiac2Controller,
+                    hintText: 'Reeleito em',
+                    obscureText: false,
+                  ),
+                ),
+                const SizedBox(width: 20), // Espaço entre os dois campos
+                Flexible(
+                  child: CustomTextField(
+                    controller: reeleitoDiac3Controller,
+                    hintText: 'Reeleito em',
+                    obscureText: false,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 30),
+            buildSectionTitle(context, 'Eleições Presbítero'),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Flexible(
+                  child: CustomTextField(
+                    controller: dataPresbController,
+                    hintText: 'Data',
+                    obscureText: false,
+                  ),
+                ),
+                const SizedBox(width: 20), // Espaço entre os dois campos
+                Flexible(
+                  child: CustomTextField(
+                    controller: reeleitoPresb1Controller,
+                    hintText: 'Reeleito em',
+                    obscureText: false,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Flexible(
+                  child: CustomTextField(
+                    controller: reeleitoPresb2Controller,
+                    hintText: 'Reeleito em',
+                    obscureText: false,
+                  ),
+                ),
+                const SizedBox(width: 20), // Espaço entre os dois campos
+                Flexible(
+                  child: CustomTextField(
+                    controller: reeleitoPresb3Controller,
+                    hintText: 'Reeleito em',
+                    obscureText: false,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 30),
             CustomButton(
               text: 'Salvar',
-              onPressed: () {
-                // Adicione a lógica de cadastro aqui
-              },
+              onPressed: () {},
             ),
           ],
         ),
@@ -230,7 +628,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
       padding: const EdgeInsets.symmetric(vertical: 12.0),
       child: Text(
         title,
-        style: Theme.of(context).textTheme.titleLarge, // Usa o estilo definido no tema
+        style: Theme.of(context).textTheme.titleMedium, // Usa o estilo definido no tema
       ),
     );
   }

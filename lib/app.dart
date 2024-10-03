@@ -23,30 +23,49 @@ class App extends StatelessWidget {
             fontWeight: FontWeight.normal,
             color: Colors.grey, // Cor inicial (cinza) para os campos vazios
           ),
-          titleLarge: TextStyle(
+          titleMedium: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
             color: Color(0xFF015B40), // Cor verde
+          ),
+          titleLarge: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w500,
+            color: Color.fromARGB(255, 255, 255, 255),
           ),
         ),
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFF015B40), // Cor do AppBar no modo claro
         ),
+        inputDecorationTheme: const InputDecorationTheme(
+          fillColor: Color(0xFFE7E7E7), // Cor de fundo dos campos no modo claro
+          filled: true, // Garante que a cor de fundo seja aplicada
+        ),
       ),
       darkTheme: ThemeData(
-        scaffoldBackgroundColor: const Color(0xFF121212), // Cor de fundo para o modo escuro
-        primaryColor: const Color(0xFF121212), // Cor primária para o modo escuro
+        fontFamily: 'Poppins', // Define a Poppins como fonte padrão
+        scaffoldBackgroundColor: const Color.fromARGB(255, 0, 0, 0), // Cor de fundo para o modo escuro
+        primaryColor: const Color.fromARGB(255, 113, 75, 75), // Cor primária para o modo escuro
         brightness: Brightness.dark, // Define o brilho como escuro
         textTheme: const TextTheme(
           bodyLarge: TextStyle(color: Colors.white, fontSize: 14), // Texto branco quando preenchido no modo escuro
           bodyMedium: TextStyle(color: Colors.grey, fontSize: 14), // Texto cinza quando vazio no modo escuro
-          titleLarge: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600), // Títulos no modo escuro
+          titleMedium: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600), // Títulos no modo escuro
+          titleLarge: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w500,
+            color: Color.fromARGB(255, 255, 255, 255),
+          ),
         ),
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF1F1F1F), // Cor do AppBar no modo escuro
+          backgroundColor: Color.fromARGB(255, 0, 0, 0), // Cor do AppBar no modo escuro
+        ),
+        inputDecorationTheme: const InputDecorationTheme(
+          fillColor: Color(0xFF1F1F1F), // Cor de fundo dos campos no modo escuro
+          filled: true, // Garante que a cor de fundo seja aplicada
         ),
       ),
-      themeMode: ThemeMode.light, // Altere para ThemeMode.system para seguir o tema do sistema
+      themeMode: ThemeMode.system, // Altere para ThemeMode.system para seguir o tema do sistema
       home: const CreateMembersScreen(),
     );
   }
