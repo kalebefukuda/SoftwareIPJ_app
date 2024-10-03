@@ -76,7 +76,7 @@ class LoginScreen extends StatelessWidget {
                           // Usando o ícone SVG
                           'assets/images/user.svg',
                           height: 24,
-                        ), fillColor: null,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 20),

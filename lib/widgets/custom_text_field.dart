@@ -5,7 +5,6 @@ class CustomTextField extends StatefulWidget {
   final bool obscureText;
   final TextEditingController controller;
   final Widget? icon;
-  final Color? fillColor;
 
   const CustomTextField({
     super.key,
@@ -13,11 +12,9 @@ class CustomTextField extends StatefulWidget {
     required this.obscureText,
     required this.controller,
     this.icon,
-    this.fillColor = const Color(0xFFE7E7E7), // Valor padrão para cor de preenchimento
   });
 
   @override
-  // ignore: library_private_types_in_public_api
   _CustomTextFieldState createState() => _CustomTextFieldState();
 }
 
@@ -46,10 +43,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
       borderRadius: BorderRadius.circular(15), // Aplica o radius diretamente no ClipRRect
       child: Container(
         decoration: BoxDecoration(
-          color: widget.fillColor, // Aplica a cor de fundo
+          color: Theme.of(context).inputDecorationTheme.fillColor, // Usa a cor de fundo do tema
           borderRadius: BorderRadius.circular(15), // Aplica o radius ao container
           border: Border.all(
-            color: isFocused ? const Color(0xFF015B40) : Colors.transparent,
+            color: isFocused ? Theme.of(context).primaryColor : Colors.transparent, // Usa a cor primária do tema quando focado
             width: isFocused ? 2.0 : 1.0,
           ),
         ),
@@ -59,9 +56,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
           focusNode: _focusNode,
           decoration: InputDecoration(
             labelText: widget.hintText,
-            floatingLabelStyle: const TextStyle(
+            floatingLabelStyle: TextStyle(
               fontSize: 16,
-              color: Color(0xFF015B40), // Cor do rótulo quando o campo está focado
+              color: Theme.of(context).primaryColor, // Usa a cor primária do tema quando o campo está focado
             ),
             labelStyle: Theme.of(context).textTheme.bodyMedium, // Cor inicial para o rótulo
             border: InputBorder.none, // Remove a borda interna padrão

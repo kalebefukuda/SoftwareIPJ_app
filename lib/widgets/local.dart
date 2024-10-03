@@ -96,7 +96,7 @@ class _LocalFieldState extends State<LocalField> {
             ),
           ),
         ),
-        const SizedBox(width: 10), // Espaço entre os dois campos
+        const SizedBox(width: 20), // Espaço entre os dois campos
 
         // Campo de estado (campo menor)
         Expanded(
