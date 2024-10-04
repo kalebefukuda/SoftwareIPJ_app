@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '/screens/create_members.dart';
-import './screens/login.dart';
+import 'package:softwareipj_app/screens/create_members.dart';
+import 'package:softwareipj_app/screens/report.dart';
+import 'package:softwareipj_app/screens/start_screen.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -74,9 +75,10 @@ class App extends StatelessWidget {
           color: Colors.white, // Cor branca para o ícone (logo) no modo escuro
         ),
       ),
+
       themeMode: ThemeMode.dark, // Altere para ThemeMode.system para seguir o tema do sistema
+
       home: CreateMembersScreen(),
     );
   }
 }
-
