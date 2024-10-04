@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:softwareipj_app/screens/create_members.dart';
+import 'package:softwareipj_app/screens/report.dart';
 import 'package:softwareipj_app/screens/start_screen.dart';
 
 class App extends StatelessWidget {
@@ -25,7 +27,7 @@ class App extends StatelessWidget {
           ),
           titleMedium: TextStyle(
             fontSize: 18,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
             color: Color(0xFF015B40), // Cor verde
           ),
           titleLarge: TextStyle(
@@ -73,8 +75,8 @@ class App extends StatelessWidget {
           color: Colors.white, // Cor branca para o ícone (logo) no modo escuro
         ),
       ),
-      themeMode: ThemeMode.system, // Altere para ThemeMode.system para seguir o tema do sistema
-      home: StartScreen(),
+      themeMode: ThemeMode.light, // Altere para ThemeMode.system para seguir o tema do sistema
+      home: CreateMembersScreen(),
     );
   }
 }
