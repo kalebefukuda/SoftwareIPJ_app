@@ -35,10 +35,10 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // Verifica se o tema é escuro ou claro
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+
     // Define a cor de fundo com opacidade apenas no modo escuro
     final Color backgroundWithOpacity = isDarkMode
-        ? Colors.black.withOpacity(0.7) // Escurece no modo escuro
+        ? Colors.black.withOpacity(0.75) // Escurece no modo escuro
         : Colors.transparent; // Sem opacidade no modo claro (imagem original)
 
     return Scaffold(
@@ -69,7 +69,8 @@ class LoginScreen extends StatelessWidget {
               child: Image.asset(
                 'assets/images/Logo_IPB.png',
                 height: 100,
-                color: Theme.of(context).primaryColor, // Usa a cor do tema para a logo
+                color: Theme.of(context).primaryColor, // Acessa a cor definida no iconTheme
+
               ),
             ),
           ),

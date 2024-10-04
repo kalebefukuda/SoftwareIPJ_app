@@ -26,7 +26,7 @@ class App extends StatelessWidget {
           ),
           titleMedium: TextStyle(
             fontSize: 18,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.w700,
             color: Color(0xFF015B40), // Cor verde
           ),
           titleLarge: TextStyle(
@@ -44,7 +44,7 @@ class App extends StatelessWidget {
         ),
         // Adiciona uma cor para a logo no modo claro
         iconTheme: const IconThemeData(
-          color: Colors.black, // Cor preta para o ícone (logo) no modo claro
+          color: Color(0xFF015B40), // Cor preta para o ícone (logo) no modo claro
         ),
       ),
       darkTheme: ThemeData(
@@ -75,7 +75,7 @@ class App extends StatelessWidget {
         ),
       ),
       themeMode: ThemeMode.dark, // Altere para ThemeMode.system para seguir o tema do sistema
-      home: LoginScreen(),
+      home: CreateMembersScreen(),
     );
   }
 }
