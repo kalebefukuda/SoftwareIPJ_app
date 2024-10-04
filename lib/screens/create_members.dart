@@ -87,6 +87,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
       appBar: AppBar(
         toolbarHeight: 90,
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        scrolledUnderElevation: 0,
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context);
