@@ -23,7 +23,7 @@ class _CardReportState extends State<CardReport> {
       width: 312,
       height: 91,
       decoration: BoxDecoration(
-        color: Appcolors.iceWhite,
+        color: Theme.of(context).inputDecorationTheme.fillColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -36,10 +36,7 @@ class _CardReportState extends State<CardReport> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
                 widget.nameReport,
-                style: TextFonts.poppinsBold.copyWith(
-                  fontSize: 17.5,
-                  color: Appcolors.green,
-                ),
+                style: Theme.of(context).textTheme.titleMedium ,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),

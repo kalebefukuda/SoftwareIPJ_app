@@ -11,7 +11,8 @@ class Report extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 90,
-        backgroundColor: Appcolors.green,
+        backgroundColor:  Theme.of(context).appBarTheme.backgroundColor,
+        scrolledUnderElevation: 0,
         leading: IconButton(
           onPressed: () {
             Navigator.pop(context); // Função de retorno
