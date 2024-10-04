@@ -74,7 +74,7 @@ class App extends StatelessWidget {
           color: Colors.white, // Cor branca para o ícone (logo) no modo escuro
         ),
       ),
-      themeMode: ThemeMode.system, // Altere para ThemeMode.system para seguir o tema do sistema
+      themeMode: ThemeMode.dark, // Altere para ThemeMode.system para seguir o tema do sistema
       home: LoginScreen(),
     );
   }

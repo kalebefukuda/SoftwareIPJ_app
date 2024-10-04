@@ -33,26 +33,30 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Pega a cor do fundo do tema e adiciona a opacidade
-    final Color backgroundWithOpacity = Theme.of(context)
-        .scaffoldBackgroundColor
-        .withOpacity(0.7); // Define a opacidade de 80%
+    // Verifica se o tema é escuro ou claro
+    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    
+    // Define a cor de fundo com opacidade apenas no modo escuro
+    final Color backgroundWithOpacity = isDarkMode
+        ? Colors.black.withOpacity(0.7) // Escurece no modo escuro
+        : Colors.transparent; // Sem opacidade no modo claro (imagem original)
 
     return Scaffold(
       body: Stack(
         children: [
-          // Imagem de fundo com efeito fosco
+          // Imagem de fundo
           Positioned.fill(
             child: Image.asset(
               'assets/images/Igreja_Fundo_Login.jpg',
               fit: BoxFit.cover,
             ),
           ),
+          // Aplica desfoque e cor de fundo apenas no modo escuro
           Positioned.fill(
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0), // Efeito fosco
+              filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0), // Efeito fosco para ambos os temas
               child: Container(
-                color: backgroundWithOpacity, // Aplica a cor com opacidade
+                color: backgroundWithOpacity, // Aplica o fundo escuro com opacidade apenas no modo escuro
               ),
             ),
           ),
@@ -65,6 +69,7 @@ class LoginScreen extends StatelessWidget {
               child: Image.asset(
                 'assets/images/Logo_IPB.png',
                 height: 100,
+                color: Theme.of(context).primaryColor, // Usa a cor do tema para a logo
               ),
             ),
           ),
@@ -89,6 +94,7 @@ class LoginScreen extends StatelessWidget {
                           icon: SvgPicture.asset(
                             'assets/images/user.svg',
                             height: 24,
+                            color: Theme.of(context).primaryColor,
                           ),
                         ),
                       ),
@@ -103,6 +109,7 @@ class LoginScreen extends StatelessWidget {
                           icon: SvgPicture.asset(
                             'assets/images/lock.svg',
                             height: 24,
+                            color: Theme.of(context).primaryColor,
                           ),
                         ),
                       ),
