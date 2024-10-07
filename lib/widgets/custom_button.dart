@@ -17,7 +17,7 @@ class CustomButton extends StatelessWidget {
       onPressed: onPressed,
       style: ButtonStyle(
         padding: WidgetStateProperty.all(
-          const EdgeInsets.symmetric(vertical: 16.0, horizontal: 32.0),
+          const EdgeInsets.symmetric(vertical: 12.0, horizontal: 32.0),
         ),
         shape: WidgetStateProperty.all(
           RoundedRectangleBorder(

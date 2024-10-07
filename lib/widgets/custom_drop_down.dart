@@ -41,7 +41,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
     return ClipRRect(
       borderRadius: BorderRadius.circular(15), // Aplica o radius diretamente no ClipRRect
       child: Container(
-        height: 52, // Altura do campo para combinar com outros campos
+        height: 55, // Altura do campo para combinar com outros campos
         decoration: BoxDecoration(
           color: Theme.of(context).inputDecorationTheme.fillColor, // Cor de fundo definida pelo tema
           borderRadius: BorderRadius.circular(15), // Radius para borda
@@ -60,7 +60,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
               color: Theme.of(context).primaryColor, // Cor do rótulo quando o campo está focado
             ),
             border: InputBorder.none, // Remove a borda interna padrão
-            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
             filled: true,
             fillColor: Colors.transparent, // Preenchimento transparente, controlado pelo container externo
           ),

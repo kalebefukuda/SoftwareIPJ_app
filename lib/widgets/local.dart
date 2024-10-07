@@ -4,13 +4,39 @@ class LocalField extends StatefulWidget {
   final bool obscureText;
   final TextEditingController cityController;
   final TextEditingController stateController;
+  final String cityLabelText;
+  final String stateLabelText;
   final Widget? icon;
 
   // Definimos os estados diretamente no widget
   final List<String> states = [
-    'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS',
-    'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC',
-    'SP', 'SE', 'TO'
+    'AC',
+    'AL',
+    'AP',
+    'AM',
+    'BA',
+    'CE',
+    'DF',
+    'ES',
+    'GO',
+    'MA',
+    'MT',
+    'MS',
+    'MG',
+    'PA',
+    'PB',
+    'PR',
+    'PE',
+    'PI',
+    'RJ',
+    'RN',
+    'RS',
+    'RO',
+    'RR',
+    'SC',
+    'SP',
+    'SE',
+    'TO'
   ];
 
   LocalField({
@@ -19,6 +45,8 @@ class LocalField extends StatefulWidget {
     required this.stateController,
     required this.obscureText,
     this.icon,
+    this.cityLabelText = 'Cidade', // Define valores padrão
+    this.stateLabelText = 'UF', // Define valores padrão
   });
 
   @override
@@ -53,7 +81,7 @@ class _LocalFieldState extends State<LocalField> {
       children: [
         // Campo de cidade (campo maior)
         Expanded(
-          flex: 3, // O campo de cidade ocupará mais espaço
+          flex: 2, // O campo de cidade ocupará mais espaço
           child: ClipRRect(
             borderRadius: BorderRadius.circular(15),
             child: Container(
@@ -70,7 +98,7 @@ class _LocalFieldState extends State<LocalField> {
                 obscureText: widget.obscureText,
                 focusNode: _cityFocusNode,
                 decoration: InputDecoration(
-                  labelText: 'Cidade',
+                  labelText: widget.cityLabelText, // Usa o texto personalizado para o rótulo
                   labelStyle: Theme.of(context).textTheme.bodyMedium,
                   floatingLabelStyle: TextStyle(
                     fontSize: 16,
@@ -83,7 +111,7 @@ class _LocalFieldState extends State<LocalField> {
                           child: widget.icon,
                         )
                       : null,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
                   filled: true,
                   fillColor: Colors.transparent, // O preenchimento será feito pelo container externo
                 ),
@@ -102,7 +130,7 @@ class _LocalFieldState extends State<LocalField> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(15),
             child: Container(
-              height: 52, // Ajusta a altura para combinar com o campo de cidade
+              height: 55, // Ajusta a altura para combinar com o campo de cidade
               decoration: BoxDecoration(
                 color: Theme.of(context).inputDecorationTheme.fillColor, // Aplica a cor de fundo do tema
                 borderRadius: BorderRadius.circular(15),
@@ -114,14 +142,14 @@ class _LocalFieldState extends State<LocalField> {
               child: DropdownButtonFormField<String>(
                 focusNode: _stateFocusNode,
                 decoration: InputDecoration(
-                  labelText: 'UF',
+                  labelText: widget.stateLabelText, // Usa o texto personalizado para o rótulo
                   labelStyle: Theme.of(context).textTheme.bodyMedium,
                   floatingLabelStyle: TextStyle(
                     fontSize: 16,
                     color: Theme.of(context).primaryColor, // Cor do rótulo quando o campo está focado
                   ),
                   border: InputBorder.none, // Remove a borda interna padrão
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 12),
                   filled: true,
                   fillColor: Colors.transparent, // O preenchimento será feito pelo container externo
                 ),
