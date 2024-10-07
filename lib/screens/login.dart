@@ -4,7 +4,6 @@ import 'package:softwareipj_app/screens/report.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_button.dart';
 import 'dart:ui'; // Necessário para o BackdropFilter
-import 'home.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController loginController = TextEditingController();

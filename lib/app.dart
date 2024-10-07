@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:softwareipj_app/screens/create_members.dart';
+import 'package:softwareipj_app/screens/login.dart';
 import 'package:softwareipj_app/screens/report.dart';
 import 'package:softwareipj_app/screens/start_screen.dart';
 
@@ -27,12 +28,13 @@ class App extends StatelessWidget {
           ),
           titleMedium: TextStyle(
             fontSize: 18,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w500,
             color: Color(0xFF015B40), // Cor verde
           ),
           titleLarge: TextStyle(
+            //Classe para os titulos de cabeçalhos
             fontSize: 24,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w600,
             color: Color.fromARGB(255, 255, 255, 255),
           ),
         ),
@@ -56,10 +58,10 @@ class App extends StatelessWidget {
         textTheme: const TextTheme(
           bodyLarge: TextStyle(color: Colors.white, fontSize: 14), // Texto branco quando preenchido no modo escuro
           bodyMedium: TextStyle(color: Colors.grey, fontSize: 14), // Texto cinza quando vazio no modo escuro
-          titleMedium: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600), // Títulos no modo escuro
+          titleMedium: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500), // Títulos no modo escuro
           titleLarge: TextStyle(
             fontSize: 24,
-            fontWeight: FontWeight.w500,
+            fontWeight: FontWeight.w600,
             color: Color.fromARGB(255, 255, 255, 255),
           ),
         ),
@@ -76,9 +78,9 @@ class App extends StatelessWidget {
         ),
       ),
 
-      themeMode: ThemeMode.dark, // Altere para ThemeMode.system para seguir o tema do sistema
+      themeMode: ThemeMode.system, // Altere para ThemeMode.system para seguir o tema do sistema
 
-      home: CreateMembersScreen(),
+      home: const CreateMembersScreen(),
     );
   }
 }

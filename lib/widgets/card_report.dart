@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../utils/constants/app_colors.dart';
-import '../utils/constants/text_font.dart';
 
 class CardReport extends StatefulWidget {
   final String nameReport;
