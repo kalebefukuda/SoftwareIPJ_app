@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:softwareipj_app/screens/create_members.dart';
 import 'package:softwareipj_app/screens/login.dart';
-import 'package:softwareipj_app/screens/report.dart';
-import 'package:softwareipj_app/screens/start_screen.dart';
+// import 'package:softwareipj_app/screens/login.dart';
+// import 'package:softwareipj_app/screens/report.dart';
+// import 'package:softwareipj_app/screens/start_screen.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -80,7 +81,7 @@ class App extends StatelessWidget {
 
       themeMode: ThemeMode.system, // Altere para ThemeMode.system para seguir o tema do sistema
 
-      home: const CreateMembersScreen(),
+      home: LoginScreen(),
     );
   }
 }
