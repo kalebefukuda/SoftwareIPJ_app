@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart'; // Importa o pacote flutter_svg
-import 'package:softwareipj_app/screens/report.dart';
+// import 'package:softwareipj_app/screens/report.dart';
+import 'package:softwareipj_app/screens/home.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_button.dart';
 import 'dart:ui'; // Necessário para o BackdropFilter
@@ -23,7 +24,7 @@ class LoginScreen extends StatelessWidget {
       // Navega para a tela Home usando o Navigator.push
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const Report()),
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     } else {
       // Exibe uma mensagem de erro
@@ -109,7 +110,7 @@ class LoginScreen extends StatelessWidget {
                           obscureText: true,
                           icon: SvgPicture.asset(
                             'assets/images/lock.svg',
-                            height: 24,
+                            height: 23,
                             color: Theme.of(context).primaryColor,
                           ),
                         ),

@@ -35,3 +35,6 @@ flutter:
   assets:
     - assets/images/
     - assets/images/Logo_IPB.png
+    - assets/images/create_member.svg
+    - assets/images/members.svg
+    - assets/images/file.svg
