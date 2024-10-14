@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:softwareipj_app/screens/create_members.dart';
-// import 'package:softwareipj_app/screens/login.dart';
+// import 'package:softwareipj_app/screens/create_members.dart';
+import 'package:softwareipj_app/screens/login.dart';
 // import 'package:softwareipj_app/screens/report.dart';
 // import 'package:softwareipj_app/screens/start_screen.dart';
 
@@ -45,9 +45,12 @@ class App extends StatelessWidget {
           fillColor: Color(0xFFE7E7E7), // Cor de fundo dos campos no modo claro
           filled: true, // Garante que a cor de fundo seja aplicada
         ),
-        // Adiciona uma cor para a logo no modo claro
         iconTheme: const IconThemeData(
-          color: Color(0xFF015B40), // Cor preta para o ícone (logo) no modo claro
+          color: Color(0xFF015B40), // Cor para os ícones no modo claro
+        ),
+        colorScheme: const ColorScheme.light(
+          primary: Color(0xFF015B40), // Cor primária no modo claro
+          secondary: Color.fromARGB(255, 0, 145, 101), // Cor secundária no modo claro
         ),
       ),
       darkTheme: ThemeData(
@@ -56,31 +59,42 @@ class App extends StatelessWidget {
         primaryColor: const Color.fromARGB(255, 0, 145, 101), // Cor do rótulo quando o campo está focado
         brightness: Brightness.dark, // Define o brilho como escuro
         textTheme: const TextTheme(
-          bodyLarge: TextStyle(color: Colors.white, fontSize: 14), // Texto branco quando preenchido no modo escuro
-          bodyMedium: TextStyle(color: Colors.grey, fontSize: 14), // Texto cinza quando vazio no modo escuro
-          titleMedium: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500), // Títulos no modo escuro
+          bodyLarge: TextStyle(
+            fontSize: 14,
+            color: Colors.white, // Texto branco quando preenchido no modo escuro
+          ),
+          bodyMedium: TextStyle(
+            fontSize: 14,
+            color: Colors.grey, // Texto cinza quando vazio no modo escuro
+          ),
+          titleMedium: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+            color: Colors.white, // Títulos no modo escuro
+          ),
           titleLarge: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w600,
-            color: Color.fromARGB(255, 255, 255, 255),
+            color: Color.fromARGB(255, 255, 255, 255), // Títulos no modo escuro
           ),
         ),
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color.fromARGB(255, 0, 0, 0), // Cor do AppBar no modo escuro
+          backgroundColor: Color(0xFF1F1F1F), // Cor do AppBar no modo escuro
         ),
         inputDecorationTheme: const InputDecorationTheme(
           fillColor: Color(0xFF1F1F1F), // Cor de fundo dos campos no modo escuro
           filled: true, // Garante que a cor de fundo seja aplicada
         ),
-        // Adiciona uma cor para a logo no modo escuro
         iconTheme: const IconThemeData(
           color: Colors.white, // Cor branca para o ícone (logo) no modo escuro
         ),
+        colorScheme: const ColorScheme.dark(
+          primary: Color.fromARGB(255, 45, 45, 45), // Cor primária no modo escuro
+          secondary: Color(0xFF015B40), // Cor secundária no modo escuro
+        ),
       ),
-
       themeMode: ThemeMode.system, // Altere para ThemeMode.system para seguir o tema do sistema
-
-      home: const CreateMembersScreen(),
+      home: LoginScreen(),
     );
   }
 }
