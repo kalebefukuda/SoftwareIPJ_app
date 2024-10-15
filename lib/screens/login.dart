@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart'; // Importa o pacote flutter_svg
-// import 'package:softwareipj_app/screens/report.dart';
-import 'package:softwareipj_app/screens/home.dart';
+import 'package:softwareipj_app/screens/report.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_button.dart';
 import 'dart:ui'; // Necessário para o BackdropFilter
@@ -24,7 +23,7 @@ class LoginScreen extends StatelessWidget {
       // Navega para a tela Home usando o Navigator.push
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(builder: (context) => const Report()),
       );
     } else {
       // Exibe uma mensagem de erro
