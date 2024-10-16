@@ -12,12 +12,12 @@ class LoginScreen extends StatelessWidget {
   final ValueNotifier<String> errorMessage = ValueNotifier<String>("");
 
   final void Function(bool value) onThemeToggle;
-  final bool isDarkMode;
+  final ValueNotifier<bool> isDarkModeNotifier;
 
   LoginScreen({
     super.key,
     required this.onThemeToggle,
-    required this.isDarkMode,
+    required this.isDarkModeNotifier,
   });
 
   void login(BuildContext context) async {
@@ -30,7 +30,7 @@ class LoginScreen extends StatelessWidget {
         MaterialPageRoute(
           builder: (context) => HomeScreen(
             onThemeToggle: onThemeToggle,
-            isDarkMode: isDarkMode,
+            isDarkModeNotifier: isDarkModeNotifier,
           ),
         ),
       );

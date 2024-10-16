@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:softwareipj_app/screens/report.dart';
 import '../widgets/card_register.dart';
 import '../widgets/card_members.dart';
 import '../widgets/card_report_home.dart';
 import '../widgets/card_count_members.dart';
 import '../widgets/custom_drawer.dart';
-import '../screens/report.dart'; // Importe o ReportScreen
 
 class HomeScreen extends StatefulWidget {
-  final Function(bool)? onThemeToggle; // Torne onThemeToggle opcional
-  final bool isDarkMode;
+  final Function(bool) onThemeToggle;
+  final ValueNotifier<bool> isDarkModeNotifier;
 
   const HomeScreen({
     super.key,
-    this.onThemeToggle, // Agora opcional
-    this.isDarkMode = false, // Valor padrão para isDarkMode
+    required this.onThemeToggle,
+    required this.isDarkModeNotifier,
   });
 
   @override
@@ -60,8 +60,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       drawer: CustomDrawer(
-        onThemeToggle: widget.onThemeToggle ?? (bool value) {},
-        isDarkMode: widget.isDarkMode,
+        onThemeToggle: widget.onThemeToggle,
+        isDarkModeNotifier: widget.isDarkModeNotifier,
       ), // Utilize o CustomDrawer como menu lateral
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),

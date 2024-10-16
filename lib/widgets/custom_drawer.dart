@@ -4,12 +4,12 @@ import 'package:softwareipj_app/screens/login.dart';
 
 class CustomDrawer extends StatefulWidget {
   final Function(bool) onThemeToggle;
-  final bool isDarkMode;
+  final ValueNotifier<bool> isDarkModeNotifier;
 
   const CustomDrawer({
     super.key,
     required this.onThemeToggle,
-    required this.isDarkMode,
+    required this.isDarkModeNotifier,
   });
 
   @override
@@ -17,49 +17,37 @@ class CustomDrawer extends StatefulWidget {
 }
 
 class _CustomDrawerState extends State<CustomDrawer> {
-  late bool isDarkMode;
-
-  @override
-  void initState() {
-    super.initState();
-    // Inicializa o estado do tema conforme o valor passado do pai
-    isDarkMode = widget.isDarkMode;
-  }
-
   @override
   void didUpdateWidget(covariant CustomDrawer oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Se o valor do tema for atualizado, sincroniza o estado
-    if (oldWidget.isDarkMode != widget.isDarkMode) {
-      setState(() {
-        isDarkMode = widget.isDarkMode;
-      });
-    }
   }
 
   void _handleThemeToggle(bool value) {
-    setState(() {
-      isDarkMode = value;
-    });
+    widget.isDarkModeNotifier.value = value;
     widget.onThemeToggle(value); // Chama o callback para alterar o tema global
   }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.6,
-      child: Drawer(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        child: Column(
-          children: [
-            _buildMenuHeader(),
-            _buildThemeToggle(),
-            _buildLogoutButton(),
-            const Spacer(),
-            _buildAppVersionInfo(),
-          ],
-        ),
-      ),
+    return ValueListenableBuilder<bool>(
+      valueListenable: widget.isDarkModeNotifier,
+      builder: (context, isDarkMode, _) {
+        return SizedBox(
+          width: MediaQuery.of(context).size.width * 0.6,
+          child: Drawer(
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            child: Column(
+              children: [
+                _buildMenuHeader(),
+                _buildThemeToggle(isDarkMode),
+                _buildLogoutButton(),
+                const Spacer(),
+                _buildAppVersionInfo(),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -79,7 +67,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
     );
   }
 
-  Widget _buildThemeToggle() {
+  Widget _buildThemeToggle(bool isDarkMode) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: MouseRegion(
@@ -121,7 +109,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               MaterialPageRoute(
                 builder: (context) => LoginScreen(
                   onThemeToggle: widget.onThemeToggle,
-                  isDarkMode: isDarkMode,
+                  isDarkModeNotifier: widget.isDarkModeNotifier,
                 ),
               ),
             );

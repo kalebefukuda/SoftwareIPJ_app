@@ -12,10 +12,12 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   bool isDarkMode = false;
+  late ValueNotifier<bool> isDarkModeNotifier;
 
   @override
   void initState() {
     super.initState();
+    isDarkModeNotifier = ValueNotifier<bool>(isDarkMode);
     _loadThemePreference();
   }
 
@@ -23,6 +25,7 @@ class _AppState extends State<App> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       isDarkMode = prefs.getBool('isDarkMode') ?? false;
+      isDarkModeNotifier.value = isDarkMode;
     });
   }
 
@@ -34,6 +37,7 @@ class _AppState extends State<App> {
   void _toggleTheme(bool value) {
     setState(() {
       isDarkMode = value;
+      isDarkModeNotifier.value = value;
       _saveThemePreference(value);
     });
   }
@@ -76,7 +80,7 @@ class _AppState extends State<App> {
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       home: LoginScreen(
         onThemeToggle: _toggleTheme,
-        isDarkMode: isDarkMode,
+        isDarkModeNotifier: isDarkModeNotifier,
       ),
     );
   }
