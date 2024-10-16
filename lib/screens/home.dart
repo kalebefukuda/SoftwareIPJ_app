@@ -85,7 +85,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const Report(), // Navega para a tela de relatório ao clicar no CardReport
+                          builder: (context) => Report(
+                            onThemeToggle: widget.onThemeToggle,
+                            isDarkModeNotifier: widget.isDarkModeNotifier
+                          ), // Navega para a tela de relatório ao clicar no CardReport
                         ),
                       );
                     },

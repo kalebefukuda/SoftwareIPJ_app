@@ -57,6 +57,7 @@ class _AppState extends State<App> {
           bodyMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: Colors.grey),
           bodySmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xFF015B40)),
           titleMedium: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Color(0xFF015B40)),
+
           titleLarge: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Color.fromARGB(255, 255, 255, 255)),
         ),
         appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF015B40)),
@@ -79,7 +80,10 @@ class _AppState extends State<App> {
         appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF1F1F1F)),
         inputDecorationTheme: const InputDecorationTheme(fillColor: Color(0xFF1F1F1F), filled: true),
         iconTheme: const IconThemeData(color: Colors.white),
-        colorScheme: const ColorScheme.dark(primary: Color.fromARGB(255, 45, 45, 45), secondary: Color(0xFF015B40)),
+        colorScheme: const ColorScheme.dark(
+          primary: Color.fromARGB(255, 45, 45, 45), 
+          secondary: Color(0xFF015B40)
+        ),
       ),
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       //home: StartScreen(onThemeToggle: _toggleTheme, isDarkModeNotifier: isDarkModeNotifier),
