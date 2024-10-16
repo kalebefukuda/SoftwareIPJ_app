@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:softwareipj_app/screens/home.dart';
 import 'package:softwareipj_app/screens/login.dart';
 import 'package:softwareipj_app/screens/start_screen.dart';
+import './screens/members.dart';
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -54,7 +55,9 @@ class _AppState extends State<App> {
         textTheme: const TextTheme(
           bodyLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: Colors.black),
           bodyMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: Colors.grey),
-          titleMedium: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF015B40)),
+          bodySmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xFF015B40)),
+          titleMedium: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Color(0xFF015B40)),
+
           titleLarge: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Color.fromARGB(255, 255, 255, 255)),
         ),
         appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF015B40)),
@@ -67,10 +70,11 @@ class _AppState extends State<App> {
         scaffoldBackgroundColor: const Color.fromARGB(255, 0, 0, 0),
         primaryColor: const Color.fromARGB(255, 0, 145, 101),
         brightness: Brightness.dark,
-        textTheme: const TextTheme(
+        textTheme:  const TextTheme(
           bodyLarge: TextStyle(fontSize: 14, color: Colors.white),
           bodyMedium: TextStyle(fontSize: 14, color: Colors.grey),
           titleMedium: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.white),
+          bodySmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white),
           titleLarge: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Color.fromARGB(255, 255, 255, 255)),
         ),
         appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF1F1F1F)),
@@ -82,11 +86,8 @@ class _AppState extends State<App> {
         ),
       ),
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
-      home: StartScreen(onThemeToggle: _toggleTheme, isDarkModeNotifier: isDarkModeNotifier),
-      // home: LoginScreen(
-      //   onThemeToggle: _toggleTheme,
-      //   isDarkModeNotifier: isDarkModeNotifier,
-      // ),
+      //home: StartScreen(onThemeToggle: _toggleTheme, isDarkModeNotifier: isDarkModeNotifier),
+      home: Members(),
     );
   }
 }
