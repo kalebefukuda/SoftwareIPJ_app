@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart'; // Importa o pacote flutter_svg
-import 'package:softwareipj_app/screens/report.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:softwareipj_app/screens/home.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_button.dart';
-import 'dart:ui'; // Necessário para o BackdropFilter
+import 'dart:ui';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController loginController = TextEditingController();
@@ -11,56 +11,56 @@ class LoginScreen extends StatelessWidget {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final ValueNotifier<String> errorMessage = ValueNotifier<String>("");
 
-  LoginScreen({super.key});
+  final void Function(bool value) onThemeToggle;
+  final ValueNotifier<bool> isDarkModeNotifier;
 
-  // Função de login, verifica as credenciais
+  LoginScreen({
+    super.key,
+    required this.onThemeToggle,
+    required this.isDarkModeNotifier,
+  });
+
   void login(BuildContext context) async {
     String usuario = loginController.text;
     String senha = passwordController.text;
 
-    // Verificação de usuário e senha
-    if (usuario == "ipj" && senha == "ipj") {
-      // Navega para a tela Home usando o Navigator.push
-      Navigator.push(
+    if (usuario == "" && senha == "") {
+      Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const Report()),
+        MaterialPageRoute(
+          builder: (context) => HomeScreen(
+            onThemeToggle: onThemeToggle,
+            isDarkModeNotifier: isDarkModeNotifier,
+          ),
+        ),
       );
     } else {
-      // Exibe uma mensagem de erro
       errorMessage.value = "Usuário ou senha incorreto! Verifique suas informações e tente novamente.";
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Verifica se o tema é escuro ou claro
-    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
-    // Define a cor de fundo com opacidade apenas no modo escuro
-    final Color backgroundWithOpacity = isDarkMode
-        ? Colors.black.withOpacity(0.75) // Escurece no modo escuro
-        : Colors.transparent; // Sem opacidade no modo claro (imagem original)
+    final bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+    final Color backgroundWithOpacity = isDarkTheme
+        ? Colors.black.withOpacity(0.75)
+        : Colors.transparent;
 
     return Scaffold(
       body: Stack(
         children: [
-          // Imagem de fundo
           Positioned.fill(
             child: Image.asset(
               'assets/images/Igreja_Fundo_Login.jpg',
               fit: BoxFit.cover,
             ),
           ),
-          // Aplica desfoque e cor de fundo apenas no modo escuro
           Positioned.fill(
             child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0), // Efeito fosco para ambos os temas
-              child: Container(
-                color: backgroundWithOpacity, // Aplica o fundo escuro com opacidade apenas no modo escuro
-              ),
+              filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+              child: Container(color: backgroundWithOpacity),
             ),
           ),
-          // Logo da empresa
           Positioned(
             top: 100,
             left: 0,
@@ -69,12 +69,10 @@ class LoginScreen extends StatelessWidget {
               child: Image.asset(
                 'assets/images/Logo_IPB.png',
                 height: 100,
-                color: Theme.of(context).primaryColor, // Acessa a cor definida no iconTheme
-
+                color: Theme.of(context).primaryColor,
               ),
             ),
           ),
-          // Formulário de login
           Center(
             child: SingleChildScrollView(
               child: Padding(
@@ -84,10 +82,9 @@ class LoginScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const SizedBox(height: 150), // Espaço entre a logo e os campos
-                      // Campo de Login com largura ajustada
+                      const SizedBox(height: 150),
                       SizedBox(
-                        width: 300, // Ajuste a largura do campo de texto aqui
+                        width: 300,
                         child: CustomTextField(
                           controller: loginController,
                           hintText: 'Login',
@@ -100,9 +97,8 @@ class LoginScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      // Campo de Senha com largura ajustada
                       SizedBox(
-                        width: 300, // Ajuste a largura do campo de texto aqui
+                        width: 300,
                         child: CustomTextField(
                           controller: passwordController,
                           hintText: 'Senha',
@@ -114,17 +110,17 @@ class LoginScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 40), // Espaço antes do botão de login
+                      const SizedBox(height: 40),
                       CustomButton(
                         text: 'Entrar',
-                        onPressed: () => login(context), // Chama a função login no onPressed
+                        onPressed: () => login(context),
                       ),
                       const SizedBox(height: 20),
                       ValueListenableBuilder(
                         valueListenable: errorMessage,
                         builder: (context, value, child) {
                           return Text(
-                            textAlign: TextAlign.center, // Centraliza o texto
+                            textAlign: TextAlign.center,
                             value,
                             style: const TextStyle(
                               color: Colors.red,

@@ -17,6 +17,7 @@ class _CardReportState extends State<CardReport> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.all(16),
       width: 312,

@@ -4,7 +4,7 @@ import '../utils/constants/app_colors.dart';
 import '../widgets/card_report.dart';
 
 class Report extends StatelessWidget {
-  const Report({super.key});
+  const Report({super.key, Function(bool p1)? onThemeToggle, bool? isDarkMode});
 
   @override
   Widget build(BuildContext context) {
