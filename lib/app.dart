@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:softwareipj_app/screens/home.dart';
 import 'package:softwareipj_app/screens/login.dart';
+import 'package:softwareipj_app/screens/start_screen.dart';
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -78,10 +79,11 @@ class _AppState extends State<App> {
         colorScheme: const ColorScheme.dark(primary: Color.fromARGB(255, 45, 45, 45), secondary: Color(0xFF015B40)),
       ),
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
-      home: LoginScreen(
-        onThemeToggle: _toggleTheme,
-        isDarkModeNotifier: isDarkModeNotifier,
-      ),
+      home: StartScreen(onThemeToggle: _toggleTheme, isDarkModeNotifier: isDarkModeNotifier),
+      // home: LoginScreen(
+      //   onThemeToggle: _toggleTheme,
+      //   isDarkModeNotifier: isDarkModeNotifier,
+      // ),
     );
   }
 }

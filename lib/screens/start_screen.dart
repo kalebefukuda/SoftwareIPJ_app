@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'login.dart'; // Certifique-se de importar a tela de login
 
-
 class StartScreen extends StatefulWidget {
-  const StartScreen({super.key});
+  final void Function(bool) onThemeToggle;
+  final ValueNotifier<bool> isDarkModeNotifier;
+
+  const StartScreen({
+    super.key,
+    required this.onThemeToggle,
+    required this.isDarkModeNotifier,
+  });
 
   @override
   _StartScreenState createState() => _StartScreenState();
@@ -21,8 +27,10 @@ class _StartScreenState extends State<StartScreen> {
         context,
         PageRouteBuilder(
           transitionDuration: const Duration(milliseconds: 600), // Duração da animação de transição
-          pageBuilder: (context, animation, secondaryAnimation) => LoginScreen(onThemeToggle: widget.onThemeToggle,
-                  isDarkModeNotifier: widget.isDarkModeNotifier,),
+          pageBuilder: (context, animation, secondaryAnimation) => LoginScreen(
+            onThemeToggle: widget.onThemeToggle,
+            isDarkModeNotifier: widget.isDarkModeNotifier,
+          ),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             // Animação de "dissolve" (fade)
             return FadeTransition(
