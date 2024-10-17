@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:softwareipj_app/screens/home.dart';
 import '../utils/constants/text_font.dart';
 import '../utils/constants/app_colors.dart';
 import '../widgets/card_report.dart';
@@ -19,7 +20,7 @@ class Report extends StatefulWidget {
 }
 
 class _ReportState extends State<Report> {
-  int currentIndex = 0;
+  int currentIndex = 3;
 
   void onTabTapped(int index) {
     setState(() {
@@ -36,7 +37,15 @@ class _ReportState extends State<Report> {
         scrolledUnderElevation: 0,
         leading: IconButton(
           onPressed: () {
-            Navigator.pop(context); // Função de retorno
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomeScreen(
+                  onThemeToggle: widget.onThemeToggle,
+                  isDarkModeNotifier: widget.isDarkModeNotifier,
+                ),
+              ),
+            );
           },
           icon: const Icon(
             Icons.chevron_left,
@@ -60,6 +69,7 @@ class _ReportState extends State<Report> {
               CardReport("Lista de Não\nComungantes Fem"),
               CardReport("Lista de\nComungantes Sede"),
               CardReport("Lista de\nDatas de Casamento"),
+              SizedBox(height: 100), //Esse Widget é para dar uma espaçamento final para a sidebar não sobrepor os itens da tela
             ],
           ),
           BottomSidebar(

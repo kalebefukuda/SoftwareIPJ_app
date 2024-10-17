@@ -22,7 +22,6 @@ class BottomSidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("Building BottomSidebar widget");
     return Align(
       alignment: Alignment.bottomCenter,
       child: Container(
@@ -57,59 +56,93 @@ class BottomSidebar extends StatelessWidget {
                     children: [
                       // Ícone Casa
                       IconButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => HomeScreen(
-                                onThemeToggle: onThemeToggle,
-                                isDarkModeNotifier: isDarkModeNotifier,
-                              ),
-                            ),
-                          );
-                          onTabTapped(0);
-                        },
+                        onPressed: currentIndex == 0
+                            ? null
+                            : () {
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => HomeScreen(
+                                      onThemeToggle: onThemeToggle,
+                                      isDarkModeNotifier: isDarkModeNotifier,
+                                    ),
+                                  ),
+                                  (Route<dynamic> route) => false, // Remove todas as rotas anteriores
+                                );
+                                onTabTapped(0);
+                              },
                         icon: SvgPicture.asset(
                           'assets/images/house.svg',
-                          color: Theme.of(context).iconTheme.color,
+                          color: currentIndex == 0 ? Colors.grey : Theme.of(context).iconTheme.color,
                           height: 24,
                           width: 24,
                         ),
                       ),
                       // Ícone Criar Membro
                       IconButton(
-                        onPressed: () {
-                          onTabTapped(1);
-                        },
+                        onPressed: currentIndex == 1
+                            ? null
+                            : () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => CreateMembersScreen(
+                                      onThemeToggle: onThemeToggle,
+                                      isDarkModeNotifier: isDarkModeNotifier,
+                                    ),
+                                  ),
+                                );
+                                onTabTapped(1);
+                              },
                         icon: SvgPicture.asset(
                           'assets/images/create_member.svg',
-                          color: Theme.of(context).iconTheme.color,
+                          color: currentIndex == 1 ? Colors.grey : Theme.of(context).iconTheme.color,
                           height: 24,
                           width: 24,
                         ),
                       ),
                       // Ícone Membros
                       IconButton(
-                        onPressed: () {
-                          print("Members icon tapped");
-                          onTabTapped(2);
-                        },
+                        onPressed: currentIndex == 2
+                            ? null
+                            : () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Members(
+                                      onThemeToggle: onThemeToggle,
+                                      isDarkModeNotifier: isDarkModeNotifier,
+                                    ),
+                                  ),
+                                );
+                                onTabTapped(2);
+                              },
                         icon: SvgPicture.asset(
                           'assets/images/members.svg',
-                          color: Theme.of(context).iconTheme.color,
+                          color: currentIndex == 2 ? Colors.grey : Theme.of(context).iconTheme.color,
                           height: 24,
                           width: 24,
                         ),
                       ),
                       // Ícone Arquivo
                       IconButton(
-                        onPressed: () {
-                          print("File icon tapped");
-                          onTabTapped(3);
-                        },
+                        onPressed: currentIndex == 3
+                            ? null
+                            : () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Report(
+                                      onThemeToggle: onThemeToggle,
+                                      isDarkModeNotifier: isDarkModeNotifier,
+                                    ),
+                                  ),
+                                );
+                                onTabTapped(3);
+                              },
                         icon: SvgPicture.asset(
                           'assets/images/file.svg',
-                          color: Theme.of(context).iconTheme.color,
+                          color: currentIndex == 3 ? Colors.grey : Theme.of(context).iconTheme.color,
                           height: 24,
                           width: 24,
                         ),

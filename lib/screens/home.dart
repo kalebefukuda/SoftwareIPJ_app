@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:softwareipj_app/screens/report.dart';
+import 'package:softwareipj_app/screens/create_members.dart';
+import 'package:softwareipj_app/screens/members.dart';
 import '../widgets/card_register.dart';
 import '../widgets/card_members.dart';
 import '../widgets/card_report_home.dart';
@@ -70,13 +72,39 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             const SizedBox(height: 10),
             // Card de cadastro de membros, ocupando toda a largura
-            const CardRegister(),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CreateMembersScreen(
+                      onThemeToggle: widget.onThemeToggle,
+                      isDarkModeNotifier: widget.isDarkModeNotifier,
+                    ),
+                  ),
+                );
+              },
+              child: const CardRegister(),
+            ),
             const SizedBox(height: 29),
             // Cards de membros e relatório na mesma linha, ocupando cada um metade da largura do card acima
             Row(
               children: [
-                const Expanded(
-                  child: CardMembers(),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Members(
+                            onThemeToggle: widget.onThemeToggle,
+                            isDarkModeNotifier: widget.isDarkModeNotifier,
+                          ),
+                        ),
+                      );
+                    },
+                    child: const CardMembers(),
+                  ),
                 ),
                 const SizedBox(width: 29), // Espaço entre os dois cards
                 Expanded(
@@ -87,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         MaterialPageRoute(
                           builder: (context) => Report(
                             onThemeToggle: widget.onThemeToggle,
-                            isDarkModeNotifier: widget.isDarkModeNotifier
+                            isDarkModeNotifier: widget.isDarkModeNotifier,
                           ), // Navega para a tela de relatório ao clicar no CardReport
                         ),
                       );
