@@ -83,7 +83,7 @@ class BottomSidebar extends StatelessWidget {
                         onPressed: currentIndex == 1
                             ? null
                             : () {
-                                Navigator.push(
+                                Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => CreateMembersScreen(
@@ -106,7 +106,7 @@ class BottomSidebar extends StatelessWidget {
                         onPressed: currentIndex == 2
                             ? null
                             : () {
-                                Navigator.push(
+                                Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => Members(
@@ -129,7 +129,7 @@ class BottomSidebar extends StatelessWidget {
                         onPressed: currentIndex == 3
                             ? null
                             : () {
-                                Navigator.push(
+                                Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => Report(

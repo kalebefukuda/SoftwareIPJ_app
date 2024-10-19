@@ -4,6 +4,7 @@ import '../utils/constants/text_font.dart';
 import '../utils/constants/app_colors.dart';
 import '../widgets/card_report.dart';
 import '../widgets/sidebar.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class Report extends StatefulWidget {
   final Function(bool) onThemeToggle;
@@ -35,17 +36,10 @@ class _ReportState extends State<Report> {
         toolbarHeight: 90,
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         scrolledUnderElevation: 0,
+        // automaticallyImplyLeading: false, //Desabilita o botão de qualquer jeito, ignorando a biblioteca do FLUTTER
         leading: IconButton(
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => HomeScreen(
-                  onThemeToggle: widget.onThemeToggle,
-                  isDarkModeNotifier: widget.isDarkModeNotifier,
-                ),
-              ),
-            );
+            Navigator.pop(context);
           },
           icon: const Icon(
             Icons.chevron_left,
@@ -53,7 +47,7 @@ class _ReportState extends State<Report> {
             color: Appcolors.white,
           ),
         ),
-        title: const Text('Relatórios', style: TextFonts.poppinsMedium),
+        title: Text('Relatórios', style: Theme.of(context).textTheme.titleLarge),
         centerTitle: true,
       ),
       body: Stack(

@@ -90,17 +90,10 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
           toolbarHeight: 90,
           backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
           scrolledUnderElevation: 0,
+          // automaticallyImplyLeading: false, //Desabilita o botão de qualquer jeito, ignorando a biblioteca do FLUTTER
           leading: IconButton(
             onPressed: () {
-              Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => HomeScreen(
-                  onThemeToggle: widget.onThemeToggle,
-                  isDarkModeNotifier: widget.isDarkModeNotifier,
-                ),
-              ),
-            );
+              Navigator.pop(context);
             },
             icon: const Icon(
               Icons.chevron_left,
@@ -120,7 +113,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
               padding: const EdgeInsets.fromLTRB(23.0, 0.0, 23.0, 0.0), // Adiciona um padding inferior maior
               child: ListView(
                 children: [
-                  const SizedBox(height: 0),
+                  const SizedBox(height: 20),
                   // Adicionando o círculo de foto no início
                   MouseRegion(
                     cursor: SystemMouseCursors.click, // Define o cursor como 'pointer' ao passar o mouse

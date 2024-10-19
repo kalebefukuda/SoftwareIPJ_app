@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:softwareipj_app/screens/home.dart';
+import 'package:softwareipj_app/utils/constants/app_colors.dart';
 import '../widgets/sidebar.dart';
 
 class Members extends StatefulWidget {
@@ -51,26 +52,22 @@ class _MembersState extends State<Members> {
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 90,
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        // automaticallyImplyLeading: false, //Desabilita o botão de qualquer jeito, ignorando a biblioteca do FLUTTER
         leading: IconButton(
-          icon: const Icon(Icons.chevron_left, color: Colors.white),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => HomeScreen(
-                  onThemeToggle: widget.onThemeToggle,
-                  isDarkModeNotifier: widget.isDarkModeNotifier,
-                ),
-              ),
-            );
+            Navigator.pop(context);
           },
+          icon: const Icon(
+            Icons.chevron_left,
+            size: 30,
+            color: Appcolors.white,
+          ),
         ),
-        title: const Text('Membros', style: TextStyle(color: Colors.white)),
+        title: Text('Membros', style: Theme.of(context).textTheme.titleLarge),
         centerTitle: true,
       ),
       body: Stack(
