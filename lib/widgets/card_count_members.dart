@@ -6,7 +6,7 @@ class MembersCountCard extends StatelessWidget {
 
   Future<Map<String, int>> _fetchMemberData() async {
     // Simula a futura chamada para uma API para buscar as informações dos membros
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(milliseconds: 500));
     return {
       'total': 200,
       'homens': 120,

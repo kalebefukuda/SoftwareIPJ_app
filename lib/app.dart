@@ -86,8 +86,8 @@ class _AppState extends State<App> {
         ),
       ),
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
-      //home: StartScreen(onThemeToggle: _toggleTheme, isDarkModeNotifier: isDarkModeNotifier),
-      home: Members(),
+      home: StartScreen(onThemeToggle: _toggleTheme, isDarkModeNotifier: isDarkModeNotifier),
+      // home: Members(),
     );
   }
 }
