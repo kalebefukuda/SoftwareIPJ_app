@@ -170,10 +170,14 @@ class _LocalFieldState extends State<LocalField> {
                 items: widget.states.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
-                    child: Text(value),
+                    child: SizedBox(
+                      width: 50, // Ajuste o valor para controlar a largura do item
+                      child: Text(value),
+                    ),
                   );
                 }).toList(),
                 dropdownColor: Theme.of(context).inputDecorationTheme.fillColor, // Ajusta a cor do dropdown
+                menuMaxHeight: 300, // Limita a altura do menu dropdown
               ),
             ),
           ),
