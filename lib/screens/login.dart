@@ -1,6 +1,6 @@
+import 'package:SoftwareIPJ/screens/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:softwareipj_app/screens/home.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_button.dart';
 import 'dart:ui';

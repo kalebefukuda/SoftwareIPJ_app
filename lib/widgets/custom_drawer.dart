@@ -1,6 +1,6 @@
+import 'package:SoftwareIPJ/screens/login.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:softwareipj_app/screens/login.dart';
 
 class CustomDrawer extends StatefulWidget {
   final Function(bool) onThemeToggle;
@@ -142,7 +142,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
       child: Align(
         alignment: Alignment.center,
         child: Text(
-          'v.0.3.1',
+          'v.0.3.2',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Colors.white,
               ),

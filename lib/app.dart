@@ -1,9 +1,7 @@
+import 'package:SoftwareIPJ/screens/start_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:softwareipj_app/screens/home.dart';
-import 'package:softwareipj_app/screens/login.dart';
-import 'package:softwareipj_app/screens/start_screen.dart';
-import './screens/members.dart';
+// import './screens/members.dart';
 
 class App extends StatefulWidget {
   const App({super.key});

@@ -1,7 +1,7 @@
+import 'package:SoftwareIPJ/screens/create_members.dart';
+import 'package:SoftwareIPJ/screens/members.dart';
+import 'package:SoftwareIPJ/screens/report.dart';
 import 'package:flutter/material.dart';
-import 'package:softwareipj_app/screens/report.dart';
-import 'package:softwareipj_app/screens/create_members.dart';
-import 'package:softwareipj_app/screens/members.dart';
 import '../widgets/card_register.dart';
 import '../widgets/card_members.dart';
 import '../widgets/card_report_home.dart';
