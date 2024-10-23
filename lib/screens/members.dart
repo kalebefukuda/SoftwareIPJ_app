@@ -78,9 +78,17 @@ class _MembersState extends State<Members> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  Text('120 Homens', style: Theme.of(context).textTheme.bodySmall),
-                  const SizedBox(width: 20),
-                  Text('80 Mulheres', style: Theme.of(context).textTheme.bodySmall),
+                  Text('120 Homens',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.copyWith(fontSize: 16)),
+                  SizedBox(width: 20),
+                  Text('80 Mulheres',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.copyWith(fontSize: 16)),
                 ],
               ),
               const SizedBox(height: 16),
@@ -88,11 +96,17 @@ class _MembersState extends State<Members> {
               TextField(
                 decoration: InputDecoration(
                   hintText: 'Pesquisar',
-                  hintStyle: const TextStyle(fontSize: 16, color: Color(0xFFB5B5B5), fontWeight: FontWeight.w400),
+                  hintStyle: const TextStyle(
+                      fontSize: 17,
+                      color: Color(0xFFB5B5B5),
+                      fontWeight: FontWeight.w400),
                   filled: true,
-                  fillColor: const Color(0xFFE7E7E7),
+                  contentPadding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 1), // Controla a altura do TextField
+                  fillColor: Theme.of(context).inputDecorationTheme.fillColor,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(15),
                     borderSide: BorderSide.none,
                   ),
                   prefixIcon: const Icon(
@@ -105,29 +119,50 @@ class _MembersState extends State<Members> {
               // Lista de membros
               Text(
                 'Todos os membros:',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 16, fontWeight: FontWeight.w600),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontSize: 17, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 16),
               ...List.generate(members.length, (index) {
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: AssetImage(avatars[index]),
-                  ),
-                  // nomes membros
-                  title: Text(
-                    members[index],
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 15),
-                  ),
-                  // numero telefone
-                  subtitle: Text(
-                    phoneNumbers[index],
-                    style: const TextStyle(
-                      color: Color(0xFFB5B5B5), // Cor personalizada para o número de telefone
-                    ),
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      CircleAvatar(
+                        radius: 28,
+                        backgroundImage: AssetImage(avatars[index]),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              members[index],
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(fontSize: 16),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              phoneNumbers[index],
+                              style: const TextStyle(
+                                color: Color(0xFFB5B5B5),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 );
               }),
-              const SizedBox(height: 100), // Adiciona espaçamento no final para evitar sobreposição com a sidebar
+              const SizedBox(height: 100),
             ],
           ),
           BottomSidebar(
