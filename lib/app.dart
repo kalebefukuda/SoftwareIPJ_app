@@ -1,7 +1,6 @@
 import 'package:SoftwareIPJ/screens/start_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-// import './screens/members.dart';
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -85,7 +84,6 @@ class _AppState extends State<App> {
       ),
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       home: StartScreen(onThemeToggle: _toggleTheme, isDarkModeNotifier: isDarkModeNotifier),
-      // home: Members(),
     );
   }
 }
