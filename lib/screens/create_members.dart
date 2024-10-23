@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:io'; // Para lidar com o arquivo de imagem selecionado
 import 'package:image_picker/image_picker.dart'; // Pacote para selecionar a imagem
-import 'package:softwareipj_app/screens/home.dart';
 import '../utils/constants/app_colors.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_button.dart';
