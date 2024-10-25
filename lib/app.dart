@@ -74,7 +74,7 @@ class _AppState extends State<App> {
           bodySmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white),
           titleLarge: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Color.fromARGB(255, 255, 255, 255)),
         ),
-        appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF1F1F1F)),
+        appBarTheme: const AppBarTheme(backgroundColor: Color.fromARGB(255, 0, 0, 0)),
         inputDecorationTheme: const InputDecorationTheme(fillColor: Color(0xFF1F1F1F), filled: true),
         iconTheme: const IconThemeData(color: Colors.white),
         colorScheme: const ColorScheme.dark(
