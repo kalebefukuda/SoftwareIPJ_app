@@ -9,6 +9,7 @@ import '../widgets/custom_button.dart';
 import '../widgets/local.dart'; // Importe o widget personalizado
 import '../widgets/custom_drop_down.dart'; // Campo de dropdown
 import '../widgets/sidebar.dart'; // Adiciona a sidebar
+import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 
 class CreateMembersScreen extends StatefulWidget {
   final Function(bool) onThemeToggle;
@@ -233,33 +234,77 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     cityController: cidadeNascimentoController,
                     stateController: estadoNascimentoController,
                     obscureText: false,
+                    onCityChanged: (value) {
+                      final capitalized = capitalize(value);
+                      if (capitalized != value) {
+                        cidadeNascimentoController.value = cidadeNascimentoController.value.copyWith(
+                          text: capitalized,
+                          selection: TextSelection.collapsed(offset: capitalized.length),
+                        );
+                      }
+                    },
                     cityLabelText: 'Cidade Nasc.', // Personaliza o rótulo
                     stateLabelText: 'UF Nasc.', // Personaliza o rótulo
                   ),
-
                   const SizedBox(height: 20),
                   CustomTextField(
                     controller: nomePaiController,
                     hintText: 'Nome do Pai',
                     obscureText: false,
+                    onChanged: (value) {
+                      final capitalized = capitalize(value);
+                      if (capitalized != value) {
+                        nomePaiController.value = nomePaiController.value.copyWith(
+                          text: capitalized,
+                          selection: TextSelection.collapsed(offset: capitalized.length),
+                        );
+                      }
+                    },
                   ),
                   const SizedBox(height: 20),
                   CustomTextField(
                     controller: nomeMaeController,
                     hintText: 'Nome da Mãe',
                     obscureText: false,
+                    onChanged: (value) {
+                      final capitalized = capitalize(value);
+                      if (capitalized != value) {
+                        nomeMaeController.value = nomeMaeController.value.copyWith(
+                          text: capitalized,
+                          selection: TextSelection.collapsed(offset: capitalized.length),
+                        );
+                      }
+                    },
                   ),
                   const SizedBox(height: 20),
                   CustomTextField(
                     controller: escolaridadeController,
                     hintText: 'Escolaridade',
                     obscureText: false,
+                    onChanged: (value) {
+                      final capitalized = capitalize(value);
+                      if (capitalized != value) {
+                        nomeCompletoController.value = nomeCompletoController.value.copyWith(
+                          text: capitalized,
+                          selection: TextSelection.collapsed(offset: capitalized.length),
+                        );
+                      }
+                    },
                   ),
                   const SizedBox(height: 20),
                   CustomTextField(
                     controller: profissaoController,
                     hintText: 'Profissão',
                     obscureText: false,
+                    onChanged: (value) {
+                      final capitalized = capitalize(value);
+                      if (capitalized != value) {
+                        nomeCompletoController.value = nomeCompletoController.value.copyWith(
+                          text: capitalized,
+                          selection: TextSelection.collapsed(offset: capitalized.length),
+                        );
+                      }
+                    },
                   ),
                   const SizedBox(height: 20),
                   CustomTextField(
@@ -282,6 +327,11 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           controller: telefoneController,
                           hintText: 'Telefone',
                           obscureText: false,
+                          keyboardType: TextInputType.phone, // Teclado de telefone
+                          inputFormatters: [
+                            PhoneInputFormatter(), // Utiliza o formatter personalizado
+                          ],
+                          
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
@@ -290,10 +340,16 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           controller: celularController,
                           hintText: 'Celular',
                           obscureText: false,
+                          keyboardType: TextInputType.phone, // Teclado de telefone
+                          inputFormatters: [
+                            PhoneInputFormatter(), // Utiliza o formatter personalizado
+                          ],
+                          
                         ),
                       ),
                     ],
                   ),
+
                   const SizedBox(height: 30),
                   Center(child: buildSectionTitle(context, 'Localização Atual')),
                   const SizedBox(height: 20),
@@ -337,6 +393,15 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     cityController: cidadeAtualController,
                     stateController: estadoAtualController,
                     obscureText: false,
+                    onCityChanged: (value) {
+                      final capitalized = capitalize(value);
+                      if (capitalized != value) {
+                        cidadeAtualController.value = cidadeAtualController.value.copyWith(
+                          text: capitalized,
+                          selection: TextSelection.collapsed(offset: capitalized.length),
+                        );
+                      }
+                    },
                   ),
                   const SizedBox(height: 30),
                   Center(child: buildSectionTitle(context, 'Outras informações')),
@@ -707,6 +772,19 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           controller: reeleitoDiac2Controller,
                           hintText: 'Reeleito em',
                           obscureText: false,
+                          keyboardType: TextInputType.number, // Teclado numérico
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(8),
+                            // Formata a data conforme o usuário digita
+                            TextInputFormatter.withFunction((oldValue, newValue) {
+                              String formatted = formatarData(newValue.text);
+                              return TextEditingValue(
+                                text: formatted,
+                                selection: TextSelection.collapsed(offset: formatted.length),
+                              );
+                            }),
+                          ],
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
@@ -715,6 +793,19 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           controller: reeleitoDiac3Controller,
                           hintText: 'Reeleito em',
                           obscureText: false,
+                          keyboardType: TextInputType.number, // Teclado numérico
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(8),
+                            // Formata a data conforme o usuário digita
+                            TextInputFormatter.withFunction((oldValue, newValue) {
+                              String formatted = formatarData(newValue.text);
+                              return TextEditingValue(
+                                text: formatted,
+                                selection: TextSelection.collapsed(offset: formatted.length),
+                              );
+                            }),
+                          ],
                         ),
                       ),
                     ],
@@ -750,6 +841,19 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           controller: reeleitoPresb1Controller,
                           hintText: 'Reeleito em',
                           obscureText: false,
+                          keyboardType: TextInputType.number, // Teclado numérico
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(8),
+                            // Formata a data conforme o usuário digita
+                            TextInputFormatter.withFunction((oldValue, newValue) {
+                              String formatted = formatarData(newValue.text);
+                              return TextEditingValue(
+                                text: formatted,
+                                selection: TextSelection.collapsed(offset: formatted.length),
+                              );
+                            }),
+                          ],
                         ),
                       ),
                     ],
@@ -762,6 +866,19 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           controller: reeleitoPresb2Controller,
                           hintText: 'Reeleito em',
                           obscureText: false,
+                          keyboardType: TextInputType.number, // Teclado numérico
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(8),
+                            // Formata a data conforme o usuário digita
+                            TextInputFormatter.withFunction((oldValue, newValue) {
+                              String formatted = formatarData(newValue.text);
+                              return TextEditingValue(
+                                text: formatted,
+                                selection: TextSelection.collapsed(offset: formatted.length),
+                              );
+                            }),
+                          ],
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
@@ -770,6 +887,19 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           controller: reeleitoPresb3Controller,
                           hintText: 'Reeleito em',
                           obscureText: false,
+                          keyboardType: TextInputType.number, // Teclado numérico
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(8),
+                            // Formata a data conforme o usuário digita
+                            TextInputFormatter.withFunction((oldValue, newValue) {
+                              String formatted = formatarData(newValue.text);
+                              return TextEditingValue(
+                                text: formatted,
+                                selection: TextSelection.collapsed(offset: formatted.length),
+                              );
+                            }),
+                          ],
                         ),
                       ),
                     ],
@@ -801,6 +931,8 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
       currentIndex = index;
     });
   }
+
+/* ----------------------FUNÇÕES----------------- */
 
   // Função para pegar a imagem da galeria
   Future<void> _pickImage() async {
@@ -868,4 +1000,14 @@ String formatarData(String input) {
 bool isValidEmail(String email) {
   final RegExp regex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
   return regex.hasMatch(email);
+}
+
+// Função para criar o formatter de telefone.
+class PhoneInputFormatter extends MaskedInputFormatter {
+  PhoneInputFormatter() : super('(##) #####-####');
+
+  // Função para remover os caracteres especiais e salvar apenas números
+  static String removeFormatting(String input) {
+    return toNumericString(input);
+  }
 }
