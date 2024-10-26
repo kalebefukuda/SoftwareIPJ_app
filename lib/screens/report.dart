@@ -72,6 +72,7 @@ class _ReportState extends State<Report> {
             onTabTapped: onTabTapped,
             onThemeToggle: widget.onThemeToggle, // Passando o parâmetro necessário
             isDarkModeNotifier: widget.isDarkModeNotifier, // Passando o parâmetro necessário
+            isKeyboardVisible: MediaQuery.of(context).viewInsets.bottom != 0
           ),
         ],
       ),
