@@ -10,6 +10,10 @@ import '../widgets/local.dart'; // Importe o widget personalizado
 import '../widgets/custom_drop_down.dart'; // Campo de dropdown
 import '../widgets/sidebar.dart'; // Adiciona a sidebar
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import '../widgets/custom_banner.dart';
 
 class CreateMembersScreen extends StatefulWidget {
   final Function(bool) onThemeToggle;
@@ -28,6 +32,7 @@ class CreateMembersScreen extends StatefulWidget {
 
 class _CreateMembersScreenState extends State<CreateMembersScreen> {
   int currentIndex = 1;
+  Widget? bannerWidget;
 
   final TextEditingController nomeCompletoController = TextEditingController();
   final TextEditingController comunganteController = TextEditingController();
@@ -78,6 +83,50 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
   final TextEditingController reeleitoPresb3Controller = TextEditingController();
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
+  final maskFormatterCep = MaskTextInputFormatter(
+    mask: '#####-###',
+    filter: {
+      "#": RegExp(r'[0-9]')
+    },
+  );
+
+  bool _isBannerVisible = false; // Variável para controlar a exibição do banner
+
+  void _showBanner() {
+    setState(() {
+      _isBannerVisible = true;
+    });
+
+    // Oculta o banner automaticamente após a duração do CustomBanner
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        setState(() {
+          _isBannerVisible = false;
+        });
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    cepController.addListener(() {
+      if (cepController.text.length == 8) {
+        buscarEnderecoPorCEP(cepController.text);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    cepController.dispose();
+    bairroController.dispose();
+    enderecotController.dispose();
+    complementoController.dispose();
+    cidadeAtualController.dispose();
+    estadoAtualController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -331,7 +380,6 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           inputFormatters: [
                             PhoneInputFormatter(), // Utiliza o formatter personalizado
                           ],
-                          
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
@@ -344,7 +392,6 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           inputFormatters: [
                             PhoneInputFormatter(), // Utiliza o formatter personalizado
                           ],
-                          
                         ),
                       ),
                     ],
@@ -362,8 +409,15 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           obscureText: false,
                           keyboardType: TextInputType.number,
                           inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly
+                            FilteringTextInputFormatter.digitsOnly,
+                            maskFormatterCep, // Adiciona o input formatter com máscara
                           ], // Filtra apenas números
+                          onChanged: (value) {
+                            // Quando o CEP estiver completo, chama a função para buscar o endereço
+                            if (maskFormatterCep.getUnmaskedText().length == 8) {
+                              buscarEnderecoPorCEP(cepController.text);
+                            }
+                          },
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
@@ -908,7 +962,10 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Center(
                       child: CustomButton(
                     text: 'Salvar',
-                    onPressed: () {},
+                    onPressed: () {
+                      _showBanner(); // Chame a função para exibir o banner
+                    },
+                    
                   )),
                   const SizedBox(height: 100), //Esse Widget é para dar uma espaçamento final para a sidebar não sobrepor os itens da tela
                 ],
@@ -919,6 +976,11 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
               onTabTapped: onTabTapped,
               onThemeToggle: widget.onThemeToggle,
               isDarkModeNotifier: widget.isDarkModeNotifier,
+            ),
+            if (_isBannerVisible)
+            const CustomBanner(
+              message: 'Membro cadastrado!',
+              backgroundColor: Colors.green,
             ),
           ],
         ),
@@ -943,6 +1005,40 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
         _selectedImage = File(pickedFile.path); // Atualiza o estado com a imagem selecionada
       });
     }
+  }
+
+  Future<void> buscarEnderecoPorCEP(String cep) async {
+    try {
+      final response = await http.get(Uri.parse('https://viacep.com.br/ws/$cep/json/'));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data.containsKey('erro') && data['erro'] == true) {
+          _mostrarBanner('CEP não encontrado.', Colors.red);
+        } else {
+          setState(() {
+            bairroController.text = data['bairro'] ?? '';
+            enderecotController.text = data['logradouro'] ?? '';
+            cidadeAtualController.text = data['localidade'] ?? '';
+            estadoAtualController.text = data['uf'] ?? '';
+          });
+        }
+      } else {
+        _mostrarBanner('Erro de conexão. Verifique sua internet.', Colors.red);
+      }
+    } catch (e) {
+      _mostrarBanner('Erro de conexão. Verifique sua internet.', Colors.red);
+    }
+  }
+
+  void _mostrarBanner(String mensagem, Color cor) {
+    setState(() {
+      bannerWidget = CustomBanner(
+        message: mensagem,
+        backgroundColor: cor,
+        duration: const Duration(seconds: 3),
+      );
+    });
   }
 
   // Função que utiliza o estilo do tema para os títulos
