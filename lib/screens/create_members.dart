@@ -32,7 +32,9 @@ class CreateMembersScreen extends StatefulWidget {
 
 class _CreateMembersScreenState extends State<CreateMembersScreen> {
   int currentIndex = 1;
-  Widget? bannerWidget;
+  bool _isBannerVisible = false; // Controla a visibilidade do banner
+  String _bannerMessage = ''; // Armazena a mensagem do banner
+  Color _bannerColor = Colors.green; // Armazena a cor do banner
 
   final TextEditingController nomeCompletoController = TextEditingController();
   final TextEditingController comunganteController = TextEditingController();
@@ -90,23 +92,6 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
     },
   );
 
-  bool _isBannerVisible = false; // Variável para controlar a exibição do banner
-
-  void _showBanner() {
-    setState(() {
-      _isBannerVisible = true;
-    });
-
-    // Oculta o banner automaticamente após a duração do CustomBanner
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
-        setState(() {
-          _isBannerVisible = false;
-        });
-      }
-    });
-  }
-
   @override
   void initState() {
     super.initState();
@@ -126,6 +111,21 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
     cidadeAtualController.dispose();
     estadoAtualController.dispose();
     super.dispose();
+  }
+
+  void _showBanner(String message, Color color) {
+    setState(() {
+      _bannerMessage = message; // Define a mensagem do banner
+      _bannerColor = color; // Define a cor do banner
+      _isBannerVisible = true;
+    });
+  }
+
+  // Definindo a função _hideBanner
+  void _hideBanner() {
+    setState(() {
+      _isBannerVisible = false;
+    });
   }
 
   @override
@@ -963,9 +963,8 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                       child: CustomButton(
                     text: 'Salvar',
                     onPressed: () {
-                      _showBanner(); // Chame a função para exibir o banner
+                      _showBanner('Membro cadastrado!', Colors.green);
                     },
-                    
                   )),
                   const SizedBox(height: 100), //Esse Widget é para dar uma espaçamento final para a sidebar não sobrepor os itens da tela
                 ],
@@ -978,10 +977,15 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
               isDarkModeNotifier: widget.isDarkModeNotifier,
             ),
             if (_isBannerVisible)
-            const CustomBanner(
-              message: 'Membro cadastrado!',
-              backgroundColor: Colors.green,
-            ),
+              Positioned(
+                top: 10, // Posiciona o banner próximo ao topo
+                right: 0, // Alinha o banner à direita
+                child: CustomBanner(
+                  message: _bannerMessage, // Usa a mensagem do estado
+                  backgroundColor: _bannerColor, // Usa a cor do estado
+                  onDismissed: _hideBanner, // Callback para ocultar o banner após a animação,
+                ),
+              ),
           ],
         ),
       ),
@@ -1014,7 +1018,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data.containsKey('erro') && data['erro'] == true) {
-          _mostrarBanner('CEP não encontrado.', Colors.red);
+          _showBanner('CEP não encontrado.', Colors.red);
         } else {
           setState(() {
             bairroController.text = data['bairro'] ?? '';
@@ -1024,21 +1028,10 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
           });
         }
       } else {
-        _mostrarBanner('Erro de conexão. Verifique sua internet.', Colors.red);
       }
     } catch (e) {
-      _mostrarBanner('Erro de conexão. Verifique sua internet.', Colors.red);
+      _showBanner('Erro de conexão. Verifique sua internet.', Colors.red);
     }
-  }
-
-  void _mostrarBanner(String mensagem, Color cor) {
-    setState(() {
-      bannerWidget = CustomBanner(
-        message: mensagem,
-        backgroundColor: cor,
-        duration: const Duration(seconds: 3),
-      );
-    });
   }
 
   // Função que utiliza o estilo do tema para os títulos

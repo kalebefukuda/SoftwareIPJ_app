@@ -4,11 +4,13 @@ class CustomBanner extends StatefulWidget {
   final String message;
   final Color backgroundColor;
   final Duration duration;
+  final VoidCallback onDismissed; // Callback para notificar o término da animação de saída
 
   const CustomBanner({
     Key? key,
     required this.message,
     required this.backgroundColor,
+    required this.onDismissed, // Adiciona o callback onDismissed como obrigatório
     this.duration = const Duration(seconds: 3), // Duração padrão de 3 segundos
   }) : super(key: key);
 
@@ -24,29 +26,30 @@ class _CustomBannerState extends State<CustomBanner> with SingleTickerProviderSt
   void initState() {
     super.initState();
 
-    // Inicializa o AnimationController e as animações
+    // Inicializa o AnimationController e a animação de deslize
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
 
+    // Configura a animação para começar fora da tela pela direita e entrar na tela
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(1.0, 0.0),
-      end: Offset.zero,
+      begin: const Offset(1.0, 0.0),  // Começa fora da tela à direita
+      end: Offset.zero,                // Fica visível no canto direito
     ).animate(CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeOut,
     ));
 
-    // Inicia a animação ao carregar
+    // Anima a entrada do banner ao carregar
     _animationController.forward();
 
-    // Fecha o banner após o tempo definido
+    // Após a duração definida, inicia a animação de saída
     Future.delayed(widget.duration, () {
       if (mounted) {
         _animationController.reverse().then((_) {
           if (mounted) {
-            setState(() {}); // Atualiza para remover o banner
+            widget.onDismissed(); // Chama o callback onDismissed após a animação de saída
           }
         });
       }
@@ -61,35 +64,37 @@ class _CustomBannerState extends State<CustomBanner> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    return SlideTransition(
-      position: _slideAnimation,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-        margin: const EdgeInsets.only(top: 50.0), // Ajuste da margem superior
-        color: widget.backgroundColor,
-        width: double.infinity,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: Text(
-                widget.message,
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+    return Align(
+      alignment: Alignment.topRight, // Posiciona o banner no canto superior direito
+      child: SlideTransition(
+        position: _slideAnimation,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+          margin: const EdgeInsets.only(top: 10.0), // Ajusta para próximo do cabeçalho
+          color: widget.backgroundColor,
+          width: MediaQuery.of(context).size.width * 0.5, // Define largura para 50% da tela
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  widget.message,
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                ),
               ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.close, color: Colors.white),
-              onPressed: () {
-                if (mounted) {
-                  _animationController.reverse().then((_) {
-                    if (mounted) {
-                      setState(() {}); // Atualiza para remover o banner
-                    }
-                  });
-                }
-              },
-            )
-          ],
+              IconButton(
+                icon: const Icon(Icons.close, color: Colors.white),
+                onPressed: () {
+                  if (mounted) {
+                    _animationController.reverse().then((_) {
+                      widget.onDismissed(); // Chama o callback quando o botão de fechar é pressionado
+                    });
+                  }
+                },
+              )
+            ],
+          ),
         ),
       ),
     );
