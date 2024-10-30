@@ -12,7 +12,7 @@ class CustomTextField extends StatefulWidget {
   final String? Function(String? value)? validator;
 
   const CustomTextField({
-    Key? key,
+    super.key,
     required this.hintText,
     required this.obscureText,
     required this.controller,
@@ -21,7 +21,7 @@ class CustomTextField extends StatefulWidget {
     this.keyboardType,
     this.onChanged,
     this.validator,
-  }) : super(key: key);
+  });
 
   @override
   _CustomTextFieldState createState() => _CustomTextFieldState();
@@ -99,5 +99,65 @@ class _CustomTextFieldState extends State<CustomTextField> {
         ),
       ),
     );
+  }
+}
+
+// CustomDateTextField para campos de data
+class CustomDateTextField extends CustomTextField {
+  CustomDateTextField({
+    Key? key,
+    required String hintText,
+    required TextEditingController controller,
+    void Function(String value)? onChanged,
+  }) : super(
+          key: key,
+          hintText: hintText,
+          obscureText: false,
+          controller: controller,
+          keyboardType: TextInputType.number,
+          inputFormatters: [
+            FilteringTextInputFormatter.digitsOnly,
+            LengthLimitingTextInputFormatter(8),
+            TextInputFormatter.withFunction((oldValue, newValue) {
+              return TextEditingValue(
+                text: _formatDate(newValue.text),
+                selection: TextSelection.collapsed(offset: _formatDate(newValue.text).length),
+              );
+            }),
+          ],
+          onChanged: onChanged,
+        );
+
+  static String _formatDate(String input) {
+    input = input.replaceAll(RegExp(r'\D'), ''); // Remove tudo que não é dígito
+    String dia = '';
+    String mes = '';
+    String ano = '';
+
+    if (input.length >= 2) {
+      dia = input.substring(0, 2);
+    } else {
+      dia = input;
+    }
+
+    if (input.length >= 4) {
+      mes = input.substring(2, 4);
+    } else if (input.length > 2) {
+      mes = input.substring(2);
+    }
+
+    if (input.length >= 5) {
+      ano = input.substring(4);
+    }
+
+    String formatted = dia;
+    if (mes.isNotEmpty) {
+      formatted += '/$mes';
+    }
+    if (ano.isNotEmpty) {
+      formatted += '/$ano';
+    }
+
+    return formatted;
   }
 }

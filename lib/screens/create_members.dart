@@ -257,24 +257,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomTextField(
-                          controller: dataNascimentoController,
-                          hintText: 'Data de nascimento',
-                          obscureText: false,
-                          keyboardType: TextInputType.number, // Teclado numérico
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(8),
-                            // Formata a data conforme o usuário digita
-                            TextInputFormatter.withFunction((oldValue, newValue) {
-                              String formatted = formatarData(newValue.text);
-                              return TextEditingValue(
-                                text: formatted,
-                                selection: TextSelection.collapsed(offset: formatted.length),
-                              );
-                            }),
-                          ],
-                        ),
+                        child: CustomDateTextField(controller: dataNascimentoController, hintText: 'Data de nascimento'),
                       ),
                     ],
                   ),
@@ -507,23 +490,9 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     children: [
                       Flexible(
                         flex: 1,
-                        child: CustomTextField(
+                        child: CustomDateTextField(
                           controller: dataBatismoController,
                           hintText: 'Data',
-                          obscureText: false,
-                          keyboardType: TextInputType.number, // Teclado numérico
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(8),
-                            // Formata a data conforme o usuário digita
-                            TextInputFormatter.withFunction((oldValue, newValue) {
-                              String formatted = formatarData(newValue.text);
-                              return TextEditingValue(
-                                text: formatted,
-                                selection: TextSelection.collapsed(offset: formatted.length),
-                              );
-                            }),
-                          ],
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
@@ -544,24 +513,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     children: [
                       Flexible(
                         flex: 1,
-                        child: CustomTextField(
-                          controller: dataProfissaoController,
-                          hintText: 'Data',
-                          obscureText: false,
-                          keyboardType: TextInputType.number, // Teclado numérico
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(8),
-                            // Formata a data conforme o usuário digita
-                            TextInputFormatter.withFunction((oldValue, newValue) {
-                              String formatted = formatarData(newValue.text);
-                              return TextEditingValue(
-                                text: formatted,
-                                selection: TextSelection.collapsed(offset: formatted.length),
-                              );
-                            }),
-                          ],
-                        ),
+                        child: CustomDateTextField(controller: dataProfissaoController, hintText: 'Data'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
@@ -581,24 +533,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     children: [
                       Flexible(
                         flex: 1,
-                        child: CustomTextField(
-                          controller: dataAdmissaoController,
-                          hintText: 'Data',
-                          obscureText: false,
-                          keyboardType: TextInputType.number, // Teclado numérico
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(8),
-                            // Formata a data conforme o usuário digita
-                            TextInputFormatter.withFunction((oldValue, newValue) {
-                              String formatted = formatarData(newValue.text);
-                              return TextEditingValue(
-                                text: formatted,
-                                selection: TextSelection.collapsed(offset: formatted.length),
-                              );
-                            }),
-                          ],
-                        ),
+                        child: CustomDateTextField(controller: dataAdmissaoController, hintText: 'Data'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
@@ -635,24 +570,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     children: [
                       Flexible(
                         flex: 1,
-                        child: CustomTextField(
-                          controller: dataDemissaoController,
-                          hintText: 'Data',
-                          obscureText: false,
-                          keyboardType: TextInputType.number, // Teclado numérico
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(8),
-                            // Formata a data conforme o usuário digita
-                            TextInputFormatter.withFunction((oldValue, newValue) {
-                              String formatted = formatarData(newValue.text);
-                              return TextEditingValue(
-                                text: formatted,
-                                selection: TextSelection.collapsed(offset: formatted.length),
-                              );
-                            }),
-                          ],
-                        ),
+                        child: CustomDateTextField(controller: dataDemissaoController, hintText: 'Data'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
@@ -688,24 +606,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomTextField(
-                          controller: dataRolSeparadoController,
-                          hintText: 'Data',
-                          obscureText: false,
-                          keyboardType: TextInputType.number, // Teclado numérico
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(8),
-                            // Formata a data conforme o usuário digita
-                            TextInputFormatter.withFunction((oldValue, newValue) {
-                              String formatted = formatarData(newValue.text);
-                              return TextEditingValue(
-                                text: formatted,
-                                selection: TextSelection.collapsed(offset: formatted.length),
-                              );
-                            }),
-                          ],
-                        ),
+                        child: CustomDateTextField(controller: dataRolSeparadoController, hintText: 'Data'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
@@ -733,24 +634,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomTextField(
-                          controller: dataDiscRolSeparadoController,
-                          hintText: 'Data Disc.',
-                          obscureText: false,
-                          keyboardType: TextInputType.number, // Teclado numérico
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(8),
-                            // Formata a data conforme o usuário digita
-                            TextInputFormatter.withFunction((oldValue, newValue) {
-                              String formatted = formatarData(newValue.text);
-                              return TextEditingValue(
-                                text: formatted,
-                                selection: TextSelection.collapsed(offset: formatted.length),
-                              );
-                            }),
-                          ],
-                        ),
+                        child: CustomDateTextField(controller: dataDiscRolSeparadoController, hintText: 'Data Disc.'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
@@ -776,45 +660,11 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomTextField(
-                          controller: dataDiacController,
-                          hintText: 'Data',
-                          obscureText: false,
-                          keyboardType: TextInputType.number, // Teclado numérico
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(8),
-                            // Formata a data conforme o usuário digita
-                            TextInputFormatter.withFunction((oldValue, newValue) {
-                              String formatted = formatarData(newValue.text);
-                              return TextEditingValue(
-                                text: formatted,
-                                selection: TextSelection.collapsed(offset: formatted.length),
-                              );
-                            }),
-                          ],
-                        ),
+                        child: CustomDateTextField(controller: dataDiacController, hintText: 'Data'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomTextField(
-                          controller: reeleitoDiac1Controller,
-                          hintText: 'Reeleito em',
-                          obscureText: false,
-                          keyboardType: TextInputType.number, // Teclado numérico
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(8),
-                            // Formata a data conforme o usuário digita
-                            TextInputFormatter.withFunction((oldValue, newValue) {
-                              String formatted = formatarData(newValue.text);
-                              return TextEditingValue(
-                                text: formatted,
-                                selection: TextSelection.collapsed(offset: formatted.length),
-                              );
-                            }),
-                          ],
-                        ),
+                        child: CustomDateTextField(controller: reeleitoDiac1Controller, hintText: 'Reeleito em'),
                       ),
                     ],
                   ),
@@ -822,45 +672,11 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomTextField(
-                          controller: reeleitoDiac2Controller,
-                          hintText: 'Reeleito em',
-                          obscureText: false,
-                          keyboardType: TextInputType.number, // Teclado numérico
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(8),
-                            // Formata a data conforme o usuário digita
-                            TextInputFormatter.withFunction((oldValue, newValue) {
-                              String formatted = formatarData(newValue.text);
-                              return TextEditingValue(
-                                text: formatted,
-                                selection: TextSelection.collapsed(offset: formatted.length),
-                              );
-                            }),
-                          ],
-                        ),
+                        child: CustomDateTextField(controller: reeleitoDiac2Controller, hintText: 'Reeleito em'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomTextField(
-                          controller: reeleitoDiac3Controller,
-                          hintText: 'Reeleito em',
-                          obscureText: false,
-                          keyboardType: TextInputType.number, // Teclado numérico
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(8),
-                            // Formata a data conforme o usuário digita
-                            TextInputFormatter.withFunction((oldValue, newValue) {
-                              String formatted = formatarData(newValue.text);
-                              return TextEditingValue(
-                                text: formatted,
-                                selection: TextSelection.collapsed(offset: formatted.length),
-                              );
-                            }),
-                          ],
-                        ),
+                        child: CustomDateTextField(controller: reeleitoDiac3Controller, hintText: 'Reeleito em'),
                       ),
                     ],
                   ),
@@ -870,45 +686,11 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomTextField(
-                          controller: dataPresbController,
-                          hintText: 'Data',
-                          obscureText: false,
-                          keyboardType: TextInputType.number, // Teclado numérico
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(8),
-                            // Formata a data conforme o usuário digita
-                            TextInputFormatter.withFunction((oldValue, newValue) {
-                              String formatted = formatarData(newValue.text);
-                              return TextEditingValue(
-                                text: formatted,
-                                selection: TextSelection.collapsed(offset: formatted.length),
-                              );
-                            }),
-                          ],
-                        ),
+                        child: CustomDateTextField(controller: dataPresbController, hintText: 'Data'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomTextField(
-                          controller: reeleitoPresb1Controller,
-                          hintText: 'Reeleito em',
-                          obscureText: false,
-                          keyboardType: TextInputType.number, // Teclado numérico
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(8),
-                            // Formata a data conforme o usuário digita
-                            TextInputFormatter.withFunction((oldValue, newValue) {
-                              String formatted = formatarData(newValue.text);
-                              return TextEditingValue(
-                                text: formatted,
-                                selection: TextSelection.collapsed(offset: formatted.length),
-                              );
-                            }),
-                          ],
-                        ),
+                        child: CustomDateTextField(controller: reeleitoPresb1Controller, hintText: 'Reeleito em'),
                       ),
                     ],
                   ),
@@ -916,45 +698,11 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomTextField(
-                          controller: reeleitoPresb2Controller,
-                          hintText: 'Reeleito em',
-                          obscureText: false,
-                          keyboardType: TextInputType.number, // Teclado numérico
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(8),
-                            // Formata a data conforme o usuário digita
-                            TextInputFormatter.withFunction((oldValue, newValue) {
-                              String formatted = formatarData(newValue.text);
-                              return TextEditingValue(
-                                text: formatted,
-                                selection: TextSelection.collapsed(offset: formatted.length),
-                              );
-                            }),
-                          ],
-                        ),
+                        child: CustomDateTextField(controller: reeleitoPresb2Controller, hintText: 'Reeleito em'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomTextField(
-                          controller: reeleitoPresb3Controller,
-                          hintText: 'Reeleito em',
-                          obscureText: false,
-                          keyboardType: TextInputType.number, // Teclado numérico
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(8),
-                            // Formata a data conforme o usuário digita
-                            TextInputFormatter.withFunction((oldValue, newValue) {
-                              String formatted = formatarData(newValue.text);
-                              return TextEditingValue(
-                                text: formatted,
-                                selection: TextSelection.collapsed(offset: formatted.length),
-                              );
-                            }),
-                          ],
-                        ),
+                        child: CustomDateTextField(controller: reeleitoPresb3Controller, hintText: 'Reeleito em'),
                       ),
                     ],
                   ),
@@ -1027,8 +775,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
             estadoAtualController.text = data['uf'] ?? '';
           });
         }
-      } else {
-      }
+      } else {}
     } catch (e) {
       _showBanner('Erro de conexão. Verifique sua internet.', Colors.red);
     }
@@ -1049,40 +796,6 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
 // Função para capitalizar cada palavra:
 String capitalize(String input) {
   return input.split(' ').map((str) => str.isNotEmpty ? str[0].toUpperCase() + str.substring(1).toLowerCase() : '').join(' ');
-}
-
-// Função para formatar a data:
-String formatarData(String input) {
-  input = input.replaceAll(RegExp(r'\D'), ''); // Remove tudo que não é dígito
-  String dia = '';
-  String mes = '';
-  String ano = '';
-
-  if (input.length >= 2) {
-    dia = input.substring(0, 2);
-  } else {
-    dia = input;
-  }
-
-  if (input.length >= 4) {
-    mes = input.substring(2, 4);
-  } else if (input.length > 2) {
-    mes = input.substring(2);
-  }
-
-  if (input.length >= 5) {
-    ano = input.substring(4);
-  }
-
-  String formatted = dia;
-  if (mes.isNotEmpty) {
-    formatted += '/$mes';
-  }
-  if (ano.isNotEmpty) {
-    formatted += '/$ano';
-  }
-
-  return formatted;
 }
 
 // Função para validar o email:

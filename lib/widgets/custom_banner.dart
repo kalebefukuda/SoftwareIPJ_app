@@ -7,12 +7,12 @@ class CustomBanner extends StatefulWidget {
   final VoidCallback onDismissed; // Callback para notificar o término da animação de saída
 
   const CustomBanner({
-    Key? key,
+    super.key,
     required this.message,
     required this.backgroundColor,
     required this.onDismissed, // Adiciona o callback onDismissed como obrigatório
     this.duration = const Duration(seconds: 3), // Duração padrão de 3 segundos
-  }) : super(key: key);
+  });
 
   @override
   _CustomBannerState createState() => _CustomBannerState();

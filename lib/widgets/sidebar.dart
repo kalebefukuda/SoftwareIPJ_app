@@ -36,7 +36,7 @@ class BottomSidebar extends StatelessWidget {
                   BoxShadow(
                     color: Colors.black.withOpacity(0.3),
                     blurRadius: 20,
-                    offset: Offset(0, 4),
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
