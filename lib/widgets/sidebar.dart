@@ -24,30 +24,25 @@ class BottomSidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: Container(
-        height: 90,
-        margin: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-        child: Stack(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(50),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
-                    blurRadius: 20,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-            ),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(50),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-                child: Container(
+    // Reduzimos a duração da animação para ser mais rápida, minimizando a sensação de atraso
+    const duration = Duration(milliseconds: 300);
+
+    return AnimatedSlide(
+      offset: isKeyboardVisible ? const Offset(0, 1) : const Offset(0, 0),
+      duration: duration,
+      curve: Curves.easeOut, // Curva que acelera para fora, removendo um pouco do atraso
+      child: AnimatedOpacity(
+        opacity: isKeyboardVisible ? 0.0 : 1.0,
+        duration: duration,
+        curve: Curves.easeOut, // Curva consistente com a animação de deslocamento
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            height: 90,
+            margin: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+            child: Stack(
+              children: [
+                Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(50),
                     boxShadow: [
