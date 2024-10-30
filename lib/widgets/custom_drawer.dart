@@ -13,6 +13,7 @@ class CustomDrawer extends StatefulWidget {
   });
 
   @override
+  // ignore: library_private_types_in_public_api
   _CustomDrawerState createState() => _CustomDrawerState();
 }
 
@@ -142,7 +143,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
       child: Align(
         alignment: Alignment.center,
         child: Text(
-          'v.0.3.2',
+          'v.0.3.3',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Colors.white,
               ),

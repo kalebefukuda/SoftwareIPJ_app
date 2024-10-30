@@ -170,6 +170,7 @@ class _MembersState extends State<Members> {
             onTabTapped: onTabTapped,
             onThemeToggle: widget.onThemeToggle,
             isDarkModeNotifier: widget.isDarkModeNotifier,
+            isKeyboardVisible: MediaQuery.of(context).viewInsets.bottom != 0
           ),
         ],
       ),

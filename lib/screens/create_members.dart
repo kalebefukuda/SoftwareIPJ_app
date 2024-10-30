@@ -659,7 +659,8 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
               currentIndex: currentIndex,
               onTabTapped: onTabTapped,
               onThemeToggle: widget.onThemeToggle,
-              isDarkModeNotifier: widget.isDarkModeNotifier,
+              isDarkModeNotifier: widget.isDarkModeNotifier, 
+              isKeyboardVisible: MediaQuery.of(context).viewInsets.bottom != 0
             ),
             if (_isBannerVisible)
               Positioned(
