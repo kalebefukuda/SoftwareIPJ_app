@@ -10,9 +10,6 @@ import '../widgets/local.dart'; // Importe o widget personalizado
 import '../widgets/custom_drop_down.dart'; // Campo de dropdown
 import '../widgets/sidebar.dart'; // Adiciona a sidebar
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import '../widgets/custom_banner.dart';
 
 class CreateMembersScreen extends StatefulWidget {
@@ -85,22 +82,6 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
   final TextEditingController reeleitoPresb3Controller = TextEditingController();
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
-  final maskFormatterCep = MaskTextInputFormatter(
-    mask: '#####-###',
-    filter: {
-      "#": RegExp(r'[0-9]')
-    },
-  );
-
-  @override
-  void initState() {
-    super.initState();
-    cepController.addListener(() {
-      if (cepController.text.length == 8) {
-        buscarEnderecoPorCEP(cepController.text);
-      }
-    });
-  }
 
   @override
   void dispose() {
@@ -386,21 +367,19 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomTextField(
+                        child: CustomCepTextField(
                           controller: cepController,
-                          hintText: 'CEP',
-                          obscureText: false,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            maskFormatterCep, // Adiciona o input formatter com máscara
-                          ], // Filtra apenas números
-                          onChanged: (value) {
-                            // Quando o CEP estiver completo, chama a função para buscar o endereço
-                            if (maskFormatterCep.getUnmaskedText().length == 8) {
-                              buscarEnderecoPorCEP(cepController.text);
-                            }
+                          onEnderecoEncontrado: (endereco) {
+                            setState(() {
+                              bairroController.text = endereco['bairro'] ?? '';
+                              enderecotController.text = endereco['logradouro'] ?? '';
+                              cidadeAtualController.text = endereco['localidade'] ?? '';
+                              estadoAtualController.text = endereco['uf'] ?? '';
+                            });
+                            _showBanner('Endereço encontrado!', Colors.green);
                           },
+                          onCepNaoEncontrado: () => _showBanner('CEP não encontrado.', Colors.red),
+                          onErro: () => _showBanner('Erro de conexão. Verifique sua internet.', Colors.red),
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
@@ -756,28 +735,6 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
       setState(() {
         _selectedImage = File(pickedFile.path); // Atualiza o estado com a imagem selecionada
       });
-    }
-  }
-
-  Future<void> buscarEnderecoPorCEP(String cep) async {
-    try {
-      final response = await http.get(Uri.parse('https://viacep.com.br/ws/$cep/json/'));
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data.containsKey('erro') && data['erro'] == true) {
-          _showBanner('CEP não encontrado.', Colors.red);
-        } else {
-          setState(() {
-            bairroController.text = data['bairro'] ?? '';
-            enderecotController.text = data['logradouro'] ?? '';
-            cidadeAtualController.text = data['localidade'] ?? '';
-            estadoAtualController.text = data['uf'] ?? '';
-          });
-        }
-      } else {}
-    } catch (e) {
-      _showBanner('Erro de conexão. Verifique sua internet.', Colors.red);
     }
   }
 

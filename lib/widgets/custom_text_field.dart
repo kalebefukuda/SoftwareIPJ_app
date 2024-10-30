@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class CustomTextField extends StatefulWidget {
   final String hintText;
@@ -159,5 +162,91 @@ class CustomDateTextField extends CustomTextField {
     }
 
     return formatted;
+  }
+}
+
+class CustomCepTextField extends StatefulWidget {
+  final TextEditingController controller;
+  final String hintText;
+  final void Function(Map<String, String> endereco) onEnderecoEncontrado;
+  final void Function()? onCepNaoEncontrado;
+  final void Function()? onErro;
+  final void Function(String)? onChanged;
+
+  const CustomCepTextField({
+    Key? key,
+    required this.controller,
+    this.hintText = 'CEP',
+    required this.onEnderecoEncontrado,
+    this.onCepNaoEncontrado,
+    this.onErro,
+    this.onChanged,
+  }) : super(key: key);
+
+  @override
+  _CustomCepTextFieldState createState() => _CustomCepTextFieldState();
+}
+
+class _CustomCepTextFieldState extends State<CustomCepTextField> {
+  late MaskTextInputFormatter maskFormatter;
+
+  @override
+  void initState() {
+    super.initState();
+    maskFormatter = MaskTextInputFormatter(
+      mask: '#####-###',
+      filter: {"#": RegExp(r'[0-9]')},
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomTextField(
+      hintText: widget.hintText,
+      obscureText: false,
+      controller: widget.controller,
+      keyboardType: TextInputType.number,
+      inputFormatters: [maskFormatter],
+      onChanged: (value) {
+        String rawCep = maskFormatter.getUnmaskedText();
+        if (rawCep.length == 8) {
+          _buscarEnderecoPorCep(
+            rawCep,
+            widget.onEnderecoEncontrado,
+            widget.onCepNaoEncontrado,
+            widget.onErro,
+          );
+        }
+        if (widget.onChanged != null) widget.onChanged!(value);
+      },
+    );
+  }
+
+  static Future<void> _buscarEnderecoPorCep(
+    String cep,
+    void Function(Map<String, String> endereco) onEnderecoEncontrado,
+    void Function()? onCepNaoEncontrado,
+    void Function()? onErro,
+  ) async {
+    try {
+      final response = await http.get(Uri.parse('https://viacep.com.br/ws/$cep/json/'));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data.containsKey('erro') && data['erro'] == true) {
+          if (onCepNaoEncontrado != null) onCepNaoEncontrado();
+        } else {
+          onEnderecoEncontrado({
+            'bairro': data['bairro'] ?? '',
+            'logradouro': data['logradouro'] ?? '',
+            'localidade': data['localidade'] ?? '',
+            'uf': data['uf'] ?? '',
+          });
+        }
+      } else {
+        if (onErro != null) onErro();
+      }
+    } catch (e) {
+      if (onErro != null) onErro();
+    }
   }
 }
