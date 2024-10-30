@@ -165,6 +165,32 @@ class CustomDateTextField extends CustomTextField {
   }
 }
 
+// CustomCapitalizedTextField para capitalizar cada palavra automaticamente
+class CustomCapitalizedTextField extends CustomTextField {
+  CustomCapitalizedTextField({
+    Key? key,
+    required String hintText,
+    required TextEditingController controller,
+  }) : super(
+          key: key,
+          hintText: hintText,
+          obscureText: false,
+          controller: controller,
+          onChanged: (value) {
+            final capitalized = _capitalize(value);
+            if (capitalized != value) {
+              controller.value = controller.value.copyWith(
+                text: capitalized,
+                selection: TextSelection.collapsed(offset: capitalized.length),
+              );
+            }
+          },
+        );
+  static String _capitalize(String input) {
+    return input.split(' ').map((str) => str.isNotEmpty ? str[0].toUpperCase() + str.substring(1).toLowerCase() : '').join(' ');
+  }
+}
+
 class CustomCepTextField extends StatefulWidget {
   final TextEditingController controller;
   final String hintText;

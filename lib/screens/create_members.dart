@@ -179,19 +179,9 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Center(child: buildSectionTitle(context, 'Informações Pessoais')),
                   const SizedBox(height: 20),
                   Center(
-                    child: CustomTextField(
+                    child: CustomCapitalizedTextField(
                       controller: nomeCompletoController,
                       hintText: 'Nome Completo',
-                      obscureText: false,
-                      onChanged: (value) {
-                        final capitalized = capitalize(value);
-                        if (capitalized != value) {
-                          nomeCompletoController.value = nomeCompletoController.value.copyWith(
-                            text: capitalized,
-                            selection: TextSelection.collapsed(offset: capitalized.length),
-                          );
-                        }
-                      },
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -260,64 +250,24 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     stateLabelText: 'UF Nasc.', // Personaliza o rótulo
                   ),
                   const SizedBox(height: 20),
-                  CustomTextField(
+                  CustomCapitalizedTextField(
                     controller: nomePaiController,
-                    hintText: 'Nome do Pai',
-                    obscureText: false,
-                    onChanged: (value) {
-                      final capitalized = capitalize(value);
-                      if (capitalized != value) {
-                        nomePaiController.value = nomePaiController.value.copyWith(
-                          text: capitalized,
-                          selection: TextSelection.collapsed(offset: capitalized.length),
-                        );
-                      }
-                    },
+                    hintText: 'Nome do Pai'
                   ),
                   const SizedBox(height: 20),
-                  CustomTextField(
+                  CustomCapitalizedTextField(
                     controller: nomeMaeController,
-                    hintText: 'Nome da Mãe',
-                    obscureText: false,
-                    onChanged: (value) {
-                      final capitalized = capitalize(value);
-                      if (capitalized != value) {
-                        nomeMaeController.value = nomeMaeController.value.copyWith(
-                          text: capitalized,
-                          selection: TextSelection.collapsed(offset: capitalized.length),
-                        );
-                      }
-                    },
+                    hintText: 'Nome da Mãe'
                   ),
                   const SizedBox(height: 20),
-                  CustomTextField(
+                  CustomCapitalizedTextField(
                     controller: escolaridadeController,
-                    hintText: 'Escolaridade',
-                    obscureText: false,
-                    onChanged: (value) {
-                      final capitalized = capitalize(value);
-                      if (capitalized != value) {
-                        nomeCompletoController.value = nomeCompletoController.value.copyWith(
-                          text: capitalized,
-                          selection: TextSelection.collapsed(offset: capitalized.length),
-                        );
-                      }
-                    },
+                    hintText: 'Escolaridade'
                   ),
                   const SizedBox(height: 20),
-                  CustomTextField(
+                  CustomCapitalizedTextField(
                     controller: profissaoController,
-                    hintText: 'Profissão',
-                    obscureText: false,
-                    onChanged: (value) {
-                      final capitalized = capitalize(value);
-                      if (capitalized != value) {
-                        nomeCompletoController.value = nomeCompletoController.value.copyWith(
-                          text: capitalized,
-                          selection: TextSelection.collapsed(offset: capitalized.length),
-                        );
-                      }
-                    },
+                    hintText: 'Profissão'
                   ),
                   const SizedBox(height: 20),
                   CustomTextField(
@@ -376,7 +326,6 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                               cidadeAtualController.text = endereco['localidade'] ?? '';
                               estadoAtualController.text = endereco['uf'] ?? '';
                             });
-                            _showBanner('Endereço encontrado!', Colors.green);
                           },
                           onCepNaoEncontrado: () => _showBanner('CEP não encontrado.', Colors.red),
                           onErro: () => _showBanner('Erro de conexão. Verifique sua internet.', Colors.red),
@@ -477,10 +426,9 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
                         flex: 2,
-                        child: CustomTextField(
+                        child: CustomCapitalizedTextField(
                           controller: oficianteBatismoController,
-                          hintText: 'Oficiante',
-                          obscureText: false,
+                          hintText: 'Oficiante'
                         ),
                       ),
                     ],
@@ -497,10 +445,9 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
                         flex: 2,
-                        child: CustomTextField(
+                        child: CustomCapitalizedTextField(
                           controller: oficianteProfissaoController,
-                          hintText: 'Oficiante',
-                          obscureText: false,
+                          hintText: 'Oficiante'
                         ),
                       ),
                     ],
@@ -521,6 +468,10 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           controller: ataAdmissaoController,
                           hintText: 'Ata',
                           obscureText: false,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
                         ),
                       ),
                     ],
@@ -558,6 +509,10 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           controller: ataDemissaoController,
                           hintText: 'Ata',
                           obscureText: false,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
                         ),
                       ),
                     ],
@@ -601,10 +556,9 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomTextField(
+                        child: CustomDateTextField(
                           controller: casamentoRolSeparadoController,
                           hintText: 'Casamento',
-                          obscureText: false,
                         ),
                       ),
                     ],
@@ -621,6 +575,10 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           controller: ataDiscRolSeparadoController,
                           hintText: 'Ata Disc.',
                           obscureText: false,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
