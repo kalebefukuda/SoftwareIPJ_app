@@ -16,7 +16,9 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_svg: ^2.0.7  # Adicione esta linha
   image_picker: ^0.8.7+3
-
+  flutter_multi_formatter: ^2.0.0 # Atualize para a versão mais recente disponível
+  http: ^0.13.4
+  mask_text_input_formatter: ^2.0.0
 
 dev_dependencies:
   flutter_test:
