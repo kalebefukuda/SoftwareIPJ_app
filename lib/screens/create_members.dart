@@ -327,8 +327,8 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                               estadoAtualController.text = endereco['uf'] ?? '';
                             });
                           },
-                          onCepNaoEncontrado: () => _showBanner('CEP não encontrado.', Colors.red),
-                          onErro: () => _showBanner('Erro de conexão. Verifique sua internet.', Colors.red),
+                          onCepNaoEncontrado: () => _showBanner('CEP não encontrado.', const Color.fromARGB(255, 93, 14, 14)),
+                          onErro: () => _showBanner('Erro de conexão. Verifique sua internet.', const Color.fromARGB(255, 93, 14, 14)),
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
@@ -648,7 +648,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                       child: CustomButton(
                     text: 'Salvar',
                     onPressed: () {
-                      _showBanner('Membro cadastrado!', Colors.green);
+                      _showBanner('Membro cadastrado!', const Color.fromARGB(255, 14, 93, 54));
                     },
                   )),
                   const SizedBox(height: 100), //Esse Widget é para dar uma espaçamento final para a sidebar não sobrepor os itens da tela
