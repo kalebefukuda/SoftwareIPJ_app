@@ -83,7 +83,7 @@ class _MembersState extends State<Members> {
                           .textTheme
                           .bodySmall
                           ?.copyWith(fontSize: 16)),
-                  SizedBox(width: 20),
+                  const SizedBox(width: 20),
                   Text('80 Mulheres',
                       style: Theme.of(context)
                           .textTheme

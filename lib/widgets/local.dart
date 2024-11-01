@@ -7,6 +7,8 @@ class LocalField extends StatefulWidget {
   final String cityLabelText;
   final String stateLabelText;
   final Widget? icon;
+    final ValueChanged<String>? onCityChanged; // Adicionando o callback para mudanças no campo cidade
+
 
   // Definimos os estados diretamente no widget
   final List<String> states = [
@@ -46,7 +48,9 @@ class LocalField extends StatefulWidget {
     required this.obscureText,
     this.icon,
     this.cityLabelText = 'Cidade', // Define valores padrão
-    this.stateLabelText = 'UF', // Define valores padrão
+    this.stateLabelText = 'UF',
+        this.onCityChanged, required TextInputAction textInputAction, // Callback opcional para o campo cidade
+
   });
 
   @override
@@ -97,6 +101,19 @@ class _LocalFieldState extends State<LocalField> {
                 controller: widget.cityController,
                 obscureText: widget.obscureText,
                 focusNode: _cityFocusNode,
+                onChanged: (value) {
+                  // Capitaliza o valor e atualiza o campo se necessário
+                  final capitalized = capitalize(value);
+                  if (capitalized != value) {
+                    widget.cityController.value = widget.cityController.value.copyWith(
+                      text: capitalized,
+                      selection: TextSelection.collapsed(offset: capitalized.length),
+                    );
+                  }
+                  if (widget.onCityChanged != null) {
+                    widget.onCityChanged!(capitalized);
+                  }
+                },
                 decoration: InputDecoration(
                   labelText: widget.cityLabelText, // Usa o texto personalizado para o rótulo
                   labelStyle: Theme.of(context).textTheme.bodyMedium,
@@ -181,4 +198,8 @@ class _LocalFieldState extends State<LocalField> {
       ],
     );
   }
+}
+
+String capitalize(String input) {
+  return input.split(' ').map((str) => str.isNotEmpty ? str[0].toUpperCase() + str.substring(1).toLowerCase() : '').join(' ');
 }
