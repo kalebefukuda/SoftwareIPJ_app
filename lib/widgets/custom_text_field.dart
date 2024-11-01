@@ -108,15 +108,12 @@ class _CustomTextFieldState extends State<CustomTextField> {
 // CustomDateTextField para campos de data
 class CustomDateTextField extends CustomTextField {
   CustomDateTextField({
-    Key? key,
-    required String hintText,
-    required TextEditingController controller,
-    void Function(String value)? onChanged,
+    super.key,
+    required super.hintText,
+    required super.controller,
+    super.onChanged,
   }) : super(
-          key: key,
-          hintText: hintText,
           obscureText: false,
-          controller: controller,
           keyboardType: TextInputType.number,
           inputFormatters: [
             FilteringTextInputFormatter.digitsOnly,
@@ -128,7 +125,6 @@ class CustomDateTextField extends CustomTextField {
               );
             }),
           ],
-          onChanged: onChanged,
         );
 
   static String _formatDate(String input) {
@@ -168,14 +164,11 @@ class CustomDateTextField extends CustomTextField {
 // CustomCapitalizedTextField para capitalizar cada palavra automaticamente
 class CustomCapitalizedTextField extends CustomTextField {
   CustomCapitalizedTextField({
-    Key? key,
-    required String hintText,
-    required TextEditingController controller,
+    super.key,
+    required super.hintText,
+    required super.controller,
   }) : super(
-          key: key,
-          hintText: hintText,
           obscureText: false,
-          controller: controller,
           onChanged: (value) {
             final capitalized = _capitalize(value);
             if (capitalized != value) {
@@ -200,14 +193,14 @@ class CustomCepTextField extends StatefulWidget {
   final void Function(String)? onChanged;
 
   const CustomCepTextField({
-    Key? key,
+    super.key,
     required this.controller,
     this.hintText = 'CEP',
     required this.onEnderecoEncontrado,
     this.onCepNaoEncontrado,
     this.onErro,
     this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   _CustomCepTextFieldState createState() => _CustomCepTextFieldState();
