@@ -89,6 +89,7 @@ class LoginScreen extends StatelessWidget {
                           controller: loginController,
                           hintText: 'Login',
                           obscureText: false,
+                          textInputAction: TextInputAction.next,
                           icon: SvgPicture.asset(
                             'assets/images/user.svg',
                             height: 24,
@@ -103,6 +104,7 @@ class LoginScreen extends StatelessWidget {
                           controller: passwordController,
                           hintText: 'Senha',
                           obscureText: true,
+                          textInputAction: TextInputAction.done,
                           icon: SvgPicture.asset(
                             'assets/images/lock.svg',
                             height: 23,

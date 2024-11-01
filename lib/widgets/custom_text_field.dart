@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -11,6 +13,7 @@ class CustomTextField extends StatefulWidget {
   final Widget? icon;
   final List<TextInputFormatter>? inputFormatters;
   final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
   final void Function(String value)? onChanged;
   final String? Function(String? value)? validator;
 
@@ -22,6 +25,7 @@ class CustomTextField extends StatefulWidget {
     this.icon,
     this.inputFormatters,
     this.keyboardType,
+    this.textInputAction,
     this.onChanged,
     this.validator,
   });
@@ -73,10 +77,17 @@ class _CustomTextFieldState extends State<CustomTextField> {
             obscureText: widget.obscureText,
             focusNode: _focusNode,
             keyboardType: widget.keyboardType,
-            textInputAction: TextInputAction.done, // Exibe o botão "Done"
+            textInputAction: widget.textInputAction,
             inputFormatters: widget.inputFormatters,
             onChanged: widget.onChanged,
             validator: widget.validator,
+            onEditingComplete: () {
+              if (widget.textInputAction == TextInputAction.next) {
+                FocusScope.of(context).nextFocus(); // Move para o próximo campo
+              } else if (widget.textInputAction == TextInputAction.done) {
+                FocusScope.of(context).unfocus(); // Fecha o teclado
+              }
+            },
             decoration: InputDecoration(
               labelText: widget.hintText,
               floatingLabelStyle: TextStyle(
@@ -108,15 +119,13 @@ class _CustomTextFieldState extends State<CustomTextField> {
 // CustomDateTextField para campos de data
 class CustomDateTextField extends CustomTextField {
   CustomDateTextField({
-    Key? key,
-    required String hintText,
-    required TextEditingController controller,
-    void Function(String value)? onChanged,
+    super.key,
+    required super.hintText,
+    required super.controller,
+    super.textInputAction, // Repassa textInputAction para uso em "Próximo" ou "Concluído"
+    super.onChanged,
   }) : super(
-          key: key,
-          hintText: hintText,
           obscureText: false,
-          controller: controller,
           keyboardType: TextInputType.number,
           inputFormatters: [
             FilteringTextInputFormatter.digitsOnly,
@@ -128,7 +137,6 @@ class CustomDateTextField extends CustomTextField {
               );
             }),
           ],
-          onChanged: onChanged,
         );
 
   static String _formatDate(String input) {
@@ -168,14 +176,12 @@ class CustomDateTextField extends CustomTextField {
 // CustomCapitalizedTextField para capitalizar cada palavra automaticamente
 class CustomCapitalizedTextField extends CustomTextField {
   CustomCapitalizedTextField({
-    Key? key,
-    required String hintText,
-    required TextEditingController controller,
+    super.key,
+    required super.hintText,
+    required super.controller,
+    super.textInputAction, // Repassa textInputAction para funcionar com "Próximo" e "Concluído"
   }) : super(
-          key: key,
-          hintText: hintText,
           obscureText: false,
-          controller: controller,
           onChanged: (value) {
             final capitalized = _capitalize(value);
             if (capitalized != value) {
@@ -198,16 +204,18 @@ class CustomCepTextField extends StatefulWidget {
   final void Function()? onCepNaoEncontrado;
   final void Function()? onErro;
   final void Function(String)? onChanged;
+  final TextInputAction? textInputAction; // Adiciona textInputAction ao CEP
 
   const CustomCepTextField({
-    Key? key,
+    super.key,
     required this.controller,
     this.hintText = 'CEP',
     required this.onEnderecoEncontrado,
     this.onCepNaoEncontrado,
     this.onErro,
     this.onChanged,
-  }) : super(key: key);
+    this.textInputAction,
+  });
 
   @override
   _CustomCepTextFieldState createState() => _CustomCepTextFieldState();
@@ -221,7 +229,9 @@ class _CustomCepTextFieldState extends State<CustomCepTextField> {
     super.initState();
     maskFormatter = MaskTextInputFormatter(
       mask: '#####-###',
-      filter: {"#": RegExp(r'[0-9]')},
+      filter: {
+        "#": RegExp(r'[0-9]')
+      },
     );
   }
 
@@ -232,7 +242,10 @@ class _CustomCepTextFieldState extends State<CustomCepTextField> {
       obscureText: false,
       controller: widget.controller,
       keyboardType: TextInputType.number,
-      inputFormatters: [maskFormatter],
+      textInputAction: widget.textInputAction, // Passa o textInputAction para o campo CEP
+      inputFormatters: [
+        maskFormatter
+      ],
       onChanged: (value) {
         String rawCep = maskFormatter.getUnmaskedText();
         if (rawCep.length == 8) {
