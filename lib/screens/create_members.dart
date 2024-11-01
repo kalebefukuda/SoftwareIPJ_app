@@ -182,6 +182,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     child: CustomCapitalizedTextField(
                       controller: nomeCompletoController,
                       hintText: 'Nome Completo',
+                      textInputAction: TextInputAction.next
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -204,6 +205,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           controller: numeroRolController,
                           hintText: 'Numero de Rol',
                           obscureText: false,
+                          textInputAction: TextInputAction.next,
                           keyboardType: TextInputType.number, // Apenas números
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
@@ -237,6 +239,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     cityController: cidadeNascimentoController,
                     stateController: estadoNascimentoController,
                     obscureText: false,
+                    textInputAction: TextInputAction.next,
                     onCityChanged: (value) {
                       final capitalized = capitalize(value);
                       if (capitalized != value) {
@@ -252,22 +255,26 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   const SizedBox(height: 20),
                   CustomCapitalizedTextField(
                     controller: nomePaiController,
-                    hintText: 'Nome do Pai'
+                    hintText: 'Nome do Pai',
+                    textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 20),
                   CustomCapitalizedTextField(
                     controller: nomeMaeController,
-                    hintText: 'Nome da Mãe'
+                    hintText: 'Nome da Mãe',
+                    textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 20),
                   CustomCapitalizedTextField(
                     controller: escolaridadeController,
-                    hintText: 'Escolaridade'
+                    hintText: 'Escolaridade',
+                    textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 20),
                   CustomCapitalizedTextField(
                     controller: profissaoController,
-                    hintText: 'Profissão'
+                    hintText: 'Profissão',
+                    textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 20),
                   CustomTextField(
@@ -275,6 +282,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     hintText: 'E-mail',
                     obscureText: false,
                     keyboardType: TextInputType.emailAddress, // Teclado de email
+                    textInputAction: TextInputAction.next,
                     validator: (value) {
                       if (value == null || value.isEmpty || !isValidEmail(value)) {
                         return 'Por favor, insira um email válido';
@@ -319,6 +327,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                       Flexible(
                         child: CustomCepTextField(
                           controller: cepController,
+                          textInputAction: TextInputAction.next,
                           onEnderecoEncontrado: (endereco) {
                             setState(() {
                               bairroController.text = endereco['bairro'] ?? '';
@@ -337,6 +346,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           controller: bairroController,
                           hintText: 'Bairro',
                           obscureText: false,
+                          textInputAction: TextInputAction.next,
                         ),
                       ),
                     ],
@@ -346,18 +356,21 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     controller: enderecotController,
                     hintText: 'Endereço',
                     obscureText: false,
+                    textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 20),
                   CustomTextField(
                     controller: complementoController,
                     hintText: 'Complemento',
                     obscureText: false,
+                    textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 20),
                   LocalField(
                     cityController: cidadeAtualController,
                     stateController: estadoAtualController,
                     obscureText: false,
+                    textInputAction: TextInputAction.next,
                     onCityChanged: (value) {
                       final capitalized = capitalize(value);
                       if (capitalized != value) {
@@ -428,7 +441,8 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                         flex: 2,
                         child: CustomCapitalizedTextField(
                           controller: oficianteBatismoController,
-                          hintText: 'Oficiante'
+                          hintText: 'Oficiante',
+                          textInputAction: TextInputAction.next,
                         ),
                       ),
                     ],
@@ -447,7 +461,8 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                         flex: 2,
                         child: CustomCapitalizedTextField(
                           controller: oficianteProfissaoController,
-                          hintText: 'Oficiante'
+                          hintText: 'Oficiante',
+                          textInputAction: TextInputAction.next,
                         ),
                       ),
                     ],

@@ -49,7 +49,7 @@ class LocalField extends StatefulWidget {
     this.icon,
     this.cityLabelText = 'Cidade', // Define valores padrão
     this.stateLabelText = 'UF',
-        this.onCityChanged, // Callback opcional para o campo cidade
+        this.onCityChanged, required TextInputAction textInputAction, // Callback opcional para o campo cidade
 
   });
 
