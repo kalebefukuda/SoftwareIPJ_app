@@ -62,10 +62,27 @@ class _MembersState extends State<Members> {
 
   Future<void> _deleteMember(String memberId) async {
     try {
-      await FirebaseFirestore.instance.collection('members').doc(memberId).delete();
-      _fetchMembers();
+      // Obtém o documento original da coleção 'members'
+      DocumentSnapshot memberSnapshot = await FirebaseFirestore.instance.collection('members').doc(memberId).get();
+
+      if (memberSnapshot.exists) {
+        // Adiciona a data e hora da exclusão ao documento
+        Map<String, dynamic> memberData = memberSnapshot.data() as Map<String, dynamic>;
+        memberData['deletedAt'] = DateTime.now().toIso8601String(); // Adiciona a data de exclusão
+
+        // Copia o documento para a coleção 'deleted_members'
+        await FirebaseFirestore.instance.collection('deleted_members').doc(memberId).set(memberData);
+
+        // Remove o documento da coleção 'members'
+        await FirebaseFirestore.instance.collection('members').doc(memberId).delete();
+
+        // Atualiza a lista de membros
+        _fetchMembers();
+      } else {
+        print("Erro: Documento não encontrado na coleção 'members'.");
+      }
     } catch (e) {
-      print("Erro ao deletar membro: $e");
+      print("Erro ao mover membro para a coleção 'deleted_members': $e");
     }
   }
 
@@ -153,14 +170,14 @@ class _MembersState extends State<Members> {
       currentlySlidMemberId = memberId;
 
       slidePositions[memberId] = (slidePositions[memberId] ?? 0.0) + details.delta.dx;
-      slidePositions[memberId] = slidePositions[memberId]!.clamp(-120.0, 0.0);
+      slidePositions[memberId] = slidePositions[memberId]!.clamp(-130.0, 0.0);
     });
   }
 
   void _onHorizontalDragEnd(DragEndDetails details, String memberId) {
     setState(() {
       if (slidePositions[memberId]! < -50) {
-        slidePositions[memberId] = -120.0;
+        slidePositions[memberId] = -130.0;
       } else {
         slidePositions[memberId] = 0.0;
         currentlySlidMemberId = null;
@@ -245,31 +262,45 @@ class _MembersState extends State<Members> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              Container(
-                                margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF015B40),
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                                child: IconButton(
-                                  icon: const Icon(Icons.edit, color: Colors.white),
-                                  onPressed: () => _editMember(member),
+                              GestureDetector(
+                                onTap: () => _editMember(member),
+                                child: Container(
+                                  margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF015B40),
+                                    borderRadius: BorderRadius.circular(20), // Ajuste o raio para um efeito oval
+                                  ),
+                                  child: const Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10), // Ajuste o padding para controlar o tamanho da área de fundo
+                                    child: Icon(
+                                      Icons.edit,
+                                      size: 18, // Ajuste o tamanho do ícone
+                                      color: Colors.white,
+                                    ),
+                                  ),
                                 ),
                               ),
-                              Container(
-                                margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                                decoration: BoxDecoration(
-                                  color: const Color.fromARGB(255, 154, 27, 27),
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                                child: IconButton(
-                                  icon: const Icon(Icons.delete, color: Colors.white),
-                                  onPressed: () async {
-                                    bool confirm = await _confirmDelete(context);
-                                    if (confirm) {
-                                      _deleteMember(member['id']);
-                                    }
-                                  },
+                              GestureDetector(
+                                onTap: () async {
+                                  bool confirm = await _confirmDelete(context);
+                                  if (confirm) {
+                                    _deleteMember(member['id']);
+                                  }
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                                  decoration: BoxDecoration(
+                                    color: const Color.fromARGB(255, 154, 27, 27),
+                                    borderRadius: BorderRadius.circular(20), // Ajuste o raio para um efeito oval
+                                  ),
+                                  child: const Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10), // Ajuste o padding para controlar o tamanho da área de fundo
+                                    child: Icon(
+                                      Icons.delete,
+                                      size: 18, // Ajuste o tamanho do ícone
+                                      color: Colors.white,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
@@ -313,7 +344,7 @@ class _MembersState extends State<Members> {
                       ],
                     ),
                   );
-                }).toList(),
+                }),
                 const SizedBox(height: 100),
               ],
             ),
