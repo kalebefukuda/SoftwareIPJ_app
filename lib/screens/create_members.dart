@@ -11,15 +11,18 @@ import '../widgets/custom_drop_down.dart'; // Campo de dropdown
 import '../widgets/sidebar.dart'; // Adiciona a sidebar
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import '../widgets/custom_banner.dart';
+import '../services/member_service.dart';
 
 class CreateMembersScreen extends StatefulWidget {
   final Function(bool) onThemeToggle;
   final ValueNotifier<bool> isDarkModeNotifier;
+  final Map<String, dynamic>? memberData; // Dados do membro, se for uma edição
 
   const CreateMembersScreen({
     super.key,
     required this.onThemeToggle,
     required this.isDarkModeNotifier,
+    this.memberData,
   });
 
   @override
@@ -32,6 +35,8 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
   bool _isBannerVisible = false; // Controla a visibilidade do banner
   String _bannerMessage = ''; // Armazena a mensagem do banner
   Color _bannerColor = Colors.green; // Armazena a cor do banner
+
+  final MemberService _memberService = MemberService();
 
   final TextEditingController nomeCompletoController = TextEditingController();
   final TextEditingController comunganteController = TextEditingController();
@@ -82,6 +87,130 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
   final TextEditingController reeleitoPresb3Controller = TextEditingController();
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Se houver memberData, preencha os controladores com os dados do membro
+    if (widget.memberData != null) {
+      nomeCompletoController.text = widget.memberData!['nomeCompleto'] ?? '';
+      comunganteController.text = widget.memberData!['comungante'] ?? '';
+      numeroRolController.text = widget.memberData!['numeroRol']?.toString() ?? '';
+      dataNascimentoController.text = widget.memberData!['dataNascimento'] ?? '';
+      sexoController.text = widget.memberData!['sexo'] ?? '';
+      cidadeNascimentoController.text = widget.memberData!['cidadeNascimento'] ?? '';
+      estadoNascimentoController.text = widget.memberData!['estadoNascimento'] ?? '';
+      nomePaiController.text = widget.memberData!['nomePai'] ?? '';
+      nomeMaeController.text = widget.memberData!['nomeMae'] ?? '';
+      escolaridadeController.text = widget.memberData!['escolaridade'] ?? '';
+      profissaoController.text = widget.memberData!['profissao'] ?? '';
+      emailController.text = widget.memberData!['email'] ?? '';
+      telefoneController.text = widget.memberData!['telefone'] ?? '';
+      celularController.text = widget.memberData!['celular'] ?? '';
+      cepController.text = widget.memberData!['cep'] ?? '';
+      bairroController.text = widget.memberData!['bairro'] ?? '';
+      enderecotController.text = widget.memberData!['endereco'] ?? '';
+      complementoController.text = widget.memberData!['complemento'] ?? '';
+      cidadeAtualController.text = widget.memberData!['cidadeAtual'] ?? '';
+      estadoAtualController.text = widget.memberData!['estadoAtual'] ?? '';
+      residenciaController.text = widget.memberData!['residencia'] ?? '';
+      estadoCivilController.text = widget.memberData!['estadoCivil'] ?? '';
+      religiaoController.text = widget.memberData!['religiao'] ?? '';
+      dataBatismoController.text = widget.memberData!['dataBatismo'] ?? '';
+      oficianteBatismoController.text = widget.memberData!['oficianteBatismo'] ?? '';
+      dataProfissaoController.text = widget.memberData!['dataProfissao'] ?? '';
+      oficianteProfissaoController.text = widget.memberData!['oficianteProfissao'] ?? '';
+      dataAdmissaoController.text = widget.memberData!['dataAdmissao'] ?? '';
+      ataAdmissaoController.text = widget.memberData!['ataAdmissao'] ?? '';
+      formaAdmissaoController.text = widget.memberData!['formaAdmissao'] ?? '';
+      dataDemissaoController.text = widget.memberData!['dataDemissao'] ?? '';
+      ataDemissaoController.text = widget.memberData!['ataDemissao'] ?? '';
+      formaDemissaoController.text = widget.memberData!['formaDemissao'] ?? '';
+      dataRolSeparadoController.text = widget.memberData!['dataRolSeparado'] ?? '';
+      ataRolSeparadoController.text = widget.memberData!['ataRolSeparado'] ?? '';
+      casamentoRolSeparadoController.text = widget.memberData!['casamentoRolSeparado'] ?? '';
+      dataDiscRolSeparadoController.text = widget.memberData!['dataDiscRolSeparado'] ?? '';
+      ataDiscRolSeparadoController.text = widget.memberData!['ataDiscRolSeparado'] ?? '';
+      discRolSeparadoController.text = widget.memberData!['discRolSeparado'] ?? '';
+      dataDiacController.text = widget.memberData!['dataDiac'] ?? '';
+      reeleitoDiac1Controller.text = widget.memberData!['reeleitoDiac1'] ?? '';
+      reeleitoDiac2Controller.text = widget.memberData!['reeleitoDiac2'] ?? '';
+      reeleitoDiac3Controller.text = widget.memberData!['reeleitoDiac3'] ?? '';
+      dataPresbController.text = widget.memberData!['dataPresb'] ?? '';
+      reeleitoPresb1Controller.text = widget.memberData!['reeleitoPresb1'] ?? '';
+      reeleitoPresb2Controller.text = widget.memberData!['reeleitoPresb2'] ?? '';
+      reeleitoPresb3Controller.text = widget.memberData!['reeleitoPresb3'] ?? '';
+    }
+  }
+
+  Future<void> _saveMember() async {
+    try {
+      // Cria o mapa com os dados do membro
+      Map<String, dynamic> memberData = {
+        'nomeCompleto': nomeCompletoController.text,
+        'comungante': comunganteController.text,
+        'numeroRol': int.tryParse(numeroRolController.text) ?? 0,
+        'dataNascimento': dataNascimentoController.text,
+        'sexo': sexoController.text,
+        'cidadeNascimento': cidadeNascimentoController.text,
+        'estadoNascimento': estadoNascimentoController.text,
+        'nomePai': nomePaiController.text,
+        'nomeMae': nomeMaeController.text,
+        'escolaridade': escolaridadeController.text,
+        'profissao': profissaoController.text,
+        'email': emailController.text,
+        'telefone': telefoneController.text,
+        'celular': celularController.text,
+        'cep': cepController.text,
+        'bairro': bairroController.text,
+        'endereco': enderecotController.text,
+        'complemento': complementoController.text,
+        'cidadeAtual': cidadeAtualController.text,
+        'estadoAtual': estadoAtualController.text,
+        'residencia': residenciaController.text,
+        'estadoCivil': estadoCivilController.text,
+        'religiao': religiaoController.text,
+        'dataBatismo': dataBatismoController.text,
+        'oficianteBatismo': oficianteBatismoController.text,
+        'dataProfissao': dataProfissaoController.text,
+        'oficianteProfissao': oficianteProfissaoController.text,
+        'dataAdmissao': dataAdmissaoController.text,
+        'ataAdmissao': ataAdmissaoController.text,
+        'formaAdmissao': formaAdmissaoController.text,
+        'dataDemissao': dataDemissaoController.text,
+        'ataDemissao': ataDemissaoController.text,
+        'formaDemissao': formaDemissaoController.text,
+        'dataRolSeparado': dataRolSeparadoController.text,
+        'ataRolSeparado': ataRolSeparadoController.text,
+        'casamentoRolSeparado': casamentoRolSeparadoController.text,
+        'dataDiscRolSeparado': dataDiscRolSeparadoController.text,
+        'ataDiscRolSeparado': ataDiscRolSeparadoController.text,
+        'discRolSeparado': discRolSeparadoController.text,
+        'dataDiac': dataDiacController.text,
+        'reeleitoDiac1': reeleitoDiac1Controller.text,
+        'reeleitoDiac2': reeleitoDiac2Controller.text,
+        'reeleitoDiac3': reeleitoDiac3Controller.text,
+        'dataPresb': dataPresbController.text,
+        'reeleitoPresb1': reeleitoPresb1Controller.text,
+        'reeleitoPresb2': reeleitoPresb2Controller.text,
+        'reeleitoPresb3': reeleitoPresb3Controller.text,
+      };
+
+      // Chama o serviço para adicionar o membro
+      if (widget.memberData != null) {
+        // Atualize o membro existente
+        await _memberService.updateMember(widget.memberData!['id'], memberData);
+      } else {
+        // Crie um novo membro
+        await _memberService.addMember(memberData);
+      }
+
+      _showBanner('Membro salvo com sucesso!', const Color(0xFF015B40));
+    } catch (e) {
+      _showBanner('Erro ao salvar membro', const Color.fromARGB(255, 154, 27, 27));
+    }
+  }
 
   @override
   void dispose() {
@@ -160,6 +289,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                                     'assets/images/user-round.svg',
                                     height: 50,
                                     width: 50,
+                                    // ignore: deprecated_member_use
                                     color: Theme.of(context).iconTheme.color, // Usa a cor do iconTheme conforme o tema
                                   ),
                                 ],
@@ -182,7 +312,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     child: CustomCapitalizedTextField(
                       controller: nomeCompletoController,
                       hintText: 'Nome Completo',
-                      textInputAction: TextInputAction.next
+                      textInputAction: TextInputAction.next,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -663,20 +793,19 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                       child: CustomButton(
                     text: 'Salvar',
                     onPressed: () {
-                      _showBanner('Membro cadastrado!', const Color.fromARGB(255, 14, 93, 54));
+                      try {
+                        _saveMember();
+                      } catch (e) {
+                        // ignore: avoid_print
+                        print(e);
+                      }
                     },
                   )),
                   const SizedBox(height: 100), //Esse Widget é para dar uma espaçamento final para a sidebar não sobrepor os itens da tela
                 ],
               ),
             ),
-            BottomSidebar(
-              currentIndex: currentIndex,
-              onTabTapped: onTabTapped,
-              onThemeToggle: widget.onThemeToggle,
-              isDarkModeNotifier: widget.isDarkModeNotifier, 
-              isKeyboardVisible: MediaQuery.of(context).viewInsets.bottom != 0
-            ),
+            BottomSidebar(currentIndex: currentIndex, onTabTapped: onTabTapped, onThemeToggle: widget.onThemeToggle, isDarkModeNotifier: widget.isDarkModeNotifier, isKeyboardVisible: MediaQuery.of(context).viewInsets.bottom != 0),
             if (_isBannerVisible)
               Positioned(
                 top: 10, // Posiciona o banner próximo ao topo

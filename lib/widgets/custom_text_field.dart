@@ -179,6 +179,7 @@ class CustomCapitalizedTextField extends CustomTextField {
     super.key,
     required super.hintText,
     required super.controller,
+    final ValueChanged<String>? onChanged,
     super.textInputAction, // Repassa textInputAction para funcionar com "Próximo" e "Concluído"
   }) : super(
           obscureText: false,
