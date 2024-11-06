@@ -16,11 +16,13 @@ import '../services/member_service.dart';
 class CreateMembersScreen extends StatefulWidget {
   final Function(bool) onThemeToggle;
   final ValueNotifier<bool> isDarkModeNotifier;
+  final Map<String, dynamic>? memberData; // Dados do membro, se for uma edição
 
   const CreateMembersScreen({
     super.key,
     required this.onThemeToggle,
     required this.isDarkModeNotifier,
+    this.memberData,
   });
 
   @override
@@ -35,6 +37,112 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
   Color _bannerColor = Colors.green; // Armazena a cor do banner
 
   final MemberService _memberService = MemberService();
+
+  final TextEditingController nomeCompletoController = TextEditingController();
+  final TextEditingController comunganteController = TextEditingController();
+  final TextEditingController numeroRolController = TextEditingController();
+  final TextEditingController dataNascimentoController = TextEditingController();
+  final TextEditingController sexoController = TextEditingController();
+  final TextEditingController cidadeNascimentoController = TextEditingController();
+  final TextEditingController estadoNascimentoController = TextEditingController();
+  final TextEditingController nomePaiController = TextEditingController();
+  final TextEditingController nomeMaeController = TextEditingController();
+  final TextEditingController escolaridadeController = TextEditingController();
+  final TextEditingController profissaoController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController telefoneController = TextEditingController();
+  final TextEditingController celularController = TextEditingController();
+  final TextEditingController cepController = TextEditingController();
+  final TextEditingController bairroController = TextEditingController();
+  final TextEditingController enderecotController = TextEditingController();
+  final TextEditingController complementoController = TextEditingController();
+  final TextEditingController cidadeAtualController = TextEditingController();
+  final TextEditingController estadoAtualController = TextEditingController();
+  final TextEditingController residenciaController = TextEditingController();
+  final TextEditingController estadoCivilController = TextEditingController();
+  final TextEditingController religiaoController = TextEditingController();
+  final TextEditingController dataBatismoController = TextEditingController();
+  final TextEditingController oficianteBatismoController = TextEditingController();
+  final TextEditingController dataProfissaoController = TextEditingController();
+  final TextEditingController oficianteProfissaoController = TextEditingController();
+  final TextEditingController dataAdmissaoController = TextEditingController();
+  final TextEditingController ataAdmissaoController = TextEditingController();
+  final TextEditingController formaAdmissaoController = TextEditingController();
+  final TextEditingController dataDemissaoController = TextEditingController();
+  final TextEditingController ataDemissaoController = TextEditingController();
+  final TextEditingController formaDemissaoController = TextEditingController();
+  final TextEditingController dataRolSeparadoController = TextEditingController();
+  final TextEditingController ataRolSeparadoController = TextEditingController();
+  final TextEditingController casamentoRolSeparadoController = TextEditingController();
+  final TextEditingController dataDiscRolSeparadoController = TextEditingController();
+  final TextEditingController ataDiscRolSeparadoController = TextEditingController();
+  final TextEditingController discRolSeparadoController = TextEditingController();
+  final TextEditingController dataDiacController = TextEditingController();
+  final TextEditingController reeleitoDiac1Controller = TextEditingController();
+  final TextEditingController reeleitoDiac2Controller = TextEditingController();
+  final TextEditingController reeleitoDiac3Controller = TextEditingController();
+  final TextEditingController dataPresbController = TextEditingController();
+  final TextEditingController reeleitoPresb1Controller = TextEditingController();
+  final TextEditingController reeleitoPresb2Controller = TextEditingController();
+  final TextEditingController reeleitoPresb3Controller = TextEditingController();
+  File? _selectedImage;
+  final ImagePicker _picker = ImagePicker();
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Se houver memberData, preencha os controladores com os dados do membro
+    if (widget.memberData != null) {
+      nomeCompletoController.text = widget.memberData!['nomeCompleto'] ?? '';
+      comunganteController.text = widget.memberData!['comungante'] ?? '';
+      numeroRolController.text = widget.memberData!['numeroRol']?.toString() ?? '';
+      dataNascimentoController.text = widget.memberData!['dataNascimento'] ?? '';
+      sexoController.text = widget.memberData!['sexo'] ?? '';
+      cidadeNascimentoController.text = widget.memberData!['cidadeNascimento'] ?? '';
+      estadoNascimentoController.text = widget.memberData!['estadoNascimento'] ?? '';
+      nomePaiController.text = widget.memberData!['nomePai'] ?? '';
+      nomeMaeController.text = widget.memberData!['nomeMae'] ?? '';
+      escolaridadeController.text = widget.memberData!['escolaridade'] ?? '';
+      profissaoController.text = widget.memberData!['profissao'] ?? '';
+      emailController.text = widget.memberData!['email'] ?? '';
+      telefoneController.text = widget.memberData!['telefone'] ?? '';
+      celularController.text = widget.memberData!['celular'] ?? '';
+      cepController.text = widget.memberData!['cep'] ?? '';
+      bairroController.text = widget.memberData!['bairro'] ?? '';
+      enderecotController.text = widget.memberData!['endereco'] ?? '';
+      complementoController.text = widget.memberData!['complemento'] ?? '';
+      cidadeAtualController.text = widget.memberData!['cidadeAtual'] ?? '';
+      estadoAtualController.text = widget.memberData!['estadoAtual'] ?? '';
+      residenciaController.text = widget.memberData!['residencia'] ?? '';
+      estadoCivilController.text = widget.memberData!['estadoCivil'] ?? '';
+      religiaoController.text = widget.memberData!['religiao'] ?? '';
+      dataBatismoController.text = widget.memberData!['dataBatismo'] ?? '';
+      oficianteBatismoController.text = widget.memberData!['oficianteBatismo'] ?? '';
+      dataProfissaoController.text = widget.memberData!['dataProfissao'] ?? '';
+      oficianteProfissaoController.text = widget.memberData!['oficianteProfissao'] ?? '';
+      dataAdmissaoController.text = widget.memberData!['dataAdmissao'] ?? '';
+      ataAdmissaoController.text = widget.memberData!['ataAdmissao'] ?? '';
+      formaAdmissaoController.text = widget.memberData!['formaAdmissao'] ?? '';
+      dataDemissaoController.text = widget.memberData!['dataDemissao'] ?? '';
+      ataDemissaoController.text = widget.memberData!['ataDemissao'] ?? '';
+      formaDemissaoController.text = widget.memberData!['formaDemissao'] ?? '';
+      dataRolSeparadoController.text = widget.memberData!['dataRolSeparado'] ?? '';
+      ataRolSeparadoController.text = widget.memberData!['ataRolSeparado'] ?? '';
+      casamentoRolSeparadoController.text = widget.memberData!['casamentoRolSeparado'] ?? '';
+      dataDiscRolSeparadoController.text = widget.memberData!['dataDiscRolSeparado'] ?? '';
+      ataDiscRolSeparadoController.text = widget.memberData!['ataDiscRolSeparado'] ?? '';
+      discRolSeparadoController.text = widget.memberData!['discRolSeparado'] ?? '';
+      dataDiacController.text = widget.memberData!['dataDiac'] ?? '';
+      reeleitoDiac1Controller.text = widget.memberData!['reeleitoDiac1'] ?? '';
+      reeleitoDiac2Controller.text = widget.memberData!['reeleitoDiac2'] ?? '';
+      reeleitoDiac3Controller.text = widget.memberData!['reeleitoDiac3'] ?? '';
+      dataPresbController.text = widget.memberData!['dataPresb'] ?? '';
+      reeleitoPresb1Controller.text = widget.memberData!['reeleitoPresb1'] ?? '';
+      reeleitoPresb2Controller.text = widget.memberData!['reeleitoPresb2'] ?? '';
+      reeleitoPresb3Controller.text = widget.memberData!['reeleitoPresb3'] ?? '';
+    }
+  }
 
   Future<void> _saveMember() async {
     try {
@@ -90,79 +198,19 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
       };
 
       // Chama o serviço para adicionar o membro
-      await _memberService.addMember(memberData);
+      if (widget.memberData != null) {
+        // Atualize o membro existente
+        await _memberService.updateMember(widget.memberData!['id'], memberData);
+      } else {
+        // Crie um novo membro
+        await _memberService.addMember(memberData);
+      }
 
-      // Exibe uma confirmação
-      _showBanner('Membro cadastrado com sucesso!', Colors.green);
+      _showBanner('Membro salvo com sucesso!', const Color(0xFF015B40));
     } catch (e) {
-      // Exibe uma mensagem de erro
-      _showBanner('Erro ao cadastrar membro. Tente novamente.', Colors.red);
+      _showBanner('Erro ao salvar membro', const Color.fromARGB(255, 154, 27, 27));
     }
   }
-
-  final TextEditingController nomeCompletoController = TextEditingController();
-  final TextEditingController comunganteController = TextEditingController();
-  final TextEditingController numeroRolController = TextEditingController();
-  final TextEditingController dataNascimentoController =
-      TextEditingController();
-  final TextEditingController sexoController = TextEditingController();
-  final TextEditingController cidadeNascimentoController =
-      TextEditingController();
-  final TextEditingController estadoNascimentoController =
-      TextEditingController();
-  final TextEditingController nomePaiController = TextEditingController();
-  final TextEditingController nomeMaeController = TextEditingController();
-  final TextEditingController escolaridadeController = TextEditingController();
-  final TextEditingController profissaoController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController telefoneController = TextEditingController();
-  final TextEditingController celularController = TextEditingController();
-  final TextEditingController cepController = TextEditingController();
-  final TextEditingController bairroController = TextEditingController();
-  final TextEditingController enderecotController = TextEditingController();
-  final TextEditingController complementoController = TextEditingController();
-  final TextEditingController cidadeAtualController = TextEditingController();
-  final TextEditingController estadoAtualController = TextEditingController();
-  final TextEditingController residenciaController = TextEditingController();
-  final TextEditingController estadoCivilController = TextEditingController();
-  final TextEditingController religiaoController = TextEditingController();
-  final TextEditingController dataBatismoController = TextEditingController();
-  final TextEditingController oficianteBatismoController =
-      TextEditingController();
-  final TextEditingController dataProfissaoController = TextEditingController();
-  final TextEditingController oficianteProfissaoController =
-      TextEditingController();
-  final TextEditingController dataAdmissaoController = TextEditingController();
-  final TextEditingController ataAdmissaoController = TextEditingController();
-  final TextEditingController formaAdmissaoController = TextEditingController();
-  final TextEditingController dataDemissaoController = TextEditingController();
-  final TextEditingController ataDemissaoController = TextEditingController();
-  final TextEditingController formaDemissaoController = TextEditingController();
-  final TextEditingController dataRolSeparadoController =
-      TextEditingController();
-  final TextEditingController ataRolSeparadoController =
-      TextEditingController();
-  final TextEditingController casamentoRolSeparadoController =
-      TextEditingController();
-  final TextEditingController dataDiscRolSeparadoController =
-      TextEditingController();
-  final TextEditingController ataDiscRolSeparadoController =
-      TextEditingController();
-  final TextEditingController discRolSeparadoController =
-      TextEditingController();
-  final TextEditingController dataDiacController = TextEditingController();
-  final TextEditingController reeleitoDiac1Controller = TextEditingController();
-  final TextEditingController reeleitoDiac2Controller = TextEditingController();
-  final TextEditingController reeleitoDiac3Controller = TextEditingController();
-  final TextEditingController dataPresbController = TextEditingController();
-  final TextEditingController reeleitoPresb1Controller =
-      TextEditingController();
-  final TextEditingController reeleitoPresb2Controller =
-      TextEditingController();
-  final TextEditingController reeleitoPresb3Controller =
-      TextEditingController();
-  File? _selectedImage;
-  final ImagePicker _picker = ImagePicker();
 
   @override
   void dispose() {
@@ -194,8 +242,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        FocusScope.of(context)
-            .unfocus(); // Esconde o teclado ao tocar fora dos campos
+        FocusScope.of(context).unfocus(); // Esconde o teclado ao tocar fora dos campos
       },
       child: Scaffold(
         appBar: AppBar(
@@ -215,30 +262,25 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
           ),
           title: Text(
             'Cadastro',
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge, // Usa o estilo do tema para o AppBar
+            style: Theme.of(context).textTheme.titleLarge, // Usa o estilo do tema para o AppBar
           ),
           centerTitle: true,
         ),
         body: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(
-                  23.0, 0.0, 23.0, 0.0), // Adiciona um padding inferior maior
+              padding: const EdgeInsets.fromLTRB(23.0, 0.0, 23.0, 0.0), // Adiciona um padding inferior maior
               child: ListView(
                 children: [
                   const SizedBox(height: 20),
                   // Adicionando o círculo de foto no início
                   MouseRegion(
-                    cursor: SystemMouseCursors
-                        .click, // Define o cursor como 'pointer' ao passar o mouse
+                    cursor: SystemMouseCursors.click, // Define o cursor como 'pointer' ao passar o mouse
                     child: GestureDetector(
                       onTap: _pickImage, // Função para selecionar a imagem
                       child: CircleAvatar(
                         radius: 70,
-                        backgroundColor:
-                            Theme.of(context).inputDecorationTheme.fillColor,
+                        backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
                         child: _selectedImage == null
                             ? Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -247,9 +289,8 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                                     'assets/images/user-round.svg',
                                     height: 50,
                                     width: 50,
-                                    color: Theme.of(context)
-                                        .iconTheme
-                                        .color, // Usa a cor do iconTheme conforme o tema
+                                    // ignore: deprecated_member_use
+                                    color: Theme.of(context).iconTheme.color, // Usa a cor do iconTheme conforme o tema
                                   ),
                                 ],
                               )
@@ -265,9 +306,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     ),
                   ),
                   const SizedBox(height: 30),
-                  Center(
-                      child:
-                          buildSectionTitle(context, 'Informações Pessoais')),
+                  Center(child: buildSectionTitle(context, 'Informações Pessoais')),
                   const SizedBox(height: 20),
                   Center(
                     child: CustomCapitalizedTextField(
@@ -283,7 +322,10 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                         child: CustomDropdown(
                           labelText: 'Comungante',
                           controller: comunganteController,
-                          items: const ['SIM', 'NÃO'],
+                          items: const [
+                            'SIM',
+                            'NÃO'
+                          ],
                           hintText: 'Comungante',
                         ),
                       ),
@@ -297,8 +339,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           keyboardType: TextInputType.number, // Apenas números
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(
-                                3), // Limita a 3 caracteres
+                            LengthLimitingTextInputFormatter(3), // Limita a 3 caracteres
                           ], // Filtra apenas números
                         ),
                       ),
@@ -311,14 +352,15 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                         child: CustomDropdown(
                           labelText: 'Sexo',
                           controller: sexoController,
-                          items: const ['Masculino', 'Feminino'],
+                          items: const [
+                            'Masculino',
+                            'Feminino'
+                          ],
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomDateTextField(
-                            controller: dataNascimentoController,
-                            hintText: 'Data de nascimento'),
+                        child: CustomDateTextField(controller: dataNascimentoController, hintText: 'Data de nascimento'),
                       ),
                     ],
                   ),
@@ -331,11 +373,9 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     onCityChanged: (value) {
                       final capitalized = capitalize(value);
                       if (capitalized != value) {
-                        cidadeNascimentoController.value =
-                            cidadeNascimentoController.value.copyWith(
+                        cidadeNascimentoController.value = cidadeNascimentoController.value.copyWith(
                           text: capitalized,
-                          selection: TextSelection.collapsed(
-                              offset: capitalized.length),
+                          selection: TextSelection.collapsed(offset: capitalized.length),
                         );
                       }
                     },
@@ -371,13 +411,10 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     controller: emailController,
                     hintText: 'E-mail',
                     obscureText: false,
-                    keyboardType:
-                        TextInputType.emailAddress, // Teclado de email
+                    keyboardType: TextInputType.emailAddress, // Teclado de email
                     textInputAction: TextInputAction.next,
                     validator: (value) {
-                      if (value == null ||
-                          value.isEmpty ||
-                          !isValidEmail(value)) {
+                      if (value == null || value.isEmpty || !isValidEmail(value)) {
                         return 'Por favor, insira um email válido';
                       }
                       return null;
@@ -391,8 +428,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           controller: telefoneController,
                           hintText: 'Telefone',
                           obscureText: false,
-                          keyboardType:
-                              TextInputType.phone, // Teclado de telefone
+                          keyboardType: TextInputType.phone, // Teclado de telefone
                           inputFormatters: [
                             PhoneInputFormatter(), // Utiliza o formatter personalizado
                           ],
@@ -404,8 +440,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           controller: celularController,
                           hintText: 'Celular',
                           obscureText: false,
-                          keyboardType:
-                              TextInputType.phone, // Teclado de telefone
+                          keyboardType: TextInputType.phone, // Teclado de telefone
                           inputFormatters: [
                             PhoneInputFormatter(), // Utiliza o formatter personalizado
                           ],
@@ -415,8 +450,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   ),
 
                   const SizedBox(height: 30),
-                  Center(
-                      child: buildSectionTitle(context, 'Localização Atual')),
+                  Center(child: buildSectionTitle(context, 'Localização Atual')),
                   const SizedBox(height: 20),
                   Row(
                     children: [
@@ -427,19 +461,13 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           onEnderecoEncontrado: (endereco) {
                             setState(() {
                               bairroController.text = endereco['bairro'] ?? '';
-                              enderecotController.text =
-                                  endereco['logradouro'] ?? '';
-                              cidadeAtualController.text =
-                                  endereco['localidade'] ?? '';
+                              enderecotController.text = endereco['logradouro'] ?? '';
+                              cidadeAtualController.text = endereco['localidade'] ?? '';
                               estadoAtualController.text = endereco['uf'] ?? '';
                             });
                           },
-                          onCepNaoEncontrado: () => _showBanner(
-                              'CEP não encontrado.',
-                              const Color.fromARGB(255, 93, 14, 14)),
-                          onErro: () => _showBanner(
-                              'Erro de conexão. Verifique sua internet.',
-                              const Color.fromARGB(255, 93, 14, 14)),
+                          onCepNaoEncontrado: () => _showBanner('CEP não encontrado.', const Color.fromARGB(255, 93, 14, 14)),
+                          onErro: () => _showBanner('Erro de conexão. Verifique sua internet.', const Color.fromARGB(255, 93, 14, 14)),
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
@@ -476,18 +504,15 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     onCityChanged: (value) {
                       final capitalized = capitalize(value);
                       if (capitalized != value) {
-                        cidadeAtualController.value =
-                            cidadeAtualController.value.copyWith(
+                        cidadeAtualController.value = cidadeAtualController.value.copyWith(
                           text: capitalized,
-                          selection: TextSelection.collapsed(
-                              offset: capitalized.length),
+                          selection: TextSelection.collapsed(offset: capitalized.length),
                         );
                       }
                     },
                   ),
                   const SizedBox(height: 30),
-                  Center(
-                      child: buildSectionTitle(context, 'Outras informações')),
+                  Center(child: buildSectionTitle(context, 'Outras informações')),
                   const SizedBox(height: 20),
                   Row(
                     children: [
@@ -495,7 +520,10 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                         child: CustomDropdown(
                           labelText: 'Local Residência',
                           controller: residenciaController,
-                          items: const ['Sede', 'Fora'],
+                          items: const [
+                            'Sede',
+                            'Fora'
+                          ],
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
@@ -556,9 +584,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     children: [
                       Flexible(
                         flex: 1,
-                        child: CustomDateTextField(
-                            controller: dataProfissaoController,
-                            hintText: 'Data'),
+                        child: CustomDateTextField(controller: dataProfissaoController, hintText: 'Data'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
@@ -578,9 +604,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     children: [
                       Flexible(
                         flex: 1,
-                        child: CustomDateTextField(
-                            controller: dataAdmissaoController,
-                            hintText: 'Data'),
+                        child: CustomDateTextField(controller: dataAdmissaoController, hintText: 'Data'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
@@ -621,9 +645,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     children: [
                       Flexible(
                         flex: 1,
-                        child: CustomDateTextField(
-                            controller: dataDemissaoController,
-                            hintText: 'Data'),
+                        child: CustomDateTextField(controller: dataDemissaoController, hintText: 'Data'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
@@ -663,9 +685,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDateTextField(
-                            controller: dataRolSeparadoController,
-                            hintText: 'Data'),
+                        child: CustomDateTextField(controller: dataRolSeparadoController, hintText: 'Data'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
@@ -692,9 +712,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDateTextField(
-                            controller: dataDiscRolSeparadoController,
-                            hintText: 'Data Disc.'),
+                        child: CustomDateTextField(controller: dataDiscRolSeparadoController, hintText: 'Data Disc.'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
@@ -724,14 +742,11 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDateTextField(
-                            controller: dataDiacController, hintText: 'Data'),
+                        child: CustomDateTextField(controller: dataDiacController, hintText: 'Data'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomDateTextField(
-                            controller: reeleitoDiac1Controller,
-                            hintText: 'Reeleito em'),
+                        child: CustomDateTextField(controller: reeleitoDiac1Controller, hintText: 'Reeleito em'),
                       ),
                     ],
                   ),
@@ -739,33 +754,25 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDateTextField(
-                            controller: reeleitoDiac2Controller,
-                            hintText: 'Reeleito em'),
+                        child: CustomDateTextField(controller: reeleitoDiac2Controller, hintText: 'Reeleito em'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomDateTextField(
-                            controller: reeleitoDiac3Controller,
-                            hintText: 'Reeleito em'),
+                        child: CustomDateTextField(controller: reeleitoDiac3Controller, hintText: 'Reeleito em'),
                       ),
                     ],
                   ),
                   const SizedBox(height: 30),
-                  Center(
-                      child: buildSectionTitle(context, 'Eleições Presbitero')),
+                  Center(child: buildSectionTitle(context, 'Eleições Presbitero')),
                   const SizedBox(height: 20),
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDateTextField(
-                            controller: dataPresbController, hintText: 'Data'),
+                        child: CustomDateTextField(controller: dataPresbController, hintText: 'Data'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomDateTextField(
-                            controller: reeleitoPresb1Controller,
-                            hintText: 'Reeleito em'),
+                        child: CustomDateTextField(controller: reeleitoPresb1Controller, hintText: 'Reeleito em'),
                       ),
                     ],
                   ),
@@ -773,15 +780,11 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDateTextField(
-                            controller: reeleitoPresb2Controller,
-                            hintText: 'Reeleito em'),
+                        child: CustomDateTextField(controller: reeleitoPresb2Controller, hintText: 'Reeleito em'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomDateTextField(
-                            controller: reeleitoPresb3Controller,
-                            hintText: 'Reeleito em'),
+                        child: CustomDateTextField(controller: reeleitoPresb3Controller, hintText: 'Reeleito em'),
                       ),
                     ],
                   ),
@@ -792,28 +795,17 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     onPressed: () {
                       try {
                         _saveMember();
-                        _showBanner('Membro cadastrado!',
-                            const Color.fromARGB(255, 14, 93, 54));
                       } catch (e) {
+                        // ignore: avoid_print
                         print(e);
-                        _showBanner('Erro ao cadastrar membro',
-                            const Color.fromARGB(255, 154, 27, 27));
                       }
                     },
                   )),
-                  const SizedBox(
-                      height:
-                          100), //Esse Widget é para dar uma espaçamento final para a sidebar não sobrepor os itens da tela
+                  const SizedBox(height: 100), //Esse Widget é para dar uma espaçamento final para a sidebar não sobrepor os itens da tela
                 ],
               ),
             ),
-            BottomSidebar(
-                currentIndex: currentIndex,
-                onTabTapped: onTabTapped,
-                onThemeToggle: widget.onThemeToggle,
-                isDarkModeNotifier: widget.isDarkModeNotifier,
-                isKeyboardVisible:
-                    MediaQuery.of(context).viewInsets.bottom != 0),
+            BottomSidebar(currentIndex: currentIndex, onTabTapped: onTabTapped, onThemeToggle: widget.onThemeToggle, isDarkModeNotifier: widget.isDarkModeNotifier, isKeyboardVisible: MediaQuery.of(context).viewInsets.bottom != 0),
             if (_isBannerVisible)
               Positioned(
                 top: 10, // Posiciona o banner próximo ao topo
@@ -821,8 +813,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                 child: CustomBanner(
                   message: _bannerMessage, // Usa a mensagem do estado
                   backgroundColor: _bannerColor, // Usa a cor do estado
-                  onDismissed:
-                      _hideBanner, // Callback para ocultar o banner após a animação,
+                  onDismissed: _hideBanner, // Callback para ocultar o banner após a animação,
                 ),
               ),
           ],
@@ -845,8 +836,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
 
     if (pickedFile != null) {
       setState(() {
-        _selectedImage =
-            File(pickedFile.path); // Atualiza o estado com a imagem selecionada
+        _selectedImage = File(pickedFile.path); // Atualiza o estado com a imagem selecionada
       });
     }
   }
@@ -857,9 +847,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
       padding: const EdgeInsets.symmetric(vertical: 12.0),
       child: Text(
         title,
-        style: Theme.of(context)
-            .textTheme
-            .titleMedium, // Usa o estilo definido no tema
+        style: Theme.of(context).textTheme.titleMedium, // Usa o estilo definido no tema
       ),
     );
   }
@@ -867,12 +855,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
 
 // Função para capitalizar cada palavra:
 String capitalize(String input) {
-  return input
-      .split(' ')
-      .map((str) => str.isNotEmpty
-          ? str[0].toUpperCase() + str.substring(1).toLowerCase()
-          : '')
-      .join(' ');
+  return input.split(' ').map((str) => str.isNotEmpty ? str[0].toUpperCase() + str.substring(1).toLowerCase() : '').join(' ');
 }
 
 // Função para validar o email:
