@@ -9,11 +9,13 @@ import '../widgets/custom_banner.dart'; // Importação do banner personalizado
 class Members extends StatefulWidget {
   final Function(bool) onThemeToggle;
   final ValueNotifier<bool> isDarkModeNotifier;
+  final String? successMessage; // Novo parâmetro para a mensagem de sucesso
 
   const Members({
     super.key,
     required this.onThemeToggle,
     required this.isDarkModeNotifier,
+    this.successMessage,
   });
 
   @override
@@ -34,6 +36,9 @@ class _MembersState extends State<Members> {
   @override
   void initState() {
     super.initState();
+    if (widget.successMessage != null) {
+      _showBanner(widget.successMessage!, const Color(0xFF015B40));
+    }
     _fetchMembers();
 
     _searchFocusNode.addListener(() {

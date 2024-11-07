@@ -12,6 +12,7 @@ import '../widgets/sidebar.dart'; // Adiciona a sidebar
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import '../widgets/custom_banner.dart';
 import '../services/member_service.dart';
+import '../screens/members.dart';
 
 class CreateMembersScreen extends StatefulWidget {
   final Function(bool) onThemeToggle;
@@ -795,7 +796,19 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     onPressed: () {
                       try {
                         _saveMember();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Members(
+                              onThemeToggle: widget.onThemeToggle,
+                              isDarkModeNotifier: widget.isDarkModeNotifier,
+                              successMessage: 'Membro salvo com sucesso!', // Passe a mensagem
+                            ),
+                          ),
+                        );
                       } catch (e) {
+                        _showBanner('Erro ao salvar membro', const Color.fromARGB(255, 154, 27, 27));
+
                         // ignore: avoid_print
                         print(e);
                       }
