@@ -1,3 +1,4 @@
+import 'package:SoftwareIPJ/screens/view_member_screen.dart'; // Importar a nova tela de visualização
 import 'package:SoftwareIPJ/screens/create_members.dart';
 import 'package:SoftwareIPJ/utils/constants/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -62,21 +63,15 @@ class _MembersState extends State<Members> {
 
   Future<void> _deleteMember(String memberId) async {
     try {
-      // Obtém o documento original da coleção 'members'
       DocumentSnapshot memberSnapshot = await FirebaseFirestore.instance.collection('members').doc(memberId).get();
 
       if (memberSnapshot.exists) {
-        // Adiciona a data e hora da exclusão ao documento
         Map<String, dynamic> memberData = memberSnapshot.data() as Map<String, dynamic>;
-        memberData['deletedAt'] = DateTime.now().toIso8601String(); // Adiciona a data de exclusão
+        memberData['deletedAt'] = DateTime.now().toIso8601String();
 
-        // Copia o documento para a coleção 'deleted_members'
         await FirebaseFirestore.instance.collection('deleted_members').doc(memberId).set(memberData);
-
-        // Remove o documento da coleção 'members'
         await FirebaseFirestore.instance.collection('members').doc(memberId).delete();
 
-        // Atualiza a lista de membros
         _fetchMembers();
       } else {
         print("Erro: Documento não encontrado na coleção 'members'.");
@@ -99,7 +94,7 @@ class _MembersState extends State<Members> {
                 ),
               ),
               content: Column(
-                mainAxisSize: MainAxisSize.min, // Ajusta a altura da coluna para o conteúdo
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     'Você realmente deseja excluir este membro?',
@@ -108,9 +103,9 @@ class _MembersState extends State<Members> {
                           color: Theme.of(context).textTheme.bodyLarge?.color,
                         ),
                   ),
-                  const SizedBox(height: 20), // Espaço entre o texto e os botões
+                  const SizedBox(height: 20),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Centraliza os botões horizontalmente
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(false),
@@ -256,6 +251,18 @@ class _MembersState extends State<Members> {
                   return GestureDetector(
                     onHorizontalDragUpdate: (details) => _onHorizontalDragUpdate(details, memberId),
                     onHorizontalDragEnd: (details) => _onHorizontalDragEnd(details, memberId),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ViewMemberScreen(
+                            memberData: member,
+                            onThemeToggle: widget.onThemeToggle,
+                            isDarkModeNotifier: widget.isDarkModeNotifier,
+                          ),
+                        ),
+                      );
+                    },
                     child: Stack(
                       children: [
                         Positioned.fill(
@@ -268,13 +275,13 @@ class _MembersState extends State<Members> {
                                   margin: const EdgeInsets.symmetric(horizontal: 4.0),
                                   decoration: BoxDecoration(
                                     color: const Color(0xFF015B40),
-                                    borderRadius: BorderRadius.circular(20), // Ajuste o raio para um efeito oval
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: const Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10), // Ajuste o padding para controlar o tamanho da área de fundo
+                                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                     child: Icon(
                                       Icons.edit,
-                                      size: 18, // Ajuste o tamanho do ícone
+                                      size: 18,
                                       color: Colors.white,
                                     ),
                                   ),
@@ -291,13 +298,13 @@ class _MembersState extends State<Members> {
                                   margin: const EdgeInsets.symmetric(horizontal: 4.0),
                                   decoration: BoxDecoration(
                                     color: const Color.fromARGB(255, 154, 27, 27),
-                                    borderRadius: BorderRadius.circular(20), // Ajuste o raio para um efeito oval
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: const Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10), // Ajuste o padding para controlar o tamanho da área de fundo
+                                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                                     child: Icon(
                                       Icons.delete,
-                                      size: 18, // Ajuste o tamanho do ícone
+                                      size: 18,
                                       color: Colors.white,
                                     ),
                                   ),
@@ -307,7 +314,7 @@ class _MembersState extends State<Members> {
                           ),
                         ),
                         AnimatedContainer(
-                          duration: const Duration(milliseconds: 200), // Animação de 300ms
+                          duration: const Duration(milliseconds: 200),
                           transform: Matrix4.translationValues(slidePositions[memberId] ?? 0.0, 0, 0),
                           color: Theme.of(context).scaffoldBackgroundColor,
                           padding: const EdgeInsets.symmetric(vertical: 10),
@@ -361,4 +368,3 @@ class _MembersState extends State<Members> {
     );
   }
 }
-
