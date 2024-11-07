@@ -4,6 +4,7 @@ import 'package:SoftwareIPJ/utils/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../widgets/sidebar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../widgets/custom_banner.dart'; // Importação do banner personalizado
 
 class Members extends StatefulWidget {
   final Function(bool) onThemeToggle;
@@ -26,6 +27,10 @@ class _MembersState extends State<Members> {
   String? currentlySlidMemberId;
   final FocusNode _searchFocusNode = FocusNode();
 
+  bool _isBannerVisible = false; // Controla a visibilidade do banner
+  String _bannerMessage = ''; // Mensagem do banner
+  Color _bannerColor = Colors.green; // Cor do banner
+
   @override
   void initState() {
     super.initState();
@@ -36,6 +41,12 @@ class _MembersState extends State<Members> {
         _resetSlidePositions();
       }
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _resetSlidePositions();
   }
 
   @override
@@ -73,11 +84,13 @@ class _MembersState extends State<Members> {
         await FirebaseFirestore.instance.collection('members').doc(memberId).delete();
 
         _fetchMembers();
+        _showBanner('Membro excluído!', const Color.fromARGB(255, 154, 27, 27));
       } else {
         print("Erro: Documento não encontrado na coleção 'members'.");
       }
     } catch (e) {
       print("Erro ao mover membro para a coleção 'deleted_members': $e");
+      _showBanner('Erro ao excluir membro.', const Color.fromARGB(255, 154, 27, 27));
     }
   }
 
@@ -147,7 +160,24 @@ class _MembersState extends State<Members> {
           isDarkModeNotifier: widget.isDarkModeNotifier,
         ),
       ),
-    );
+    ).then((_) {
+      _resetSlidePositions();
+    });
+  }
+
+  void _viewMember(Map<String, dynamic> member) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ViewMemberScreen(
+          memberData: member,
+          onThemeToggle: widget.onThemeToggle,
+          isDarkModeNotifier: widget.isDarkModeNotifier,
+        ),
+      ),
+    ).then((_) {
+      _resetSlidePositions();
+    });
   }
 
   void onTabTapped(int index) {
@@ -180,10 +210,24 @@ class _MembersState extends State<Members> {
     });
   }
 
+  void _showBanner(String message, Color color) {
+    setState(() {
+      _bannerMessage = message;
+      _bannerColor = color;
+      _isBannerVisible = true;
+    });
+  }
+
   void _resetSlidePositions() {
     setState(() {
       slidePositions.updateAll((key, value) => 0.0);
       currentlySlidMemberId = null;
+    });
+  }
+
+  void _hideBanner() {
+    setState(() {
+      _isBannerVisible = false;
     });
   }
 
@@ -252,16 +296,7 @@ class _MembersState extends State<Members> {
                     onHorizontalDragUpdate: (details) => _onHorizontalDragUpdate(details, memberId),
                     onHorizontalDragEnd: (details) => _onHorizontalDragEnd(details, memberId),
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ViewMemberScreen(
-                            memberData: member,
-                            onThemeToggle: widget.onThemeToggle,
-                            isDarkModeNotifier: widget.isDarkModeNotifier,
-                          ),
-                        ),
-                      );
+                      _viewMember(member);
                     },
                     child: Stack(
                       children: [
@@ -355,6 +390,16 @@ class _MembersState extends State<Members> {
                 const SizedBox(height: 100),
               ],
             ),
+            if (_isBannerVisible)
+              Positioned(
+                top: 10,
+                right: 0,
+                child: CustomBanner(
+                  message: _bannerMessage,
+                  backgroundColor: _bannerColor,
+                  onDismissed: _hideBanner, // Callback para ocultar o banner após a animação,
+                ),
+              ),
             BottomSidebar(
               currentIndex: currentIndex,
               onTabTapped: onTabTapped,
