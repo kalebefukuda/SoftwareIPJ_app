@@ -82,6 +82,7 @@ class _AppState extends State<App> {
           secondary: Color(0xFF015B40)
         ),
       ),
+      debugShowCheckedModeBanner: false, // Adicione isso
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       home: StartScreen(onThemeToggle: _toggleTheme, isDarkModeNotifier: isDarkModeNotifier),
     );
