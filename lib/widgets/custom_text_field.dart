@@ -16,6 +16,7 @@ class CustomTextField extends StatefulWidget {
   final TextInputAction? textInputAction;
   final void Function(String value)? onChanged;
   final String? Function(String? value)? validator;
+  final bool readOnly; // Adicione a propriedade readOnly
 
   const CustomTextField({
     super.key,
@@ -28,6 +29,7 @@ class CustomTextField extends StatefulWidget {
     this.textInputAction,
     this.onChanged,
     this.validator,
+    this.readOnly = false, // Define como false por padrão
   });
 
   @override
@@ -66,8 +68,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
           color: Theme.of(context).inputDecorationTheme.fillColor, // Usa a cor de fundo do tema
           borderRadius: BorderRadius.circular(15), // Aplica o radius ao container
           border: Border.all(
-            color: isFocused ? Theme.of(context).primaryColor : Colors.transparent, // Usa a cor primária do tema quando focado
-            width: isFocused ? 2.0 : 1.0,
+            color: (isFocused && !widget.readOnly)
+                ? Theme.of(context).primaryColor
+                : Colors.transparent, // Apenas mostra a borda se focado e não em modo de leitura
+            width: (isFocused && !widget.readOnly) ? 2.0 : 1.0,
           ),
         ),
         child: GestureDetector(
@@ -75,12 +79,13 @@ class _CustomTextFieldState extends State<CustomTextField> {
           child: TextFormField(
             controller: widget.controller,
             obscureText: widget.obscureText,
-            focusNode: _focusNode,
+            focusNode: widget.readOnly ? null : _focusNode, // Desativa o FocusNode no modo de leitura
             keyboardType: widget.keyboardType,
             textInputAction: widget.textInputAction,
             inputFormatters: widget.inputFormatters,
             onChanged: widget.onChanged,
             validator: widget.validator,
+            readOnly: widget.readOnly, // Adicione a propriedade readOnly
             onEditingComplete: () {
               if (widget.textInputAction == TextInputAction.next) {
                 FocusScope.of(context).nextFocus(); // Move para o próximo campo
@@ -180,7 +185,8 @@ class CustomCapitalizedTextField extends CustomTextField {
     required super.hintText,
     required super.controller,
     final ValueChanged<String>? onChanged,
-    super.textInputAction, // Repassa textInputAction para funcionar com "Próximo" e "Concluído"
+    super.textInputAction,
+    bool? readOnly, // Repassa textInputAction para funcionar com "Próximo" e "Concluído"
   }) : super(
           obscureText: false,
           onChanged: (value) {

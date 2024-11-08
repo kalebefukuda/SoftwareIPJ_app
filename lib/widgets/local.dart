@@ -7,8 +7,7 @@ class LocalField extends StatefulWidget {
   final String cityLabelText;
   final String stateLabelText;
   final Widget? icon;
-    final ValueChanged<String>? onCityChanged; // Adicionando o callback para mudanças no campo cidade
-
+  final ValueChanged<String>? onCityChanged; // Adicionando o callback para mudanças no campo cidade
 
   // Definimos os estados diretamente no widget
   final List<String> states = [
@@ -49,8 +48,8 @@ class LocalField extends StatefulWidget {
     this.icon,
     this.cityLabelText = 'Cidade', // Define valores padrão
     this.stateLabelText = 'UF',
-        this.onCityChanged, required TextInputAction textInputAction, // Callback opcional para o campo cidade
-
+    this.onCityChanged,
+    required TextInputAction textInputAction, // Callback opcional para o campo cidade
   });
 
   @override

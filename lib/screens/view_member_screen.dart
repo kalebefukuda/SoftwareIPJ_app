@@ -1,44 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:io'; // Para lidar com o arquivo de imagem selecionado
 import 'package:image_picker/image_picker.dart'; // Pacote para selecionar a imagem
 import '../utils/constants/app_colors.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_button.dart';
-import '../widgets/local.dart'; // Importe o widget personalizado
-import '../widgets/custom_drop_down.dart'; // Campo de dropdown
 import '../widgets/sidebar.dart'; // Adiciona a sidebar
-import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import '../widgets/custom_banner.dart';
-import '../services/member_service.dart';
-import '../screens/members.dart';
+import 'create_members.dart';
 
-class CreateMembersScreen extends StatefulWidget {
+class ViewMemberScreen extends StatefulWidget {
   final Function(bool) onThemeToggle;
   final ValueNotifier<bool> isDarkModeNotifier;
   final Map<String, dynamic>? memberData; // Dados do membro, se for uma edição
+  final bool isReadOnly; // Adicione esta propriedade
 
-  const CreateMembersScreen({
+  const ViewMemberScreen({
     super.key,
     required this.onThemeToggle,
     required this.isDarkModeNotifier,
     this.memberData,
+    this.isReadOnly = true,
   });
 
   @override
   // ignore: library_private_types_in_public_api
-  _CreateMembersScreenState createState() => _CreateMembersScreenState();
+  _ViewMemberScreenState createState() => _ViewMemberScreenState();
 }
 
-class _CreateMembersScreenState extends State<CreateMembersScreen> {
-  int currentIndex = 1;
+class _ViewMemberScreenState extends State<ViewMemberScreen> {
+  int currentIndex = 2;
   bool _isBannerVisible = false; // Controla a visibilidade do banner
-  String _bannerMessage = ''; // Armazena a mensagem do banner
-  Color _bannerColor = Colors.green; // Armazena a cor do banner
-
-  final MemberService _memberService = MemberService();
-
+  final String _bannerMessage = ''; // Armazena a mensagem do banner
+  final Color _bannerColor = Colors.green; // Armazena a cor do banner
   final TextEditingController nomeCompletoController = TextEditingController();
   final TextEditingController comunganteController = TextEditingController();
   final TextEditingController numeroRolController = TextEditingController();
@@ -145,74 +139,6 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
     }
   }
 
-  Future<void> _saveMember() async {
-    try {
-      // Cria o mapa com os dados do membro
-      Map<String, dynamic> memberData = {
-        'nomeCompleto': nomeCompletoController.text,
-        'comungante': comunganteController.text,
-        'numeroRol': int.tryParse(numeroRolController.text) ?? 0,
-        'dataNascimento': dataNascimentoController.text,
-        'sexo': sexoController.text,
-        'cidadeNascimento': cidadeNascimentoController.text,
-        'estadoNascimento': estadoNascimentoController.text,
-        'nomePai': nomePaiController.text,
-        'nomeMae': nomeMaeController.text,
-        'escolaridade': escolaridadeController.text,
-        'profissao': profissaoController.text,
-        'email': emailController.text,
-        'telefone': telefoneController.text,
-        'celular': celularController.text,
-        'cep': cepController.text,
-        'bairro': bairroController.text,
-        'endereco': enderecotController.text,
-        'complemento': complementoController.text,
-        'cidadeAtual': cidadeAtualController.text,
-        'estadoAtual': estadoAtualController.text,
-        'residencia': residenciaController.text,
-        'estadoCivil': estadoCivilController.text,
-        'religiao': religiaoController.text,
-        'dataBatismo': dataBatismoController.text,
-        'oficianteBatismo': oficianteBatismoController.text,
-        'dataProfissao': dataProfissaoController.text,
-        'oficianteProfissao': oficianteProfissaoController.text,
-        'dataAdmissao': dataAdmissaoController.text,
-        'ataAdmissao': ataAdmissaoController.text,
-        'formaAdmissao': formaAdmissaoController.text,
-        'dataDemissao': dataDemissaoController.text,
-        'ataDemissao': ataDemissaoController.text,
-        'formaDemissao': formaDemissaoController.text,
-        'dataRolSeparado': dataRolSeparadoController.text,
-        'ataRolSeparado': ataRolSeparadoController.text,
-        'casamentoRolSeparado': casamentoRolSeparadoController.text,
-        'dataDiscRolSeparado': dataDiscRolSeparadoController.text,
-        'ataDiscRolSeparado': ataDiscRolSeparadoController.text,
-        'discRolSeparado': discRolSeparadoController.text,
-        'dataDiac': dataDiacController.text,
-        'reeleitoDiac1': reeleitoDiac1Controller.text,
-        'reeleitoDiac2': reeleitoDiac2Controller.text,
-        'reeleitoDiac3': reeleitoDiac3Controller.text,
-        'dataPresb': dataPresbController.text,
-        'reeleitoPresb1': reeleitoPresb1Controller.text,
-        'reeleitoPresb2': reeleitoPresb2Controller.text,
-        'reeleitoPresb3': reeleitoPresb3Controller.text,
-      };
-
-      // Chama o serviço para adicionar o membro
-      if (widget.memberData != null) {
-        // Atualize o membro existente
-        await _memberService.updateMember(widget.memberData!['id'], memberData);
-      } else {
-        // Crie um novo membro
-        await _memberService.addMember(memberData);
-      }
-
-      _showBanner('Membro salvo com sucesso!', const Color(0xFF015B40));
-    } catch (e) {
-      _showBanner('Erro ao salvar membro', const Color.fromARGB(255, 154, 27, 27));
-    }
-  }
-
   @override
   void dispose() {
     cepController.dispose();
@@ -222,14 +148,6 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
     cidadeAtualController.dispose();
     estadoAtualController.dispose();
     super.dispose();
-  }
-
-  void _showBanner(String message, Color color) {
-    setState(() {
-      _bannerMessage = message; // Define a mensagem do banner
-      _bannerColor = color; // Define a cor do banner
-      _isBannerVisible = true;
-    });
   }
 
   // Definindo a função _hideBanner
@@ -278,7 +196,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   MouseRegion(
                     cursor: SystemMouseCursors.click, // Define o cursor como 'pointer' ao passar o mouse
                     child: GestureDetector(
-                      onTap: _pickImage, // Função para selecionar a imagem
+                      onTap: widget.isReadOnly ? null : _pickImage, // Desabilita a seleção de imagem se for apenas leitura
                       child: CircleAvatar(
                         radius: 70,
                         backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
@@ -310,24 +228,22 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Center(child: buildSectionTitle(context, 'Informações Pessoais')),
                   const SizedBox(height: 20),
                   Center(
-                    child: CustomCapitalizedTextField(
+                    child: CustomTextField(
                       controller: nomeCompletoController,
                       hintText: 'Nome Completo',
-                      textInputAction: TextInputAction.next,
+                      obscureText: false,
+                      readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                     ),
                   ),
                   const SizedBox(height: 20),
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDropdown(
-                          labelText: 'Comungante',
-                          controller: comunganteController,
-                          items: const [
-                            'SIM',
-                            'NÃO'
-                          ],
+                        child: CustomTextField(
                           hintText: 'Comungante',
+                          controller: comunganteController,
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
@@ -336,12 +252,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           controller: numeroRolController,
                           hintText: 'Numero de Rol',
                           obscureText: false,
-                          textInputAction: TextInputAction.next,
-                          keyboardType: TextInputType.number, // Apenas números
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(3), // Limita a 3 caracteres
-                          ], // Filtra apenas números
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                         ),
                       ),
                     ],
@@ -350,76 +261,82 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDropdown(
-                          labelText: 'Sexo',
+                        child: CustomTextField(
+                          hintText: 'Sexo',
                           controller: sexoController,
-                          items: const [
-                            'Masculino',
-                            'Feminino'
-                          ],
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomDateTextField(controller: dataNascimentoController, hintText: 'Data de nascimento'),
+                        child: CustomTextField(
+                          controller: dataNascimentoController,
+                          hintText: 'Data de nascimento',
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          obscureText: false,
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 20),
-                  LocalField(
-                    cityController: cidadeNascimentoController,
-                    stateController: estadoNascimentoController,
-                    obscureText: false,
-                    textInputAction: TextInputAction.next,
-                    onCityChanged: (value) {
-                      final capitalized = capitalize(value);
-                      if (capitalized != value) {
-                        cidadeNascimentoController.value = cidadeNascimentoController.value.copyWith(
-                          text: capitalized,
-                          selection: TextSelection.collapsed(offset: capitalized.length),
-                        );
-                      }
-                    },
-                    cityLabelText: 'Cidade Nasc.', // Personaliza o rótulo
-                    stateLabelText: 'UF Nasc.', // Personaliza o rótulo
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: CustomTextField(
+                          hintText: 'Cidade Nasc.',
+                          controller: cidadeNascimentoController,
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                        ),
+                      ),
+                      const SizedBox(width: 20), // Espaço entre os dois campos
+                      Expanded(
+                        flex: 1,
+                        child: CustomTextField(
+                          hintText: 'UF Nasc.',
+                          controller: estadoNascimentoController,
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 20),
-                  CustomCapitalizedTextField(
+                  CustomTextField(
                     controller: nomePaiController,
                     hintText: 'Nome do Pai',
-                    textInputAction: TextInputAction.next,
+                    obscureText: false,
+                    readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                   ),
                   const SizedBox(height: 20),
-                  CustomCapitalizedTextField(
+                  CustomTextField(
                     controller: nomeMaeController,
                     hintText: 'Nome da Mãe',
-                    textInputAction: TextInputAction.next,
+                    obscureText: false,
+                    readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                   ),
                   const SizedBox(height: 20),
-                  CustomCapitalizedTextField(
+                  CustomTextField(
                     controller: escolaridadeController,
                     hintText: 'Escolaridade',
-                    textInputAction: TextInputAction.next,
+                    obscureText: false,
+                    readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                   ),
                   const SizedBox(height: 20),
-                  CustomCapitalizedTextField(
+                  CustomTextField(
                     controller: profissaoController,
                     hintText: 'Profissão',
-                    textInputAction: TextInputAction.next,
+                    obscureText: false,
+                    readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                   ),
                   const SizedBox(height: 20),
                   CustomTextField(
                     controller: emailController,
                     hintText: 'E-mail',
                     obscureText: false,
-                    keyboardType: TextInputType.emailAddress, // Teclado de email
-                    textInputAction: TextInputAction.next,
-                    validator: (value) {
-                      if (value == null || value.isEmpty || !isValidEmail(value)) {
-                        return 'Por favor, insira um email válido';
-                      }
-                      return null;
-                    },
+                    readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                   ),
                   const SizedBox(height: 20),
                   Row(
@@ -429,10 +346,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           controller: telefoneController,
                           hintText: 'Telefone',
                           obscureText: false,
-                          keyboardType: TextInputType.phone, // Teclado de telefone
-                          inputFormatters: [
-                            PhoneInputFormatter(), // Utiliza o formatter personalizado
-                          ],
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
@@ -441,34 +355,22 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           controller: celularController,
                           hintText: 'Celular',
                           obscureText: false,
-                          keyboardType: TextInputType.phone, // Teclado de telefone
-                          inputFormatters: [
-                            PhoneInputFormatter(), // Utiliza o formatter personalizado
-                          ],
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                         ),
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 30),
                   Center(child: buildSectionTitle(context, 'Localização Atual')),
                   const SizedBox(height: 20),
                   Row(
                     children: [
                       Flexible(
-                        child: CustomCepTextField(
+                        child: CustomTextField(
                           controller: cepController,
-                          textInputAction: TextInputAction.next,
-                          onEnderecoEncontrado: (endereco) {
-                            setState(() {
-                              bairroController.text = endereco['bairro'] ?? '';
-                              enderecotController.text = endereco['logradouro'] ?? '';
-                              cidadeAtualController.text = endereco['localidade'] ?? '';
-                              estadoAtualController.text = endereco['uf'] ?? '';
-                            });
-                          },
-                          onCepNaoEncontrado: () => _showBanner('CEP não encontrado.', const Color.fromARGB(255, 93, 14, 14)),
-                          onErro: () => _showBanner('Erro de conexão. Verifique sua internet.', const Color.fromARGB(255, 93, 14, 14)),
+                          hintText: 'CEP',
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
@@ -477,7 +379,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           controller: bairroController,
                           hintText: 'Bairro',
                           obscureText: false,
-                          textInputAction: TextInputAction.next,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                         ),
                       ),
                     ],
@@ -487,30 +389,38 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     controller: enderecotController,
                     hintText: 'Endereço',
                     obscureText: false,
-                    textInputAction: TextInputAction.next,
+                    readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                   ),
                   const SizedBox(height: 20),
                   CustomTextField(
                     controller: complementoController,
                     hintText: 'Complemento',
                     obscureText: false,
-                    textInputAction: TextInputAction.next,
+                    readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                   ),
                   const SizedBox(height: 20),
-                  LocalField(
-                    cityController: cidadeAtualController,
-                    stateController: estadoAtualController,
-                    obscureText: false,
-                    textInputAction: TextInputAction.next,
-                    onCityChanged: (value) {
-                      final capitalized = capitalize(value);
-                      if (capitalized != value) {
-                        cidadeAtualController.value = cidadeAtualController.value.copyWith(
-                          text: capitalized,
-                          selection: TextSelection.collapsed(offset: capitalized.length),
-                        );
-                      }
-                    },
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 2,
+                        child: CustomTextField(
+                          hintText: 'Cidade',
+                          controller: cidadeAtualController,
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                        ),
+                      ),
+                      const SizedBox(width: 20), // Espaço entre os dois campos
+                      Expanded(
+                        flex: 1,
+                        child: CustomTextField(
+                          hintText: 'UF',
+                          controller: estadoAtualController,
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 30),
                   Center(child: buildSectionTitle(context, 'Outras informações')),
@@ -518,42 +428,29 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDropdown(
-                          labelText: 'Local Residência',
+                        child: CustomTextField(
+                          hintText: 'Local Residência',
                           controller: residenciaController,
-                          items: const [
-                            'Sede',
-                            'Fora'
-                          ],
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomDropdown(
-                          labelText: 'Estado Civil',
+                        child: CustomTextField(
+                          hintText: 'Estado Civil',
                           controller: estadoCivilController,
-                          items: const [
-                            'Solteiro(a)',
-                            'Casado(a)',
-                            'Viuvo(a)',
-                            'Divorciado(a)',
-                            'Outros'
-                          ],
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 20),
-                  CustomDropdown(
-                      labelText: 'Religião Procedente',
-                      items: const [
-                        'Reformada',
-                        'Pentecostal',
-                        'Neo-Pentecostal',
-                        'Católica Romana',
-                        'Espiritismos e Assemelhados',
-                        'Outros'
-                      ],
+                  CustomTextField(
+                      hintText: 'Religião Procedente',
+                      obscureText: false,
+                      readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                       controller: religiaoController),
                   const SizedBox(height: 30),
                   Center(child: buildSectionTitle(context, 'Batismo')),
@@ -562,18 +459,21 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     children: [
                       Flexible(
                         flex: 1,
-                        child: CustomDateTextField(
+                        child: CustomTextField(
                           controller: dataBatismoController,
                           hintText: 'Data',
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
                         flex: 2,
-                        child: CustomCapitalizedTextField(
+                        child: CustomTextField(
                           controller: oficianteBatismoController,
                           hintText: 'Oficiante',
-                          textInputAction: TextInputAction.next,
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                         ),
                       ),
                     ],
@@ -585,15 +485,21 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     children: [
                       Flexible(
                         flex: 1,
-                        child: CustomDateTextField(controller: dataProfissaoController, hintText: 'Data'),
+                        child: CustomTextField(
+                          controller: dataProfissaoController,
+                          hintText: 'Data',
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                        ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
                         flex: 2,
-                        child: CustomCapitalizedTextField(
+                        child: CustomTextField(
                           controller: oficianteProfissaoController,
                           hintText: 'Oficiante',
-                          textInputAction: TextInputAction.next,
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                         ),
                       ),
                     ],
@@ -605,38 +511,32 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     children: [
                       Flexible(
                         flex: 1,
-                        child: CustomDateTextField(controller: dataAdmissaoController, hintText: 'Data'),
+                        child: CustomTextField(
+                          controller: dataAdmissaoController,
+                          hintText: 'Data',
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                        ),
                       ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
+                      const SizedBox(width: 20),
                       Flexible(
                         flex: 2,
                         child: CustomTextField(
                           controller: ataAdmissaoController,
                           hintText: 'Ata',
                           obscureText: false,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 20),
                   Flexible(
-                    child: CustomDropdown(
-                      labelText: 'Forma',
+                    child: CustomTextField(
+                      hintText: 'Forma',
                       controller: formaAdmissaoController,
-                      items: const [
-                        'Transferência',
-                        'Batismo',
-                        'Profissão de Fé',
-                        'Batismo e Profissão de Fé',
-                        'Jurisdição a pedido',
-                        'Jurisdição Ex-Officio',
-                        'Restauração',
-                        'Designação e Presbitério'
-                      ],
+                      obscureText: false,
+                      readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -646,38 +546,32 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     children: [
                       Flexible(
                         flex: 1,
-                        child: CustomDateTextField(controller: dataDemissaoController, hintText: 'Data'),
+                        child: CustomTextField(
+                          controller: dataDemissaoController,
+                          hintText: 'Data',
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                        ),
                       ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
+                      const SizedBox(width: 20),
                       Flexible(
                         flex: 2,
                         child: CustomTextField(
                           controller: ataDemissaoController,
                           hintText: 'Ata',
                           obscureText: false,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 20),
                   Flexible(
-                    child: CustomDropdown(
-                      labelText: 'Forma',
+                    child: CustomTextField(
+                      hintText: 'Forma',
                       controller: formaDemissaoController,
-                      items: const [
-                        'Transferência',
-                        'Batismo',
-                        'Profissão de Fé',
-                        'Batismo e Profissão de Fé',
-                        'Jurisdição a pedido',
-                        'Jurisdição Ex-Officio',
-                        'Restauração',
-                        'Designação e Presbitério'
-                      ],
+                      obscureText: false,
+                      readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -686,25 +580,29 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDateTextField(controller: dataRolSeparadoController, hintText: 'Data'),
+                        child: CustomTextField(
+                          controller: dataRolSeparadoController,
+                          hintText: 'Data',
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                        ),
                       ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
+                      const SizedBox(width: 20),
                       Flexible(
                         child: CustomTextField(
                           controller: ataRolSeparadoController,
                           hintText: 'Ata',
                           obscureText: false,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomDateTextField(
+                        child: CustomTextField(
                           controller: casamentoRolSeparadoController,
                           hintText: 'Casamento',
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar',
                         ),
                       ),
                     ],
@@ -713,7 +611,12 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDateTextField(controller: dataDiscRolSeparadoController, hintText: 'Data Disc.'),
+                        child: CustomTextField(
+                          controller: dataDiscRolSeparadoController,
+                          hintText: 'Data Disc.',
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                        ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
@@ -721,10 +624,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           controller: ataDiscRolSeparadoController,
                           hintText: 'Ata Disc.',
                           obscureText: false,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
@@ -733,6 +633,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           controller: discRolSeparadoController,
                           hintText: 'Disciplina',
                           obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
                         ),
                       ),
                     ],
@@ -743,11 +644,21 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDateTextField(controller: dataDiacController, hintText: 'Data'),
+                        child: CustomTextField(
+                          controller: dataDiacController,
+                          hintText: 'Data',
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                        ),
                       ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
+                      const SizedBox(width: 20),
                       Flexible(
-                        child: CustomDateTextField(controller: reeleitoDiac1Controller, hintText: 'Reeleito em'),
+                        child: CustomTextField(
+                          controller: reeleitoDiac1Controller,
+                          hintText: 'Reeleito em',
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                        ),
                       ),
                     ],
                   ),
@@ -755,11 +666,21 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDateTextField(controller: reeleitoDiac2Controller, hintText: 'Reeleito em'),
+                        child: CustomTextField(
+                          controller: reeleitoDiac2Controller,
+                          hintText: 'Reeleito em',
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                        ),
                       ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
+                      const SizedBox(width: 20),
                       Flexible(
-                        child: CustomDateTextField(controller: reeleitoDiac3Controller, hintText: 'Reeleito em'),
+                        child: CustomTextField(
+                          controller: reeleitoDiac3Controller,
+                          hintText: 'Reeleito em',
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                        ),
                       ),
                     ],
                   ),
@@ -769,11 +690,21 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDateTextField(controller: dataPresbController, hintText: 'Data'),
+                        child: CustomTextField(
+                          controller: dataPresbController,
+                          hintText: 'Data',
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                        ),
                       ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
+                      const SizedBox(width: 20),
                       Flexible(
-                        child: CustomDateTextField(controller: reeleitoPresb1Controller, hintText: 'Reeleito em'),
+                        child: CustomTextField(
+                          controller: reeleitoPresb1Controller,
+                          hintText: 'Reeleito em',
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                        ),
                       ),
                     ],
                   ),
@@ -781,39 +712,43 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDateTextField(controller: reeleitoPresb2Controller, hintText: 'Reeleito em'),
+                        child: CustomTextField(
+                          controller: reeleitoPresb2Controller,
+                          hintText: 'Reeleito em',
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                        ),
                       ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
+                      const SizedBox(width: 20),
                       Flexible(
-                        child: CustomDateTextField(controller: reeleitoPresb3Controller, hintText: 'Reeleito em'),
+                        child: CustomTextField(
+                          controller: reeleitoPresb3Controller,
+                          hintText: 'Reeleito em',
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 30),
                   Center(
-                      child: CustomButton(
-                    text: 'Salvar',
-                    onPressed: () {
-                      try {
-                        _saveMember();
+                    child: CustomButton(
+                      text: 'Editar',
+                      onPressed: () {
+                        // Navegue para a tela de edição do membro com os dados atuais do membro
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => Members(
-                              onThemeToggle: widget.onThemeToggle,
-                              isDarkModeNotifier: widget.isDarkModeNotifier,
-                              successMessage: 'Membro salvo com sucesso!', // Passe a mensagem
+                            builder: (context) => CreateMembersScreen(
+                              memberData: widget.memberData, // Passe os dados do membro para a tela de edição
+                              onThemeToggle: widget.onThemeToggle, // Passe a função de alternar tema
+                              isDarkModeNotifier: widget.isDarkModeNotifier, // Passe o ValueNotifier para o modo escuro
                             ),
                           ),
                         );
-                      } catch (e) {
-                        _showBanner('Erro ao salvar membro', const Color.fromARGB(255, 154, 27, 27));
-
-                        // ignore: avoid_print
-                        print(e);
-                      }
-                    },
-                  )),
+                      },
+                    ),
+                  ),
                   const SizedBox(height: 100), //Esse Widget é para dar uma espaçamento final para a sidebar não sobrepor os itens da tela
                 ],
               ),
@@ -863,26 +798,5 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
         style: Theme.of(context).textTheme.titleMedium, // Usa o estilo definido no tema
       ),
     );
-  }
-}
-
-// Função para capitalizar cada palavra:
-String capitalize(String input) {
-  return input.split(' ').map((str) => str.isNotEmpty ? str[0].toUpperCase() + str.substring(1).toLowerCase() : '').join(' ');
-}
-
-// Função para validar o email:
-bool isValidEmail(String email) {
-  final RegExp regex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-  return regex.hasMatch(email);
-}
-
-// Função para criar o formatter de telefone.
-class PhoneInputFormatter extends MaskedInputFormatter {
-  PhoneInputFormatter() : super('(##) #####-####');
-
-  // Função para remover os caracteres especiais e salvar apenas números
-  static String removeFormatting(String input) {
-    return toNumericString(input);
   }
 }
