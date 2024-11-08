@@ -36,7 +36,7 @@ class _CardRegisterState extends State<CardRegister> {
           Expanded(
             child: Text(
               'Cadastro de Membros',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 color: Colors.white,
               ),
               textAlign: TextAlign.center, // Centraliza o texto no espaço disponível
