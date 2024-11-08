@@ -220,7 +220,7 @@ class _MembersState extends State<Members> {
       _bannerMessage = message;
       _bannerColor = color;
       _isBannerVisible = true;
-    });
+    }); 
   }
 
   void _resetSlidePositions() {
