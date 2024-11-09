@@ -14,5 +14,7 @@ class Appcolors {
   static const Color backDark = Color(0xFF000000);
   static const Color backLight = Color(0xFF2D2D2D);
   static const Color white = Color(0xFFFFFFFF);
+
+  static var primary;
   
 }

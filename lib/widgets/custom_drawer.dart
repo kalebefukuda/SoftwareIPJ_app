@@ -143,7 +143,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
       child: Align(
         alignment: Alignment.center,
         child: Text(
-          'v.0.5.4',
+          'v.0.6.6',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Colors.white,
               ),
