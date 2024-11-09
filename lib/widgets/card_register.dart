@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class CardRegister extends StatefulWidget {
   const CardRegister({super.key});
@@ -21,17 +21,13 @@ class _CardRegisterState extends State<CardRegister> {
         borderRadius: BorderRadius.circular(35),
       ),
       child: Row(
-        
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          
-          // Ícone do cadastro
-          SvgPicture.asset(
-            'assets/images/create_member.svg',
-            width: 50,
-            height: 50,
+          PhosphorIcon(
+              PhosphorIcons.userPlus(PhosphorIconsStyle.bold),
+              size: 50,
+              color: Colors.white,
           ),
-          
           // Texto do cadastro
           Expanded(
             child: Text(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class CardMembers extends StatefulWidget {
   const CardMembers({super.key});
@@ -23,11 +23,11 @@ class _CardMembersState extends State<CardMembers> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Ícone de membros
-          SvgPicture.asset(
-            'assets/images/members.svg',
-            width: 50,
-            height: 50,
+          // Use o widget PhosphorIcon com o estilo correto
+          PhosphorIcon(
+            PhosphorIcons.users(PhosphorIconsStyle.bold), // Defina o estilo do ícone
+            size: 50,
+            color: Colors.white,
           ),
         ],
       ),
