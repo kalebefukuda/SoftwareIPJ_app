@@ -1,6 +1,6 @@
 import 'package:SoftwareIPJ/screens/login.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class CustomDrawer extends StatefulWidget {
   final Function(bool) onThemeToggle;
@@ -118,10 +118,10 @@ class _CustomDrawerState extends State<CustomDrawer> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SvgPicture.asset(
-                'assets/images/exit.svg',
-                width: 24,
-                height: 24,
+              PhosphorIcon(
+                PhosphorIcons.signOut(),
+                size: 24,
+                color: Colors.white,
               ),
               const SizedBox(width: 50),
               Text(
