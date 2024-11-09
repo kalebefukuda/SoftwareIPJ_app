@@ -86,8 +86,8 @@ class BottomSidebar extends StatelessWidget {
                                   },
                             icon: PhosphorIcon(
                               PhosphorIcons.house(PhosphorIconsStyle.bold),
-                              color: currentIndex == 0 ? Colors.grey : Theme.of(context).iconTheme.color,
-                              size: 24,
+                              color: currentIndex == 0 ? Theme.of(context).primaryColor : Theme.of(context).colorScheme.tertiary,
+                              size: currentIndex == 0 ? 30 : 24,
                             ),
                           ),
                           // Ícone Criar Membro
@@ -108,8 +108,9 @@ class BottomSidebar extends StatelessWidget {
                                   },
                             icon: PhosphorIcon(
                               PhosphorIcons.userPlus(PhosphorIconsStyle.bold),
-                              color: currentIndex == 1 ? Colors.grey : Theme.of(context).iconTheme.color,
-                              size: 24,
+                              color: currentIndex == 1 ? Theme.of(context).primaryColor : Theme.of(context).colorScheme.tertiary,
+                              size: currentIndex == 1 ? 30 : 24,
+
                             ),
                           ),
                           // Ícone Membros
@@ -130,8 +131,9 @@ class BottomSidebar extends StatelessWidget {
                                   },
                             icon: PhosphorIcon(
                               PhosphorIcons.users(PhosphorIconsStyle.bold),
-                              color: currentIndex == 2 ? Colors.grey : Theme.of(context).iconTheme.color,
-                              size: 24,
+                              color: currentIndex == 2 ? Theme.of(context).primaryColor : Theme.of(context).colorScheme.tertiary,
+                              size: currentIndex == 2 ? 30 : 24,
+
                             ),
                           ),
                           // Ícone Arquivo
@@ -152,8 +154,9 @@ class BottomSidebar extends StatelessWidget {
                                   },
                             icon: PhosphorIcon(
                               PhosphorIcons.file(PhosphorIconsStyle.bold),
-                              color: currentIndex == 3 ? Colors.grey : Theme.of(context).iconTheme.color,
-                              size: 24,
+                              color: currentIndex == 3 ? Theme.of(context).primaryColor : Theme.of(context).colorScheme.tertiary,
+                              size: currentIndex == 3 ? 30 : 24,
+
                             ),
                           ),
                         ],
