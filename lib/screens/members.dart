@@ -220,7 +220,7 @@ class _MembersState extends State<Members> {
       _bannerMessage = message;
       _bannerColor = color;
       _isBannerVisible = true;
-    }); 
+    });
   }
 
   void _resetSlidePositions() {
@@ -363,7 +363,9 @@ class _MembersState extends State<Members> {
                             children: [
                               CircleAvatar(
                                 radius: 28,
-                                backgroundImage: member['foto'] != null && member['foto'] is String ? NetworkImage(member['foto']) : const AssetImage('assets/images/avatar_placeholder.png') as ImageProvider,
+                                backgroundImage: member['foto'] != null && member['foto'] is String
+                                    ? NetworkImage(member['foto'])
+                                    : const AssetImage('assets/images/avatar_placeholder.png') as ImageProvider,
                               ),
                               const SizedBox(width: 16),
                               Expanded(

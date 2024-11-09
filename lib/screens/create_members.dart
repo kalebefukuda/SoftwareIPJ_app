@@ -13,6 +13,7 @@ import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import '../widgets/custom_banner.dart';
 import '../services/member_service.dart';
 import '../screens/members.dart';
+import 'package:firebase_storage/firebase_storage.dart'; // Importe o Firebase Storage
 
 class CreateMembersScreen extends StatefulWidget {
   final Function(bool) onThemeToggle;
@@ -147,6 +148,22 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
 
   Future<void> _saveMember() async {
     try {
+      // Se houver uma imagem selecionada, faça o upload para o Firebase Storage
+      String? imageUrl;
+      if (_selectedImage != null) {
+      // Crie uma referência ao Firebase Storage
+      final storageRef = FirebaseStorage.instance
+          .ref()
+          .child('membros')
+          .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
+
+      // Faça o upload do arquivo
+      final uploadTask = storageRef.putFile(_selectedImage!);
+
+      // Espere o upload ser concluído e pegue a URL da imagem
+      final snapshot = await uploadTask.whenComplete(() {});
+      imageUrl = await snapshot.ref.getDownloadURL();
+    }
       // Cria o mapa com os dados do membro
       Map<String, dynamic> memberData = {
         'nomeCompleto': nomeCompletoController.text,
@@ -196,6 +213,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
         'reeleitoPresb1': reeleitoPresb1Controller.text,
         'reeleitoPresb2': reeleitoPresb2Controller.text,
         'reeleitoPresb3': reeleitoPresb3Controller.text,
+        'imageUrl': imageUrl, // Adicione a URL da imagem
       };
 
       // Chama o serviço para adicionar o membro
@@ -290,7 +308,6 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                                     'assets/images/user-round.svg',
                                     height: 50,
                                     width: 50,
-                                    // ignore: deprecated_member_use
                                     color: Theme.of(context).iconTheme.color, // Usa a cor do iconTheme conforme o tema
                                   ),
                                 ],
@@ -298,8 +315,8 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                             : ClipOval(
                                 child: Image.file(
                                   _selectedImage!,
-                                  width: 100,
-                                  height: 100,
+                                  width: 140,
+                                  height: 140,
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -844,13 +861,24 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
 /* ----------------------FUNÇÕES----------------- */
 
   // Função para pegar a imagem da galeria
+  // Função para pegar a imagem da galeria
   Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    try {
+      // Abre o seletor de imagens
+      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
 
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path); // Atualiza o estado com a imagem selecionada
-      });
+      if (pickedFile != null) {
+        setState(() {
+          _selectedImage = File(pickedFile.path); // Atualiza o estado com a imagem selecionada
+        });
+      } else {
+        // Usuário cancelou a seleção de imagem
+        _showBanner('Seleção de imagem cancelada.', const Color.fromARGB(255, 142, 85, 0));
+      }
+    } catch (e) {
+      // Captura erros durante a seleção de imagem
+      _showBanner('Erro ao selecionar imagem: $e', const Color.fromARGB(255, 154, 27, 27));
+      print('Erro ao selecionar imagem: $e');
     }
   }
 
