@@ -7,6 +7,7 @@ import '../widgets/card_members.dart';
 import '../widgets/card_report_home.dart';
 import '../widgets/card_count_members.dart';
 import '../widgets/custom_drawer.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
   final Function(bool) onThemeToggle;
@@ -40,8 +41,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: () {
                     Scaffold.of(context).openDrawer(); // Abre o menu lateral
                   },
-                  icon: Icon(
-                    Icons.menu,
+                  icon: PhosphorIcon(
+                    Icons.menu_rounded, // Ou qualquer outro ícone que você queira da biblioteca Phosphor
                     size: 40,
                     color: Theme.of(context).iconTheme.color,
                   ),
