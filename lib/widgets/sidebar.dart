@@ -86,8 +86,9 @@ class BottomSidebar extends StatelessWidget {
                                   },
                             icon: SvgPicture.asset(
                               'assets/images/house.svg',
-                              color: currentIndex == 0 ? Colors.grey : Theme.of(context).iconTheme.color,
-                              height: 24,
+                              // ignore: deprecated_member_use
+                              color: currentIndex == 0 ? Theme.of(context).primaryColor : Theme.of(context).colorScheme.tertiary,
+                              height: currentIndex == 0 ? 30 : 24,
                               width: 24,
                             ),
                           ),
@@ -109,9 +110,9 @@ class BottomSidebar extends StatelessWidget {
                                   },
                             icon: SvgPicture.asset(
                               'assets/images/create_member.svg',
-                              color: currentIndex == 1 ? Colors.grey : Theme.of(context).iconTheme.color,
-                              height: 24,
-                              width: 24,
+                              // ignore: deprecated_member_use
+                              color: currentIndex == 1 ? Theme.of(context).primaryColor : Theme.of(context).colorScheme.tertiary,
+                              height: currentIndex == 1 ? 30 : 24,
                             ),
                           ),
                           // Ícone Membros
@@ -132,8 +133,9 @@ class BottomSidebar extends StatelessWidget {
                                   },
                             icon: SvgPicture.asset(
                               'assets/images/members.svg',
-                              color: currentIndex == 2 ? Colors.grey : Theme.of(context).iconTheme.color,
-                              height: 24,
+                              // ignore: deprecated_member_use
+                              color: currentIndex == 2 ? Theme.of(context).primaryColor : Theme.of(context).colorScheme.tertiary,
+                              height: currentIndex == 2 ? 30 : 24,
                               width: 24,
                             ),
                           ),
@@ -155,8 +157,9 @@ class BottomSidebar extends StatelessWidget {
                                   },
                             icon: SvgPicture.asset(
                               'assets/images/file.svg',
-                              color: currentIndex == 3 ? Colors.grey : Theme.of(context).iconTheme.color,
-                              height: 24,
+                              // ignore: deprecated_member_use
+                              color: currentIndex == 3 ? Theme.of(context).primaryColor : Theme.of(context).colorScheme.tertiary,
+                              height: currentIndex == 3 ? 30 : 24,
                               width: 24,
                             ),
                           ),

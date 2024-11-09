@@ -50,38 +50,93 @@ class _AppState extends State<App> {
         primaryColor: const Color(0xFF015B40),
         brightness: Brightness.light,
         textTheme: const TextTheme(
-          bodyLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: Colors.black),
-          bodyMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: Colors.grey),
-          bodySmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xFF015B40)),
-          titleMedium: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Color(0xFF015B40)),
-
-          titleLarge: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Color.fromARGB(255, 255, 255, 255)),
+          bodyLarge: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.normal,
+            color: Colors.black,
+          ),
+          bodyMedium: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.normal,
+            color: Colors.grey,
+          ),
+          bodySmall: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF015B40),
+          ),
+          titleMedium: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF015B40),
+          ),
+          titleLarge: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+            color: Color.fromARGB(255, 255, 255, 255),
+          ),
         ),
-        appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF015B40)),
-        inputDecorationTheme: const InputDecorationTheme(fillColor: Color(0xFFE7E7E7), filled: true),
-        iconTheme: const IconThemeData(color: Color(0xFF015B40)),
-        colorScheme: const ColorScheme.light(primary: Color(0xFF015B40), secondary: Color.fromARGB(255, 0, 145, 101)),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF015B40),
+        ),
+        inputDecorationTheme: const InputDecorationTheme(
+          fillColor: Color(0xFFE7E7E7),
+          filled: true,
+        ),
+        iconTheme: const IconThemeData(
+          color: Color(0xFF015B40),
+        ),
+        colorScheme: const ColorScheme.light(
+          primary: Color(0xFF015B40),
+          secondary: Color.fromARGB(255, 0, 145, 101),
+          tertiary: Color.fromARGB(255, 109, 109, 109),
+        ),
       ),
       darkTheme: ThemeData(
         fontFamily: 'Poppins',
         scaffoldBackgroundColor: const Color.fromARGB(255, 0, 0, 0),
         primaryColor: const Color.fromARGB(255, 0, 145, 101),
         brightness: Brightness.dark,
-        textTheme:  const TextTheme(
-          bodyLarge: TextStyle(fontSize: 14, color: Colors.white),
-          bodyMedium: TextStyle(fontSize: 14, color: Colors.grey),
-          titleMedium: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.white),
-          bodySmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white),
-          titleLarge: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Color.fromARGB(255, 255, 255, 255)),
+        textTheme: const TextTheme(
+          bodyLarge: TextStyle(
+            fontSize: 14,
+            color: Colors.white,
+          ),
+          bodyMedium: TextStyle(
+            fontSize: 14,
+            color: Colors.grey,
+          ),
+          titleMedium: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+            color: Colors.white,
+          ),
+          bodySmall: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Colors.white,
+          ),
+          titleLarge: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+            color: Color.fromARGB(255, 255, 255, 255),
+          ),
         ),
-        appBarTheme: const AppBarTheme(backgroundColor: Color.fromARGB(255, 0, 0, 0)),
-        inputDecorationTheme: const InputDecorationTheme(fillColor: Color(0xFF1F1F1F), filled: true),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color.fromARGB(255, 0, 0, 0),
+        ),
+        inputDecorationTheme: const InputDecorationTheme(
+          fillColor: Color(0xFF1F1F1F),
+          filled: true,
+        ),
         iconTheme: const IconThemeData(color: Colors.white),
         colorScheme: const ColorScheme.dark(
-          primary: Color.fromARGB(255, 45, 45, 45), 
-          secondary: Color(0xFF015B40)
+          primary: Color.fromARGB(255, 45, 45, 45),
+          secondary: Color(0xFF015B40),
+          tertiary: Color.fromARGB(255, 186, 186, 186),
         ),
       ),
+      debugShowCheckedModeBanner: false, // Adicione isso
       themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
       home: StartScreen(onThemeToggle: _toggleTheme, isDarkModeNotifier: isDarkModeNotifier),
     );
