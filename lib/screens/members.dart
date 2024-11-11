@@ -1,10 +1,12 @@
-import 'package:SoftwareIPJ/screens/view_member_screen.dart'; // Importar a nova tela de visualização
+import 'package:SoftwareIPJ/screens/view_member_screen.dart';
 import 'package:SoftwareIPJ/screens/create_members.dart';
 import 'package:SoftwareIPJ/utils/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../widgets/sidebar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../widgets/custom_banner.dart'; // Importação do banner personalizado
+import '../services/member_service.dart';
+import '../widgets/custom_banner.dart'; 
+
 
 class Members extends StatefulWidget {
   final Function(bool) onThemeToggle;
@@ -25,9 +27,16 @@ class Members extends StatefulWidget {
 class _MembersState extends State<Members> {
   int currentIndex = 2;
   List<Map<String, dynamic>> membersData = [];
+  List<Map<String, dynamic>> filteredMembers = [];
   Map<String, double> slidePositions = {};
   String? currentlySlidMemberId;
   final FocusNode _searchFocusNode = FocusNode();
+  final TextEditingController _searchController = TextEditingController();
+  int maleCount = 0;
+  int femaleCount = 0;
+  bool filterMen = false;
+  bool filterWomen = false;
+  final MemberService memberService = MemberService();
 
   bool _isBannerVisible = false; // Controla a visibilidade do banner
   String _bannerMessage = ''; // Mensagem do banner
@@ -40,12 +49,28 @@ class _MembersState extends State<Members> {
       _showBanner(widget.successMessage!, const Color(0xFF015B40));
     }
     _fetchMembers();
+    _getMemberCounts();
 
     _searchFocusNode.addListener(() {
       if (_searchFocusNode.hasFocus) {
         _resetSlidePositions();
       }
     });
+
+    _searchController.addListener(_filterMembers);
+  }
+
+  Future<void> _getMemberCounts() async {
+    try {
+      // Usa a função do serviço para obter as contagens
+      Map<String, int> counts = await memberService.getMemberCountByGender();
+      setState(() {
+        maleCount = counts['Masculino'] ?? 0;
+        femaleCount = counts['Feminino'] ?? 0;
+      });
+    } catch (e) {
+      print("Erro ao obter contagem de membros: $e");
+    }
   }
 
   @override
@@ -57,36 +82,85 @@ class _MembersState extends State<Members> {
   @override
   void dispose() {
     _searchFocusNode.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
   Future<void> _fetchMembers() async {
     try {
-      final QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('members').get();
+      final QuerySnapshot snapshot =
+          await FirebaseFirestore.instance.collection('members').get();
 
       setState(() {
         membersData = snapshot.docs
-            .map((doc) => {
-                  'id': doc.id,
-                  ...doc.data() as Map<String, dynamic>
-                })
+            .map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>})
             .toList();
+        filteredMembers = List.from(membersData);
       });
     } catch (e) {
       print("Erro ao buscar membros: $e");
     }
   }
 
+  void _filterMembers() {
+    String query = _searchController.text.toLowerCase();
+    setState(() {
+      filteredMembers = membersData.where((member) {
+        bool matchesQuery =
+            member['nomeCompleto']?.toLowerCase().contains(query) ?? false;
+        bool matchesGender = true;
+
+        if (filterMen) {
+          matchesGender = member['sexo'] == 'Masculino';
+        } else if (filterWomen) {
+          matchesGender = member['sexo'] == 'Feminino';
+        }
+
+        return matchesQuery && matchesGender;
+      }).toList();
+    });
+  }
+
+  void _toggleGenderFilter(String gender) {
+    setState(() {
+      if (gender == 'Masculino') {
+        filterMen = !filterMen;
+        if (filterMen) filterWomen = false;
+      } else if (gender == 'Feminino') {
+        filterWomen = !filterWomen;
+        if (filterWomen) filterMen = false;
+      }
+
+      _filterMembers();
+    });
+  }
+
   Future<void> _deleteMember(String memberId) async {
     try {
-      DocumentSnapshot memberSnapshot = await FirebaseFirestore.instance.collection('members').doc(memberId).get();
+      // Obtém o documento original da coleção 'members'
+      DocumentSnapshot memberSnapshot = await FirebaseFirestore.instance
+          .collection('members')
+          .doc(memberId)
+          .get();
 
       if (memberSnapshot.exists) {
-        Map<String, dynamic> memberData = memberSnapshot.data() as Map<String, dynamic>;
-        memberData['deletedAt'] = DateTime.now().toIso8601String();
+        // Adiciona a data e hora da exclusão ao documento
+        Map<String, dynamic> memberData =
+            memberSnapshot.data() as Map<String, dynamic>;
+        memberData['deletedAt'] =
+            DateTime.now().toIso8601String(); // Adiciona a data de exclusão
 
-        await FirebaseFirestore.instance.collection('deleted_members').doc(memberId).set(memberData);
-        await FirebaseFirestore.instance.collection('members').doc(memberId).delete();
+        // Copia o documento para a coleção 'deleted_members'
+        await FirebaseFirestore.instance
+            .collection('deleted_members')
+            .doc(memberId)
+            .set(memberData);
+
+        // Remove o documento da coleção 'members'
+        await FirebaseFirestore.instance
+            .collection('members')
+            .doc(memberId)
+            .delete();
 
         _fetchMembers();
         _showBanner('Membro excluído!', const Color.fromARGB(255, 154, 27, 27));
@@ -199,7 +273,8 @@ class _MembersState extends State<Members> {
 
       currentlySlidMemberId = memberId;
 
-      slidePositions[memberId] = (slidePositions[memberId] ?? 0.0) + details.delta.dx;
+      slidePositions[memberId] =
+          (slidePositions[memberId] ?? 0.0) + details.delta.dx;
       slidePositions[memberId] = slidePositions[memberId]!.clamp(-130.0, 0.0);
     });
   }
@@ -265,19 +340,60 @@ class _MembersState extends State<Members> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text('120 Homens', style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 16)),
+                    GestureDetector(
+                      onTap: () => _toggleGenderFilter('Masculino'),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: filterMen
+                              ? Color(0xFF015B40)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          '$maleCount Homens',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(fontSize: 16),
+                        ),
+                      ),
+                    ),
                     const SizedBox(width: 20),
-                    Text('80 Mulheres', style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 16)),
+                    GestureDetector(
+                      onTap: () => _toggleGenderFilter('Feminino'),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: filterWomen
+                              ? Color.fromARGB(117, 2, 161, 113)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          '$femaleCount Mulheres',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(fontSize: 16),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 TextField(
+                  controller: _searchController,
                   focusNode: _searchFocusNode,
                   decoration: InputDecoration(
                     hintText: 'Pesquisar',
-                    hintStyle: const TextStyle(fontSize: 17, color: Color(0xFFB5B5B5), fontWeight: FontWeight.w400),
+                    hintStyle: const TextStyle(
+                        fontSize: 17,
+                        color: Color(0xFFB5B5B5),
+                        fontWeight: FontWeight.w400),
                     filled: true,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 1),
+                    contentPadding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 1),
                     fillColor: Theme.of(context).inputDecorationTheme.fillColor,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -292,10 +408,13 @@ class _MembersState extends State<Members> {
                 const SizedBox(height: 16),
                 Text(
                   'Todos os membros:',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 17, fontWeight: FontWeight.w600),
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontSize: 17, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 16),
-                ...membersData.map((member) {
+                ...filteredMembers.map((member) {
                   String memberId = member['id'];
                   return GestureDetector(
                     onHorizontalDragUpdate: (details) => _onHorizontalDragUpdate(details, memberId),
@@ -305,6 +424,7 @@ class _MembersState extends State<Members> {
                     },
                     child: Stack(
                       children: [
+                        // Botões de editar e deletar
                         Positioned.fill(
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -312,7 +432,8 @@ class _MembersState extends State<Members> {
                               GestureDetector(
                                 onTap: () => _editMember(member),
                                 child: Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 4.0),
                                   decoration: BoxDecoration(
                                     color: const Color(0xFF015B40),
                                     borderRadius: BorderRadius.circular(20),
@@ -335,8 +456,10 @@ class _MembersState extends State<Members> {
                                   }
                                 },
                                 child: Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 4.0),
                                   decoration: BoxDecoration(
+
                                     color: const Color.fromARGB(255, 154, 27, 27),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
@@ -374,12 +497,17 @@ class _MembersState extends State<Members> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      member['nomeCompleto'] ?? 'Nome não disponível',
-                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 16),
+                                      member['nomeCompleto'] ??
+                                          'Nome não disponível',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(fontSize: 16),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      member['telefone'] ?? 'Telefone não disponível',
+                                      member['telefone'] ??
+                                          'Telefone não disponível',
                                       style: const TextStyle(
                                         color: Color(0xFFB5B5B5),
                                       ),
@@ -393,7 +521,7 @@ class _MembersState extends State<Members> {
                       ],
                     ),
                   );
-                }),
+                }).toList(),
                 const SizedBox(height: 100),
               ],
             ),
