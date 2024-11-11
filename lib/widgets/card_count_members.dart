@@ -1,43 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../services/member_service.dart';
 
 class MembersCountCard extends StatelessWidget {
-  const MembersCountCard({super.key});
+  MembersCountCard({super.key});
+
+  final MemberService memberService = MemberService();
 
   Future<Map<String, int>> _fetchMemberData() async {
-    // Simula a futura chamada para uma API para buscar as informações dos membros
-    await Future.delayed(const Duration(milliseconds: 500));
-    return {
-      'total': 200,
-      'homens': 120,
-      'mulheres': 80,
-    };
+    try {
+      // Usa a função do serviço para obter as contagens reais
+      Map<String, int> counts = await memberService.getMemberCountByGender();
+      return {
+        'total': (counts['Masculino'] ?? 0) + (counts['Feminino'] ?? 0),
+        'homens': counts['Masculino'] ?? 0,
+        'mulheres': counts['Feminino'] ?? 0,
+      };
+    } catch (e) {
+      print("Erro ao carregar dados dos membros: $e");
+      return {'total': 0, 'homens': 0, 'mulheres': 0};
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Map<String, int>>(
-      future: _fetchMemberData(), // Simula a chamada para uma API futura
+      future: _fetchMemberData(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator()); // Exibe indicador de progresso enquanto carrega
+          return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return const Text('Erro ao carregar os dados dos membros');
         } else if (snapshot.hasData) {
           final memberData = snapshot.data!;
-          // Define o caminho da imagem SVG baseado no tema atual (claro ou escuro)
           final svgPath = Theme.of(context).brightness == Brightness.dark
               ? 'assets/images/4_card_dark1.svg'
               : 'assets/images/4_card_light1.svg';
 
           return Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary, // Cor de fundo do card
-              borderRadius: BorderRadius.circular(35), // Bordas arredondadas
+              color: Theme.of(context).colorScheme.primary,
+              borderRadius: BorderRadius.circular(35),
             ),
             child: Row(
               children: [
-                // Divisão esquerda: imagem
                 Expanded(
                   flex: 2,
                   child: ClipRRect(
@@ -46,24 +52,23 @@ class MembersCountCard extends StatelessWidget {
                       bottomLeft: Radius.circular(35),
                     ),
                     child: SvgPicture.asset(
-                      svgPath, // Caminho da imagem baseado no tema
+                      svgPath,
                       fit: BoxFit.cover,
-                      height: 323, // Altura do card
+                      height: 323,
                     ),
                   ),
                 ),
-                // Divisão direita: três quadrados para contagem dos membros
                 Expanded(
                   flex: 1,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start, // Garante que a coluna também comece do início
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildMemberCountBox(context, memberData['total']!),
+                      _buildAnimatedCountBox(context, memberData['total']!),
                       const SizedBox(height: 60),
-                      _buildMemberCountBox(context, memberData['homens']!),
+                      _buildAnimatedCountBox(context, memberData['homens']!),
                       const SizedBox(height: 30),
-                      _buildMemberCountBox(context, memberData['mulheres']!),
+                      _buildAnimatedCountBox(context, memberData['mulheres']!),
                     ],
                   ),
                 ),
@@ -71,28 +76,34 @@ class MembersCountCard extends StatelessWidget {
             ),
           );
         }
-        return const SizedBox.shrink(); // Caso padrão se não houver dados
+        return const SizedBox.shrink();
       },
     );
   }
 
-  // Método para construir cada "quadrado" com a contagem de membros
-  Widget _buildMemberCountBox(BuildContext context, int count) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.secondary, // Cor de fundo dos quadrados
-        borderRadius: BorderRadius.circular(35),
-      ),
-      width: 80,
-      child: Center(
-        child: Text(
-          '$count',
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: Colors.white,
-              ),
-        ),
-      ),
+  Widget _buildAnimatedCountBox(BuildContext context, int targetCount) {
+    return TweenAnimationBuilder<int>(
+      tween: IntTween(begin: 0, end: targetCount),
+      duration: const Duration(seconds: 2),
+      builder: (context, count, child) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.secondary,
+            borderRadius: BorderRadius.circular(35),
+          ),
+          width: 80,
+          child: Center(
+            child: Text(
+              '$count',
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: Colors.white,
+                    fontSize: 19,
+                  ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
