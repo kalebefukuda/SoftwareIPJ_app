@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../utils/constants/app_colors.dart';
+import '../services/pdf_generator.dart';
 
 class CardReport extends StatefulWidget {
   final String nameReport;
@@ -66,7 +67,16 @@ class _CardReportState extends State<CardReport> {
                 ),
                 child: ElevatedButton(
                   onPressed: () {
-                    // Ação ao clicar no botão
+                    switch (widget.nameReport) {
+                      case "Lista de\nAniversariantes":
+                        // Chame a função que gera o PDF da lista de aniversariantes
+                        generateBirthdayListPdf();
+                        break;
+                      default:
+                        // Caso padrão se nenhum dos casos anteriores for correspondido
+                        print("Relatório não encontrado");
+                        break;
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent, // Transparente para o AnimatedContainer controlar a cor
