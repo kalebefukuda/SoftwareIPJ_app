@@ -57,4 +57,29 @@ class MemberService {
       rethrow;
     }
   }
+
+  Future<Map<String, int>> getMemberCountByGender() async {
+    try {
+      int maleCount = 0;
+      int femaleCount = 0;
+
+      QuerySnapshot snapshot = await membersCollection.get();
+      for (var doc in snapshot.docs) {
+        String? gender = (doc.data() as Map<String, dynamic>)['sexo'];
+        if (gender == 'Masculino') {
+          maleCount++;
+        } else if (gender == 'Feminino') {
+          femaleCount++;
+        }
+      }
+
+      return {'Masculino': maleCount, 'Feminino': femaleCount};
+    } catch (e) {
+      print("Erro ao contar membros por gênero: $e");
+      rethrow;
+    }
+  }
 }
+
+
+

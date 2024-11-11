@@ -3,6 +3,7 @@ import 'package:SoftwareIPJ/utils/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../widgets/sidebar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../services/member_service.dart';
 
 class Members extends StatefulWidget {
   final Function(bool) onThemeToggle;
@@ -21,60 +22,127 @@ class Members extends StatefulWidget {
 class _MembersState extends State<Members> {
   int currentIndex = 2;
   List<Map<String, dynamic>> membersData = [];
+  List<Map<String, dynamic>> filteredMembers = [];
   Map<String, double> slidePositions = {};
   String? currentlySlidMemberId;
   final FocusNode _searchFocusNode = FocusNode();
+  final TextEditingController _searchController = TextEditingController();
+  int maleCount = 0;
+  int femaleCount = 0;
+  bool filterMen = false;
+  bool filterWomen = false;
+  final MemberService memberService = MemberService();
 
   @override
   void initState() {
     super.initState();
     _fetchMembers();
+    _getMemberCounts();
 
     _searchFocusNode.addListener(() {
       if (_searchFocusNode.hasFocus) {
         _resetSlidePositions();
       }
     });
+
+    _searchController.addListener(_filterMembers);
+  }
+
+  Future<void> _getMemberCounts() async {
+    try {
+      // Usa a função do serviço para obter as contagens
+      Map<String, int> counts = await memberService.getMemberCountByGender();
+      setState(() {
+        maleCount = counts['Masculino'] ?? 0;
+        femaleCount = counts['Feminino'] ?? 0;
+      });
+    } catch (e) {
+      print("Erro ao obter contagem de membros: $e");
+    }
   }
 
   @override
   void dispose() {
     _searchFocusNode.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
   Future<void> _fetchMembers() async {
     try {
-      final QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('members').get();
+      final QuerySnapshot snapshot =
+          await FirebaseFirestore.instance.collection('members').get();
 
       setState(() {
         membersData = snapshot.docs
-            .map((doc) => {
-                  'id': doc.id,
-                  ...doc.data() as Map<String, dynamic>
-                })
+            .map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>})
             .toList();
+        filteredMembers = List.from(membersData);
       });
     } catch (e) {
       print("Erro ao buscar membros: $e");
     }
   }
 
+  void _filterMembers() {
+    String query = _searchController.text.toLowerCase();
+    setState(() {
+      filteredMembers = membersData.where((member) {
+        bool matchesQuery =
+            member['nomeCompleto']?.toLowerCase().contains(query) ?? false;
+        bool matchesGender = true;
+
+        if (filterMen) {
+          matchesGender = member['sexo'] == 'Masculino';
+        } else if (filterWomen) {
+          matchesGender = member['sexo'] == 'Feminino';
+        }
+
+        return matchesQuery && matchesGender;
+      }).toList();
+    });
+  }
+
+  void _toggleGenderFilter(String gender) {
+    setState(() {
+      if (gender == 'Masculino') {
+        filterMen = !filterMen;
+        if (filterMen) filterWomen = false;
+      } else if (gender == 'Feminino') {
+        filterWomen = !filterWomen;
+        if (filterWomen) filterMen = false;
+      }
+
+      _filterMembers();
+    });
+  }
+
   Future<void> _deleteMember(String memberId) async {
     try {
       // Obtém o documento original da coleção 'members'
-      DocumentSnapshot memberSnapshot = await FirebaseFirestore.instance.collection('members').doc(memberId).get();
+      DocumentSnapshot memberSnapshot = await FirebaseFirestore.instance
+          .collection('members')
+          .doc(memberId)
+          .get();
 
       if (memberSnapshot.exists) {
         // Adiciona a data e hora da exclusão ao documento
-        Map<String, dynamic> memberData = memberSnapshot.data() as Map<String, dynamic>;
-        memberData['deletedAt'] = DateTime.now().toIso8601String(); // Adiciona a data de exclusão
+        Map<String, dynamic> memberData =
+            memberSnapshot.data() as Map<String, dynamic>;
+        memberData['deletedAt'] =
+            DateTime.now().toIso8601String(); // Adiciona a data de exclusão
 
         // Copia o documento para a coleção 'deleted_members'
-        await FirebaseFirestore.instance.collection('deleted_members').doc(memberId).set(memberData);
+        await FirebaseFirestore.instance
+            .collection('deleted_members')
+            .doc(memberId)
+            .set(memberData);
 
         // Remove o documento da coleção 'members'
-        await FirebaseFirestore.instance.collection('members').doc(memberId).delete();
+        await FirebaseFirestore.instance
+            .collection('members')
+            .doc(memberId)
+            .delete();
 
         // Atualiza a lista de membros
         _fetchMembers();
@@ -99,7 +167,8 @@ class _MembersState extends State<Members> {
                 ),
               ),
               content: Column(
-                mainAxisSize: MainAxisSize.min, // Ajusta a altura da coluna para o conteúdo
+                mainAxisSize: MainAxisSize
+                    .min, // Ajusta a altura da coluna para o conteúdo
                 children: [
                   Text(
                     'Você realmente deseja excluir este membro?',
@@ -108,9 +177,11 @@ class _MembersState extends State<Members> {
                           color: Theme.of(context).textTheme.bodyLarge?.color,
                         ),
                   ),
-                  const SizedBox(height: 20), // Espaço entre o texto e os botões
+                  const SizedBox(
+                      height: 20), // Espaço entre o texto e os botões
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Centraliza os botões horizontalmente
+                    mainAxisAlignment: MainAxisAlignment
+                        .spaceEvenly, // Centraliza os botões horizontalmente
                     children: [
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(false),
@@ -169,7 +240,8 @@ class _MembersState extends State<Members> {
 
       currentlySlidMemberId = memberId;
 
-      slidePositions[memberId] = (slidePositions[memberId] ?? 0.0) + details.delta.dx;
+      slidePositions[memberId] =
+          (slidePositions[memberId] ?? 0.0) + details.delta.dx;
       slidePositions[memberId] = slidePositions[memberId]!.clamp(-130.0, 0.0);
     });
   }
@@ -221,19 +293,60 @@ class _MembersState extends State<Members> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Text('120 Homens', style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 16)),
+                    GestureDetector(
+                      onTap: () => _toggleGenderFilter('Masculino'),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: filterMen
+                              ? Color(0xFF015B40)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          '$maleCount Homens',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(fontSize: 16),
+                        ),
+                      ),
+                    ),
                     const SizedBox(width: 20),
-                    Text('80 Mulheres', style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 16)),
+                    GestureDetector(
+                      onTap: () => _toggleGenderFilter('Feminino'),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: filterWomen
+                              ? Color.fromARGB(117, 2, 161, 113)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          '$femaleCount Mulheres',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(fontSize: 16),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 TextField(
+                  controller: _searchController,
                   focusNode: _searchFocusNode,
                   decoration: InputDecoration(
                     hintText: 'Pesquisar',
-                    hintStyle: const TextStyle(fontSize: 17, color: Color(0xFFB5B5B5), fontWeight: FontWeight.w400),
+                    hintStyle: const TextStyle(
+                        fontSize: 17,
+                        color: Color(0xFFB5B5B5),
+                        fontWeight: FontWeight.w400),
                     filled: true,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 1),
+                    contentPadding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 1),
                     fillColor: Theme.of(context).inputDecorationTheme.fillColor,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -248,16 +361,22 @@ class _MembersState extends State<Members> {
                 const SizedBox(height: 16),
                 Text(
                   'Todos os membros:',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 17, fontWeight: FontWeight.w600),
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontSize: 17, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 16),
-                ...membersData.map((member) {
+                ...filteredMembers.map((member) {
                   String memberId = member['id'];
                   return GestureDetector(
-                    onHorizontalDragUpdate: (details) => _onHorizontalDragUpdate(details, memberId),
-                    onHorizontalDragEnd: (details) => _onHorizontalDragEnd(details, memberId),
+                    onHorizontalDragUpdate: (details) =>
+                        _onHorizontalDragUpdate(details, memberId),
+                    onHorizontalDragEnd: (details) =>
+                        _onHorizontalDragEnd(details, memberId),
                     child: Stack(
                       children: [
+                        // Botões de editar e deletar
                         Positioned.fill(
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -265,16 +384,18 @@ class _MembersState extends State<Members> {
                               GestureDetector(
                                 onTap: () => _editMember(member),
                                 child: Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 4.0),
                                   decoration: BoxDecoration(
                                     color: const Color(0xFF015B40),
-                                    borderRadius: BorderRadius.circular(20), // Ajuste o raio para um efeito oval
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: const Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10), // Ajuste o padding para controlar o tamanho da área de fundo
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 10),
                                     child: Icon(
                                       Icons.edit,
-                                      size: 18, // Ajuste o tamanho do ícone
+                                      size: 18,
                                       color: Colors.white,
                                     ),
                                   ),
@@ -288,16 +409,19 @@ class _MembersState extends State<Members> {
                                   }
                                 },
                                 child: Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 4.0),
                                   decoration: BoxDecoration(
-                                    color: const Color.fromARGB(255, 154, 27, 27),
-                                    borderRadius: BorderRadius.circular(20), // Ajuste o raio para um efeito oval
+                                    color:
+                                        const Color.fromARGB(255, 154, 27, 27),
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: const Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10), // Ajuste o padding para controlar o tamanho da área de fundo
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 10),
                                     child: Icon(
                                       Icons.delete,
-                                      size: 18, // Ajuste o tamanho do ícone
+                                      size: 18,
                                       color: Colors.white,
                                     ),
                                   ),
@@ -307,8 +431,9 @@ class _MembersState extends State<Members> {
                           ),
                         ),
                         AnimatedContainer(
-                          duration: const Duration(milliseconds: 200), // Animação de 300ms
-                          transform: Matrix4.translationValues(slidePositions[memberId] ?? 0.0, 0, 0),
+                          duration: const Duration(milliseconds: 200),
+                          transform: Matrix4.translationValues(
+                              slidePositions[memberId] ?? 0.0, 0, 0),
                           color: Theme.of(context).scaffoldBackgroundColor,
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           child: Row(
@@ -316,7 +441,12 @@ class _MembersState extends State<Members> {
                             children: [
                               CircleAvatar(
                                 radius: 28,
-                                backgroundImage: member['foto'] != null && member['foto'] is String ? NetworkImage(member['foto']) : const AssetImage('assets/images/avatar_placeholder.png') as ImageProvider,
+                                backgroundImage: member['foto'] != null &&
+                                        member['foto'] is String
+                                    ? NetworkImage(member['foto'])
+                                    : const AssetImage(
+                                            'assets/images/avatar_placeholder.png')
+                                        as ImageProvider,
                               ),
                               const SizedBox(width: 16),
                               Expanded(
@@ -325,12 +455,17 @@ class _MembersState extends State<Members> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      member['nomeCompleto'] ?? 'Nome não disponível',
-                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 16),
+                                      member['nomeCompleto'] ??
+                                          'Nome não disponível',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium
+                                          ?.copyWith(fontSize: 16),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      member['telefone'] ?? 'Telefone não disponível',
+                                      member['telefone'] ??
+                                          'Telefone não disponível',
                                       style: const TextStyle(
                                         color: Color(0xFFB5B5B5),
                                       ),
@@ -344,7 +479,7 @@ class _MembersState extends State<Members> {
                       ],
                     ),
                   );
-                }),
+                }).toList(),
                 const SizedBox(height: 100),
               ],
             ),
@@ -361,4 +496,3 @@ class _MembersState extends State<Members> {
     );
   }
 }
-
