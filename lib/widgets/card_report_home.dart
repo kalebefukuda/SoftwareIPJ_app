@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class CardReport extends StatefulWidget {
   const CardReport({super.key});
@@ -23,12 +23,17 @@ class _CardReportState extends State<CardReport> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          PhosphorIcon(
+            PhosphorIcons.file(PhosphorIconsStyle.bold),
+            size: 50,
+            color: Colors.white,
+          )
           // Ícone de relatório
-          SvgPicture.asset(
-            'assets/images/file.svg',
-            width: 50,
-            height: 50,
-          ),
+          // SvgPicture.asset(
+          //   'assets/images/file.svg',
+          //   width: 50,
+          //   height: 50,
+          // ),
         ],
       ),
     );

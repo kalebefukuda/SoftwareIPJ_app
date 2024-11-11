@@ -7,6 +7,7 @@ import '../widgets/card_members.dart';
 import '../widgets/card_report_home.dart';
 import '../widgets/card_count_members.dart';
 import '../widgets/custom_drawer.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
   final Function(bool) onThemeToggle;
@@ -26,52 +27,57 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 90,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        scrolledUnderElevation: 0,
-        leading: Builder(
-          builder: (context) {
-            return IconButton(
-              onPressed: () {
-                Scaffold.of(context).openDrawer(); // Abre o menu lateral
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(90), // Define a altura do AppBar
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(30, 0, 0, 0), // Adiciona padding horizontal no AppBar
+          child: AppBar(
+            toolbarHeight: 90,
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            scrolledUnderElevation: 0,
+            leading: Builder(
+              builder: (context) {
+                return IconButton(
+                  onPressed: () {
+                    Scaffold.of(context).openDrawer(); // Abre o menu lateral
+                  },
+                  icon: PhosphorIcon(
+                    Icons.menu_rounded, // Ou qualquer outro ícone que você queira da biblioteca Phosphor
+                    size: 40,
+                    color: Theme.of(context).iconTheme.color,
+                  ),
+                  splashColor: Colors.transparent, // Remove a sombra ao clicar
+                  highlightColor: Colors.transparent, // Remove o destaque ao clicar
+                  focusColor: Colors.transparent, // Remove o destaque ao focar
+                  hoverColor: Colors.transparent, // Remove o destaque ao passar o mouse por cima
+                );
               },
-              icon: Icon(
-                Icons.menu,
-                size: 30,
-                color: Theme.of(context).iconTheme.color,
-              ),
-              splashColor: Colors.transparent, // Remove a sombra ao clicar
-              highlightColor: Colors.transparent, // Remove o destaque ao clicar
-              focusColor: Colors.transparent, // Remove o destaque ao focar
-              hoverColor: Colors.transparent, // Remove o destaque ao passar o mouse por cima
-            );
-          },
-        ),
-        centerTitle: true,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const SizedBox(),
-            Image.asset(
-              'assets/images/Logo_IPB.png',
-              height: 50,
-              color: Theme.of(context).iconTheme.color,
             ),
-          ],
+            centerTitle: true,
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const SizedBox(),
+                Image.asset(
+                  'assets/images/Logo_IPB.png',
+                  height: 80,
+                  color: Theme.of(context).iconTheme.color,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
       drawer: CustomDrawer(
         onThemeToggle: widget.onThemeToggle,
         isDarkModeNotifier: widget.isDarkModeNotifier,
-      ), // Utilize o CustomDrawer como menu lateral
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 10),
-            // Card de cadastro de membros, ocupando toda a largura
             GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -87,7 +93,6 @@ class _HomeScreenState extends State<HomeScreen> {
               child: const CardRegister(),
             ),
             const SizedBox(height: 29),
-            // Cards de membros e relatório na mesma linha, ocupando cada um metade da largura do card acima
             Row(
               children: [
                 Expanded(
@@ -106,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: const CardMembers(),
                   ),
                 ),
-                const SizedBox(width: 29), // Espaço entre os dois cards
+                const SizedBox(width: 29),
                 Expanded(
                   child: GestureDetector(
                     onTap: () {
@@ -116,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           builder: (context) => Report(
                             onThemeToggle: widget.onThemeToggle,
                             isDarkModeNotifier: widget.isDarkModeNotifier,
-                          ), // Navega para a tela de relatório ao clicar no CardReport
+                          ),
                         ),
                       );
                     },
@@ -126,7 +131,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             const SizedBox(height: 29),
-            // Adicionando o card de contagem de membros
             const MembersCountCard(),
           ],
         ),

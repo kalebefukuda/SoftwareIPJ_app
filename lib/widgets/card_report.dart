@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import '../utils/constants/app_colors.dart';
 
 class CardReport extends StatefulWidget {
@@ -8,6 +8,7 @@ class CardReport extends StatefulWidget {
   const CardReport(this.nameReport, {super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _CardReportState createState() => _CardReportState();
 }
 
@@ -17,7 +18,6 @@ class _CardReportState extends State<CardReport> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.all(16),
       width: 312,
@@ -36,7 +36,7 @@ class _CardReportState extends State<CardReport> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
                 widget.nameReport,
-                style: Theme.of(context).textTheme.titleMedium ,
+                style: Theme.of(context).textTheme.titleMedium,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -76,10 +76,10 @@ class _CardReportState extends State<CardReport> {
                     ),
                     shadowColor: Colors.transparent,
                   ),
-                  child: SvgPicture.asset(
-                    'assets/images/downloadIcon.svg',
-                    width: 20,
-                    height: 20,
+                  child: PhosphorIcon(
+                    PhosphorIcons.fileArrowDown(PhosphorIconsStyle.bold), // Use o ícone com o estilo específico
+                    size: 24,
+                    color: Colors.white,
                   ),
                 ),
               ),
