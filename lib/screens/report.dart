@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-// import 'package:SoftwareIPJ/screens/home.dart';
-// import '../utils/constants/text_font.dart';
 import '../app.dart';
 import '../utils/constants/app_colors.dart';
 import '../widgets/card_report.dart';
 import '../widgets/sidebar.dart';
-// import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class Report extends StatefulWidget {
   final Function(ThemeModeOptions) onThemeToggle;
