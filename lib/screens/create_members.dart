@@ -866,24 +866,33 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
   // Função para pegar a imagem da galeria
   // Função para pegar a imagem da galeria
   Future<void> _pickImage() async {
-    try {
-      // Abre o seletor de imagens
-      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+  try {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
 
-      if (pickedFile != null) {
-        setState(() {
-          _selectedImage = File(pickedFile.path); // Atualiza o estado com a imagem selecionada
-        });
-      } else {
-        // Usuário cancelou a seleção de imagem
-        _showBanner('Seleção de imagem cancelada.', const Color.fromARGB(255, 142, 85, 0));
-      }
-    } catch (e) {
-      // Captura erros durante a seleção de imagem
-      _showBanner('Erro ao selecionar imagem: $e', const Color.fromARGB(255, 154, 27, 27));
-      print('Erro ao selecionar imagem: $e');
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+
+      // Faz o upload da imagem para o Firebase Storage
+      final storageRef = FirebaseStorage.instance
+          .ref()
+          .child('user_images/${DateTime.now().millisecondsSinceEpoch}.jpg');
+      
+      final uploadTask = storageRef.putFile(_selectedImage!);
+      final snapshot = await uploadTask;
+      final imageUrl = await snapshot.ref.getDownloadURL();
+
+      print("Imagem carregada com sucesso: $imageUrl");
+      // Aqui, você pode salvar `imageUrl` no Firestore para armazenar o link da imagem
+    } else {
+      _showBanner('Seleção de imagem cancelada.', const Color.fromARGB(255, 142, 85, 0));
     }
+  } catch (e) {
+    _showBanner('Erro ao selecionar ou fazer upload da imagem: $e', const Color.fromARGB(255, 154, 27, 27));
+    print('Erro ao selecionar ou fazer upload da imagem: $e');
   }
+}
 
   // Função que utiliza o estilo do tema para os títulos
   Widget buildSectionTitle(BuildContext context, String title) {
