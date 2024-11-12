@@ -1,6 +1,13 @@
-import 'package:SoftwareIPJ/screens/start_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:SoftwareIPJ/screens/start_screen.dart';
+
+// Enum para os modos de tema
+enum ThemeModeOptions {
+  light,
+  system,
+  dark
+}
 
 class App extends StatefulWidget {
   const App({super.key});
@@ -10,71 +17,56 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  bool isDarkMode = false;
-  late ValueNotifier<bool> isDarkModeNotifier;
+  ThemeModeOptions currentThemeMode = ThemeModeOptions.system;
+  late ValueNotifier<ThemeModeOptions> themeModeNotifier;
 
   @override
   void initState() {
     super.initState();
-    isDarkModeNotifier = ValueNotifier<bool>(isDarkMode);
+    themeModeNotifier = ValueNotifier<ThemeModeOptions>(currentThemeMode);
     _loadThemePreference();
   }
 
+  // Carregar a preferência do tema salva
   Future<void> _loadThemePreference() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      isDarkMode = prefs.getBool('isDarkMode') ?? false;
-      isDarkModeNotifier.value = isDarkMode;
+      int? modeIndex = prefs.getInt('themeMode');
+      currentThemeMode = ThemeModeOptions.values[modeIndex ?? ThemeModeOptions.system.index];
+      themeModeNotifier.value = currentThemeMode;
     });
   }
 
-  Future<void> _saveThemePreference(bool value) async {
+  // Salvar a preferência do tema
+  Future<void> _saveThemePreference(ThemeModeOptions mode) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isDarkMode', value);
+    await prefs.setInt('themeMode', mode.index);
   }
 
-  void _toggleTheme(bool value) {
+  // Alterar o modo de tema
+  void _toggleTheme(ThemeModeOptions mode) {
     setState(() {
-      isDarkMode = value;
-      isDarkModeNotifier.value = value;
-      _saveThemePreference(value);
+      currentThemeMode = mode;
+      themeModeNotifier.value = mode;
+      _saveThemePreference(mode);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      // Tema claro
       theme: ThemeData(
         fontFamily: 'Poppins',
         scaffoldBackgroundColor: const Color(0xFFFCF9F6),
         primaryColor: const Color(0xFF015B40),
         brightness: Brightness.light,
         textTheme: const TextTheme(
-          bodyLarge: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.normal,
-            color: Colors.black,
-          ),
-          bodyMedium: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.normal,
-            color: Colors.grey,
-          ),
-          bodySmall: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: Color(0xFF015B40),
-          ),
-          titleMedium: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
-            color: Color(0xFF015B40),
-          ),
-          titleLarge: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w600,
-            color: Color.fromARGB(255, 255, 255, 255),
-          ),
+          bodyLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: Colors.black),
+          bodyMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: Colors.grey),
+          bodySmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xFF015B40)),
+          titleMedium: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Color(0xFF015B40)),
+          titleLarge: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white),
         ),
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFF015B40),
@@ -83,44 +75,28 @@ class _AppState extends State<App> {
           fillColor: Color(0xFFE7E7E7),
           filled: true,
         ),
-        iconTheme: const IconThemeData(
-          color: Color(0xFF015B40),
-        ),
+        iconTheme: const IconThemeData(color: Color(0xFF015B40)),
         colorScheme: const ColorScheme.light(
           primary: Color(0xFF015B40),
           secondary: Color.fromARGB(255, 0, 145, 101),
           tertiary: Color.fromARGB(255, 109, 109, 109),
+          onSecondary: Colors.black,          
+          onTertiary: Color.fromARGB(255, 226, 177, 0),
         ),
       ),
+
+      // Tema escuro
       darkTheme: ThemeData(
         fontFamily: 'Poppins',
         scaffoldBackgroundColor: const Color.fromARGB(255, 0, 0, 0),
         primaryColor: const Color.fromARGB(255, 0, 145, 101),
         brightness: Brightness.dark,
         textTheme: const TextTheme(
-          bodyLarge: TextStyle(
-            fontSize: 14,
-            color: Colors.white,
-          ),
-          bodyMedium: TextStyle(
-            fontSize: 14,
-            color: Colors.grey,
-          ),
-          titleMedium: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
-            color: Colors.white,
-          ),
-          bodySmall: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: Colors.white,
-          ),
-          titleLarge: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w600,
-            color: Color.fromARGB(255, 255, 255, 255),
-          ),
+          bodyLarge: TextStyle(fontSize: 14, color: Colors.white),
+          bodyMedium: TextStyle(fontSize: 14, color: Colors.grey),
+          bodySmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white),
+          titleMedium: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.white),
+          titleLarge: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white),
         ),
         appBarTheme: const AppBarTheme(
           backgroundColor: Color.fromARGB(255, 0, 0, 0),
@@ -134,11 +110,23 @@ class _AppState extends State<App> {
           primary: Color.fromARGB(255, 45, 45, 45),
           secondary: Color(0xFF015B40),
           tertiary: Color.fromARGB(255, 186, 186, 186),
+          onSecondary: Colors.white,
+          onTertiary: Color.fromARGB(255, 75, 75, 75),
         ),
       ),
-      debugShowCheckedModeBanner: false, // Adicione isso
-      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
-      home: StartScreen(onThemeToggle: _toggleTheme, isDarkModeNotifier: isDarkModeNotifier),
+      debugShowCheckedModeBanner: false,
+      // Definindo o modo de tema com base na escolha do usuário
+      themeMode: currentThemeMode == ThemeModeOptions.light
+          ? ThemeMode.light
+          : currentThemeMode == ThemeModeOptions.dark
+              ? ThemeMode.dark
+              : ThemeMode.system,
+
+      // Definindo a tela inicial
+      home: StartScreen(
+        onThemeToggle: _toggleTheme,
+        themeModeNotifier: themeModeNotifier,
+      ),
     );
   }
 }

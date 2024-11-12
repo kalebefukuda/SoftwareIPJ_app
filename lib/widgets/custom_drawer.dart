@@ -1,19 +1,20 @@
 import 'package:SoftwareIPJ/screens/login.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import '../app.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class CustomDrawer extends StatefulWidget {
-  final Function(bool) onThemeToggle;
-  final ValueNotifier<bool> isDarkModeNotifier;
+  final Function(ThemeModeOptions) onThemeToggle;
+  final ValueNotifier<ThemeModeOptions> themeModeNotifier;
 
   const CustomDrawer({
     super.key,
     required this.onThemeToggle,
-    required this.isDarkModeNotifier,
+    required this.themeModeNotifier,
   });
 
   @override
-  // ignore: library_private_types_in_public_api
   _CustomDrawerState createState() => _CustomDrawerState();
 }
 
@@ -23,16 +24,18 @@ class _CustomDrawerState extends State<CustomDrawer> {
     super.didUpdateWidget(oldWidget);
   }
 
-  void _handleThemeToggle(bool value) {
-    widget.isDarkModeNotifier.value = value;
-    widget.onThemeToggle(value); // Chama o callback para alterar o tema global
+  void _handleThemeToggle(ThemeModeOptions mode) {
+    setState(() {
+      widget.themeModeNotifier.value = mode;
+      widget.onThemeToggle(mode);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: widget.isDarkModeNotifier,
-      builder: (context, isDarkMode, _) {
+    return ValueListenableBuilder<ThemeModeOptions>(
+      valueListenable: widget.themeModeNotifier,
+      builder: (context, themeMode, _) {
         return SizedBox(
           width: MediaQuery.of(context).size.width * 0.6,
           child: Drawer(
@@ -40,7 +43,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             child: Column(
               children: [
                 _buildMenuHeader(),
-                _buildThemeToggle(isDarkMode),
+                _buildThemeToggle(themeMode),
                 _buildLogoutButton(),
                 const Spacer(),
                 _buildAppVersionInfo(),
@@ -68,32 +71,24 @@ class _CustomDrawerState extends State<CustomDrawer> {
     );
   }
 
-  Widget _buildThemeToggle(bool isDarkMode) {
+  Widget _buildThemeToggle(ThemeModeOptions themeMode) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-          onTap: () {
-            _handleThemeToggle(!isDarkMode);
-          },
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CustomSwitch(
-                value: isDarkMode,
-                onChanged: _handleThemeToggle,
-              ),
-              const SizedBox(width: 20),
-              Text(
-                'Cor do sistema',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.white,
-                    ),
-              ),
-            ],
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CustomSwitch(
+            value: themeMode,
+            onChanged: _handleThemeToggle,
           ),
-        ),
+          const SizedBox(width: 20),
+          Text(
+            'Tema',
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Colors.white,
+                ),
+          ),
+        ],
       ),
     );
   }
@@ -110,7 +105,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
               MaterialPageRoute(
                 builder: (context) => LoginScreen(
                   onThemeToggle: widget.onThemeToggle,
-                  isDarkModeNotifier: widget.isDarkModeNotifier,
+                  themeModeNotifier: widget.themeModeNotifier,
                 ),
               ),
             );
@@ -143,7 +138,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
       child: Align(
         alignment: Alignment.center,
         child: Text(
-          'v.0.7.0',
+          'v.0.7.1',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Colors.white,
               ),
@@ -153,41 +148,76 @@ class _CustomDrawerState extends State<CustomDrawer> {
   }
 }
 
-// Widget personalizado para o Switch com ícone no círculo
+// CustomSwitch modificado para ter três estados
 class CustomSwitch extends StatelessWidget {
-  final bool value;
-  final ValueChanged<bool> onChanged;
+  final ThemeModeOptions value;
+  final ValueChanged<ThemeModeOptions> onChanged;
 
-  const CustomSwitch({super.key, required this.value, required this.onChanged});
+  const CustomSwitch({
+    super.key,
+    required this.value,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => onChanged(!value),
+      onTap: () {
+        ThemeModeOptions nextMode;
+        if (value == ThemeModeOptions.light) {
+          nextMode = ThemeModeOptions.system;
+        } else if (value == ThemeModeOptions.system) {
+          nextMode = ThemeModeOptions.dark;
+        } else {
+          nextMode = ThemeModeOptions.light;
+        }
+        onChanged(nextMode);
+      },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
-        width: 60,
-        height: 30,
-        padding: const EdgeInsets.all(3),
+        width: 70,
+        height: 36,
         decoration: BoxDecoration(
-          color: value ? const Color(0xFF1E1E1E) : Colors.white,
+          color: Theme.of(context).scaffoldBackgroundColor,
           borderRadius: BorderRadius.circular(20),
         ),
-        child: Align(
-          alignment: value ? Alignment.centerRight : Alignment.centerLeft,
-          child: Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: value ? const Color(0xFF585858) : Colors.yellow.shade700,
+        child: Stack(
+          children: [
+            // Indicador circular animado
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 300),
+              left: value == ThemeModeOptions.light
+                  ? 2
+                  : value == ThemeModeOptions.system
+                      ? 18
+                      : 36,
+              top: 2,
+              child: Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Theme.of(context).colorScheme.onTertiary,
+                ),
+                child: Center(
+                  child: value == ThemeModeOptions.system
+                      ? Text(
+                          'AUTO',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSecondary,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                      : Icon(
+                          value == ThemeModeOptions.light ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                          color: Theme.of(context).colorScheme.onSecondary,
+                          size: 18,
+                        ),
+                ),
+              ),
             ),
-            child: Icon(
-              value ? Icons.dark_mode : Icons.light_mode,
-              color: value ? const Color(0xFF1E1E1E) : Colors.black,
-              size: 18,
-            ),
-          ),
+          ],
         ),
       ),
     );

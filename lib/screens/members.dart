@@ -1,3 +1,4 @@
+import '../app.dart';
 import 'package:SoftwareIPJ/screens/view_member_screen.dart';
 import 'package:SoftwareIPJ/screens/create_members.dart';
 import 'package:SoftwareIPJ/utils/constants/app_colors.dart';
@@ -5,19 +6,18 @@ import 'package:flutter/material.dart';
 import '../widgets/sidebar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/member_service.dart';
-import '../widgets/custom_banner.dart'; 
-
+import '../widgets/custom_banner.dart';
 
 class Members extends StatefulWidget {
-  final Function(bool) onThemeToggle;
-  final ValueNotifier<bool> isDarkModeNotifier;
+  final Function(ThemeModeOptions) onThemeToggle;
+  final ValueNotifier<ThemeModeOptions> themeModeNotifier;
   final String? successMessage; // Novo parâmetro para a mensagem de sucesso
 
   const Members({
     super.key,
     required this.onThemeToggle,
-    required this.isDarkModeNotifier,
     this.successMessage,
+    required this.themeModeNotifier,
   });
 
   @override
@@ -88,12 +88,14 @@ class _MembersState extends State<Members> {
 
   Future<void> _fetchMembers() async {
     try {
-      final QuerySnapshot snapshot =
-          await FirebaseFirestore.instance.collection('members').get();
+      final QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('members').get();
 
       setState(() {
         membersData = snapshot.docs
-            .map((doc) => {'id': doc.id, ...doc.data() as Map<String, dynamic>})
+            .map((doc) => {
+                  'id': doc.id,
+                  ...doc.data() as Map<String, dynamic>
+                })
             .toList();
         filteredMembers = List.from(membersData);
       });
@@ -106,8 +108,7 @@ class _MembersState extends State<Members> {
     String query = _searchController.text.toLowerCase();
     setState(() {
       filteredMembers = membersData.where((member) {
-        bool matchesQuery =
-            member['nomeCompleto']?.toLowerCase().contains(query) ?? false;
+        bool matchesQuery = member['nomeCompleto']?.toLowerCase().contains(query) ?? false;
         bool matchesGender = true;
 
         if (filterMen) {
@@ -138,29 +139,18 @@ class _MembersState extends State<Members> {
   Future<void> _deleteMember(String memberId) async {
     try {
       // Obtém o documento original da coleção 'members'
-      DocumentSnapshot memberSnapshot = await FirebaseFirestore.instance
-          .collection('members')
-          .doc(memberId)
-          .get();
+      DocumentSnapshot memberSnapshot = await FirebaseFirestore.instance.collection('members').doc(memberId).get();
 
       if (memberSnapshot.exists) {
         // Adiciona a data e hora da exclusão ao documento
-        Map<String, dynamic> memberData =
-            memberSnapshot.data() as Map<String, dynamic>;
-        memberData['deletedAt'] =
-            DateTime.now().toIso8601String(); // Adiciona a data de exclusão
+        Map<String, dynamic> memberData = memberSnapshot.data() as Map<String, dynamic>;
+        memberData['deletedAt'] = DateTime.now().toIso8601String(); // Adiciona a data de exclusão
 
         // Copia o documento para a coleção 'deleted_members'
-        await FirebaseFirestore.instance
-            .collection('deleted_members')
-            .doc(memberId)
-            .set(memberData);
+        await FirebaseFirestore.instance.collection('deleted_members').doc(memberId).set(memberData);
 
         // Remove o documento da coleção 'members'
-        await FirebaseFirestore.instance
-            .collection('members')
-            .doc(memberId)
-            .delete();
+        await FirebaseFirestore.instance.collection('members').doc(memberId).delete();
 
         _fetchMembers();
         _showBanner('Membro excluído!', const Color.fromARGB(255, 154, 27, 27));
@@ -236,7 +226,7 @@ class _MembersState extends State<Members> {
         builder: (context) => CreateMembersScreen(
           memberData: member,
           onThemeToggle: widget.onThemeToggle,
-          isDarkModeNotifier: widget.isDarkModeNotifier,
+          themeModeNotifier: widget.themeModeNotifier,
         ),
       ),
     ).then((_) {
@@ -251,7 +241,7 @@ class _MembersState extends State<Members> {
         builder: (context) => ViewMemberScreen(
           memberData: member,
           onThemeToggle: widget.onThemeToggle,
-          isDarkModeNotifier: widget.isDarkModeNotifier,
+          themeModeNotifier: widget.themeModeNotifier,
         ),
       ),
     ).then((_) {
@@ -273,8 +263,7 @@ class _MembersState extends State<Members> {
 
       currentlySlidMemberId = memberId;
 
-      slidePositions[memberId] =
-          (slidePositions[memberId] ?? 0.0) + details.delta.dx;
+      slidePositions[memberId] = (slidePositions[memberId] ?? 0.0) + details.delta.dx;
       slidePositions[memberId] = slidePositions[memberId]!.clamp(-130.0, 0.0);
     });
   }
@@ -344,18 +333,13 @@ class _MembersState extends State<Members> {
                       onTap: () => _toggleGenderFilter('Masculino'),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: filterMen
-                              ? Color(0xFF015B40)
-                              : Colors.transparent,
+                          color: filterMen ? Color(0xFF015B40) : Colors.transparent,
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
                           '$maleCount Homens',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.copyWith(fontSize: 16),
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 16),
                         ),
                       ),
                     ),
@@ -364,18 +348,13 @@ class _MembersState extends State<Members> {
                       onTap: () => _toggleGenderFilter('Feminino'),
                       child: Container(
                         decoration: BoxDecoration(
-                          color: filterWomen
-                              ? Color.fromARGB(117, 2, 161, 113)
-                              : Colors.transparent,
+                          color: filterWomen ? Color.fromARGB(117, 2, 161, 113) : Colors.transparent,
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
                           '$femaleCount Mulheres',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.copyWith(fontSize: 16),
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 16),
                         ),
                       ),
                     ),
@@ -387,13 +366,9 @@ class _MembersState extends State<Members> {
                   focusNode: _searchFocusNode,
                   decoration: InputDecoration(
                     hintText: 'Pesquisar',
-                    hintStyle: const TextStyle(
-                        fontSize: 17,
-                        color: Color(0xFFB5B5B5),
-                        fontWeight: FontWeight.w400),
+                    hintStyle: const TextStyle(fontSize: 17, color: Color(0xFFB5B5B5), fontWeight: FontWeight.w400),
                     filled: true,
-                    contentPadding:
-                        const EdgeInsets.symmetric(vertical: 8, horizontal: 1),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 1),
                     fillColor: Theme.of(context).inputDecorationTheme.fillColor,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
@@ -408,10 +383,7 @@ class _MembersState extends State<Members> {
                 const SizedBox(height: 16),
                 Text(
                   'Todos os membros:',
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
-                      ?.copyWith(fontSize: 17, fontWeight: FontWeight.w600),
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 17, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 16),
                 ...filteredMembers.map((member) {
@@ -432,8 +404,7 @@ class _MembersState extends State<Members> {
                               GestureDetector(
                                 onTap: () => _editMember(member),
                                 child: Container(
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 4.0),
+                                  margin: const EdgeInsets.symmetric(horizontal: 4.0),
                                   decoration: BoxDecoration(
                                     color: const Color(0xFF015B40),
                                     borderRadius: BorderRadius.circular(20),
@@ -456,10 +427,8 @@ class _MembersState extends State<Members> {
                                   }
                                 },
                                 child: Container(
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 4.0),
+                                  margin: const EdgeInsets.symmetric(horizontal: 4.0),
                                   decoration: BoxDecoration(
-
                                     color: const Color.fromARGB(255, 154, 27, 27),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
@@ -486,9 +455,7 @@ class _MembersState extends State<Members> {
                             children: [
                               CircleAvatar(
                                 radius: 28,
-                                backgroundImage: member['foto'] != null && member['foto'] is String
-                                    ? NetworkImage(member['foto'])
-                                    : const AssetImage('assets/images/avatar_placeholder.png') as ImageProvider,
+                                backgroundImage: member['foto'] != null && member['foto'] is String ? NetworkImage(member['foto']) : const AssetImage('assets/images/avatar_placeholder.png') as ImageProvider,
                               ),
                               const SizedBox(width: 16),
                               Expanded(
@@ -497,17 +464,12 @@ class _MembersState extends State<Members> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      member['nomeCompleto'] ??
-                                          'Nome não disponível',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium
-                                          ?.copyWith(fontSize: 16),
+                                      member['nomeCompleto'] ?? 'Nome não disponível',
+                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 16),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      member['telefone'] ??
-                                          'Telefone não disponível',
+                                      member['telefone'] ?? 'Telefone não disponível',
                                       style: const TextStyle(
                                         color: Color(0xFFB5B5B5),
                                       ),
@@ -539,7 +501,7 @@ class _MembersState extends State<Members> {
               currentIndex: currentIndex,
               onTabTapped: onTabTapped,
               onThemeToggle: widget.onThemeToggle,
-              isDarkModeNotifier: widget.isDarkModeNotifier,
+              themeModeNotifier: widget.themeModeNotifier,
               isKeyboardVisible: MediaQuery.of(context).viewInsets.bottom != 0,
             ),
           ],
