@@ -7,16 +7,16 @@ import '../widgets/card_members.dart';
 import '../widgets/card_report_home.dart';
 import '../widgets/card_count_members.dart';
 import '../widgets/custom_drawer.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:SoftwareIPJ/app.dart';
 
 class HomeScreen extends StatefulWidget {
-  final Function(bool) onThemeToggle;
-  final ValueNotifier<bool> isDarkModeNotifier;
+  final Function(ThemeModeOptions) onThemeToggle;
+  final ValueNotifier<ThemeModeOptions> themeModeNotifier;
 
   const HomeScreen({
     super.key,
     required this.onThemeToggle,
-    required this.isDarkModeNotifier,
+    required this.themeModeNotifier,
   });
 
   @override
@@ -28,9 +28,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(90), // Define a altura do AppBar
+        preferredSize: const Size.fromHeight(90),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(30, 0, 0, 0), // Adiciona padding horizontal no AppBar
+          padding: const EdgeInsets.fromLTRB(30, 0, 0, 0),
           child: AppBar(
             toolbarHeight: 90,
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -39,17 +39,13 @@ class _HomeScreenState extends State<HomeScreen> {
               builder: (context) {
                 return IconButton(
                   onPressed: () {
-                    Scaffold.of(context).openDrawer(); // Abre o menu lateral
+                    Scaffold.of(context).openDrawer();
                   },
-                  icon: PhosphorIcon(
-                    Icons.menu_rounded, // Ou qualquer outro ícone que você queira da biblioteca Phosphor
+                  icon: Icon(
+                    Icons.menu_rounded,
                     size: 40,
                     color: Theme.of(context).iconTheme.color,
                   ),
-                  splashColor: Colors.transparent, // Remove a sombra ao clicar
-                  highlightColor: Colors.transparent, // Remove o destaque ao clicar
-                  focusColor: Colors.transparent, // Remove o destaque ao focar
-                  hoverColor: Colors.transparent, // Remove o destaque ao passar o mouse por cima
                 );
               },
             ),
@@ -70,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       drawer: CustomDrawer(
         onThemeToggle: widget.onThemeToggle,
-        isDarkModeNotifier: widget.isDarkModeNotifier,
+        themeModeNotifier: widget.themeModeNotifier,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
@@ -85,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   MaterialPageRoute(
                     builder: (context) => CreateMembersScreen(
                       onThemeToggle: widget.onThemeToggle,
-                      isDarkModeNotifier: widget.isDarkModeNotifier,
+                      themeModeNotifier: widget.themeModeNotifier,
                     ),
                   ),
                 );
@@ -103,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         MaterialPageRoute(
                           builder: (context) => Members(
                             onThemeToggle: widget.onThemeToggle,
-                            isDarkModeNotifier: widget.isDarkModeNotifier,
+                            themeModeNotifier: widget.themeModeNotifier,
                           ),
                         ),
                       );
@@ -120,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         MaterialPageRoute(
                           builder: (context) => Report(
                             onThemeToggle: widget.onThemeToggle,
-                            isDarkModeNotifier: widget.isDarkModeNotifier,
+                            themeModeNotifier: widget.themeModeNotifier,
                           ),
                         ),
                       );

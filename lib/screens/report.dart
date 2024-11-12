@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 // import 'package:SoftwareIPJ/screens/home.dart';
 // import '../utils/constants/text_font.dart';
+import '../app.dart';
 import '../utils/constants/app_colors.dart';
 import '../widgets/card_report.dart';
 import '../widgets/sidebar.dart';
 // import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class Report extends StatefulWidget {
-  final Function(bool) onThemeToggle;
-  final ValueNotifier<bool> isDarkModeNotifier;
+  final Function(ThemeModeOptions) onThemeToggle;
+  final ValueNotifier<ThemeModeOptions> themeModeNotifier;
 
   const Report({
     super.key,
     required this.onThemeToggle,
-    required this.isDarkModeNotifier,
+    required this.themeModeNotifier,
   });
 
   @override
@@ -68,12 +69,11 @@ class _ReportState extends State<Report> {
             ],
           ),
           BottomSidebar(
-            currentIndex: currentIndex,
-            onTabTapped: onTabTapped,
-            onThemeToggle: widget.onThemeToggle, // Passando o parâmetro necessário
-            isDarkModeNotifier: widget.isDarkModeNotifier, // Passando o parâmetro necessário
-            isKeyboardVisible: MediaQuery.of(context).viewInsets.bottom != 0
-          ),
+              currentIndex: currentIndex,
+              onTabTapped: onTabTapped,
+              onThemeToggle: widget.onThemeToggle, // Passando o parâmetro necessário
+              themeModeNotifier: widget.themeModeNotifier, // Passando o parâmetro necessário
+              isKeyboardVisible: MediaQuery.of(context).viewInsets.bottom != 0),
         ],
       ),
     );

@@ -1,3 +1,4 @@
+import 'package:SoftwareIPJ/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:io'; // Para lidar com o arquivo de imagem selecionado
@@ -10,17 +11,17 @@ import '../widgets/custom_banner.dart';
 import 'create_members.dart';
 
 class ViewMemberScreen extends StatefulWidget {
-  final Function(bool) onThemeToggle;
-  final ValueNotifier<bool> isDarkModeNotifier;
+  final ValueNotifier<ThemeModeOptions> themeModeNotifier;
+  final Function(ThemeModeOptions) onThemeToggle;
   final Map<String, dynamic>? memberData; // Dados do membro, se for uma edição
   final bool isReadOnly; // Adicione esta propriedade
 
   const ViewMemberScreen({
     super.key,
     required this.onThemeToggle,
-    required this.isDarkModeNotifier,
     this.memberData,
-    this.isReadOnly = true,
+    this.isReadOnly = true, 
+    required this.themeModeNotifier,
   });
 
   @override
@@ -742,7 +743,7 @@ class _ViewMemberScreenState extends State<ViewMemberScreen> {
                             builder: (context) => CreateMembersScreen(
                               memberData: widget.memberData, // Passe os dados do membro para a tela de edição
                               onThemeToggle: widget.onThemeToggle, // Passe a função de alternar tema
-                              isDarkModeNotifier: widget.isDarkModeNotifier, // Passe o ValueNotifier para o modo escuro
+                              themeModeNotifier: widget.themeModeNotifier, // Passe o ValueNotifier para o modo escuro
                             ),
                           ),
                         );
@@ -753,7 +754,7 @@ class _ViewMemberScreenState extends State<ViewMemberScreen> {
                 ],
               ),
             ),
-            BottomSidebar(currentIndex: currentIndex, onTabTapped: onTabTapped, onThemeToggle: widget.onThemeToggle, isDarkModeNotifier: widget.isDarkModeNotifier, isKeyboardVisible: MediaQuery.of(context).viewInsets.bottom != 0),
+            BottomSidebar(currentIndex: currentIndex, onTabTapped: onTabTapped, onThemeToggle: widget.onThemeToggle, themeModeNotifier: widget.themeModeNotifier, isKeyboardVisible: MediaQuery.of(context).viewInsets.bottom != 0),
             if (_isBannerVisible)
               Positioned(
                 top: 10, // Posiciona o banner próximo ao topo

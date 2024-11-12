@@ -1,3 +1,4 @@
+import 'package:SoftwareIPJ/app.dart';
 import 'package:SoftwareIPJ/screens/home.dart';
 import 'package:flutter/material.dart';
 import '../widgets/custom_text_field.dart';
@@ -11,27 +12,28 @@ class LoginScreen extends StatelessWidget {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final ValueNotifier<String> errorMessage = ValueNotifier<String>("");
 
-  final void Function(bool value) onThemeToggle;
-  final ValueNotifier<bool> isDarkModeNotifier;
+  final void Function(ThemeModeOptions) onThemeToggle;
+  final ValueNotifier<ThemeModeOptions> themeModeNotifier;
   final ValueNotifier<bool> isTextFieldFocused = ValueNotifier<bool>(false); // Notifier para monitorar o foco dos campos
 
   LoginScreen({
     super.key,
     required this.onThemeToggle,
-    required this.isDarkModeNotifier,
+    required this.themeModeNotifier,
   });
 
-  void login(BuildContext context) async {
+  void login(BuildContext context) {
     String usuario = loginController.text;
     String senha = passwordController.text;
 
+    // Simulação de login bem-sucedido com credenciais vazias (personalize conforme necessário)
     if (usuario == "" && senha == "") {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => HomeScreen(
             onThemeToggle: onThemeToggle,
-            isDarkModeNotifier: isDarkModeNotifier,
+            themeModeNotifier: themeModeNotifier,
           ),
         ),
       );
@@ -95,7 +97,7 @@ class LoginScreen extends StatelessWidget {
                             obscureText: false,
                             textInputAction: TextInputAction.next,
                             icon: PhosphorIcon(
-                              Icons.person_rounded, 
+                              Icons.person_rounded,
                               color: Theme.of(context).primaryColor,
                               size: 30,
                             ),
@@ -110,7 +112,7 @@ class LoginScreen extends StatelessWidget {
                             obscureText: true,
                             textInputAction: TextInputAction.done,
                             icon: PhosphorIcon(
-                              Icons.lock, 
+                              Icons.lock,
                               color: Theme.of(context).primaryColor,
                               size: 30,
                             ),
@@ -132,7 +134,6 @@ class LoginScreen extends StatelessWidget {
                                 color: Colors.red,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
-                                // TESTE
                               ),
                             );
                           },
@@ -149,191 +150,3 @@ class LoginScreen extends StatelessWidget {
     );
   }
 }
-
-
-/* CÓDIGO COM BANNER COMO ERRO */
-
-// import 'package:SoftwareIPJ/screens/home.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter_svg/flutter_svg.dart';
-// import '../widgets/custom_text_field.dart';
-// import '../widgets/custom_button.dart';
-// import '../widgets/custom_banner.dart'; // Importação do banner personalizado
-// import 'dart:ui';
-
-// class LoginScreen extends StatefulWidget {
-//   final void Function(bool value) onThemeToggle;
-//   final ValueNotifier<bool> isDarkModeNotifier;
-
-//   const LoginScreen({
-//     super.key,
-//     required this.onThemeToggle,
-//     required this.isDarkModeNotifier,
-//   });
-
-//   @override
-//   _LoginScreenState createState() => _LoginScreenState();
-// }
-
-// class _LoginScreenState extends State<LoginScreen> {
-//   final TextEditingController loginController = TextEditingController();
-//   final TextEditingController passwordController = TextEditingController();
-//   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-//   final ValueNotifier<String> errorMessage = ValueNotifier<String>("");
-//   final ValueNotifier<bool> isTextFieldFocused = ValueNotifier<bool>(false);
-
-//   bool _isBannerVisible = false; // Controla a visibilidade do banner
-//   String _bannerMessage = ''; // Mensagem do banner
-//   Color _bannerColor = Colors.green; // Cor do banner
-
-//   void login(BuildContext context) {
-//     String usuario = loginController.text;
-//     String senha = passwordController.text;
-
-//     if (usuario == "" && senha == "") {
-//       Navigator.pushReplacement(
-//         context,
-//         MaterialPageRoute(
-//           builder: (context) => HomeScreen(
-//             onThemeToggle: widget.onThemeToggle,
-//             isDarkModeNotifier: widget.isDarkModeNotifier,
-//           ),
-//         ),
-//       );
-//     } else {
-//       _showBanner("Usuário ou senha incorreto!", const Color.fromARGB(255, 154, 27, 27));
-//     }
-//   }
-
-//   void _showBanner(String message, Color color) {
-//     setState(() {
-//       _bannerMessage = message;
-//       _bannerColor = color;
-//       _isBannerVisible = true;
-//     });
-//   }
-
-//   void _hideBanner() {
-//     setState(() {
-//       _isBannerVisible = false;
-//     });
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
-//     final Color backgroundWithOpacity = isDarkTheme ? Colors.black.withOpacity(0.75) : Colors.transparent;
-
-//     return GestureDetector(
-//       onTap: () {
-//         FocusScope.of(context).unfocus(); // Esconde o teclado ao tocar fora dos campos
-//         isTextFieldFocused.value = false; // Remove o foco ao tocar fora
-//       },
-//       child: Scaffold(
-//         body: Stack(
-//           children: [
-//             Positioned.fill(
-//               child: Image.asset(
-//                 'assets/images/Igreja_Fundo_Login.jpg',
-//                 fit: BoxFit.cover,
-//               ),
-//             ),
-//             Positioned.fill(
-//               child: BackdropFilter(
-//                 filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
-//                 child: Container(color: backgroundWithOpacity),
-//               ),
-//             ),
-//             Positioned(
-//               top: 100,
-//               left: 0,
-//               right: 0,
-//               child: Center(
-//                 child: Image.asset(
-//                   'assets/images/Logo_IPB.png',
-//                   height: 80,
-//                   color: Theme.of(context).primaryColor,
-//                 ),
-//               ),
-//             ),
-//             Center(
-//               child: SingleChildScrollView(
-//                 child: Padding(
-//                   padding: const EdgeInsets.symmetric(horizontal: 40.0),
-//                   child: Form(
-//                     key: formKey,
-//                     child: Column(
-//                       mainAxisAlignment: MainAxisAlignment.center,
-//                       children: [
-//                         const SizedBox(height: 150),
-//                         SizedBox(
-//                           width: 300,
-//                           child: CustomTextField(
-//                             controller: loginController,
-//                             hintText: 'Login',
-//                             obscureText: false,
-//                             textInputAction: TextInputAction.next,
-//                             icon: SvgPicture.asset(
-//                               'assets/images/user.svg',
-//                               height: 24,
-//                               color: Theme.of(context).primaryColor,
-//                             ),
-//                           ),
-//                         ),
-//                         const SizedBox(height: 20),
-//                         SizedBox(
-//                           width: 300,
-//                           child: CustomTextField(
-//                             controller: passwordController,
-//                             hintText: 'Senha',
-//                             obscureText: true,
-//                             textInputAction: TextInputAction.done,
-//                             icon: SvgPicture.asset(
-//                               'assets/images/lock.svg',
-//                               height: 23,
-//                               color: Theme.of(context).primaryColor,
-//                             ),
-//                           ),
-//                         ),
-//                         const SizedBox(height: 40),
-//                         CustomButton(
-//                           text: 'Entrar',
-//                           onPressed: () => login(context),
-//                         ),
-//                         const SizedBox(height: 20),
-//                         ValueListenableBuilder(
-//                           valueListenable: errorMessage,
-//                           builder: (context, value, child) {
-//                             return Text(
-//                               value,
-//                               textAlign: TextAlign.center,
-//                               style: const TextStyle(
-//                                 color: Colors.red,
-//                                 fontSize: 14,
-//                                 fontWeight: FontWeight.normal,
-//                               ),
-//                             );
-//                           },
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//             ),
-//             if (_isBannerVisible)
-//               Positioned(
-//                 top: 200,
-//                 right: 0,
-//                 child: CustomBanner(
-//                   message: _bannerMessage,
-//                   backgroundColor: _bannerColor,
-//                   onDismissed: _hideBanner, // Callback para ocultar o banner após a animação
-//                 ),
-//               ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }

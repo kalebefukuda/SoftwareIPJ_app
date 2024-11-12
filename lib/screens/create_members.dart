@@ -1,3 +1,4 @@
+import '../app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -16,15 +17,17 @@ import '../screens/members.dart';
 import 'package:firebase_storage/firebase_storage.dart'; // Importe o Firebase Storage
 
 class CreateMembersScreen extends StatefulWidget {
-  final Function(bool) onThemeToggle;
-  final ValueNotifier<bool> isDarkModeNotifier;
+  // final Function(bool) onThemeToggle;
   final Map<String, dynamic>? memberData; // Dados do membro, se for uma edição
+  final Function(ThemeModeOptions) onThemeToggle;
+  final ValueNotifier<ThemeModeOptions> themeModeNotifier;
+
 
   const CreateMembersScreen({
     super.key,
     required this.onThemeToggle,
-    required this.isDarkModeNotifier,
     this.memberData,
+    required this.themeModeNotifier,
   });
 
   @override
@@ -818,7 +821,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           MaterialPageRoute(
                             builder: (context) => Members(
                               onThemeToggle: widget.onThemeToggle,
-                              isDarkModeNotifier: widget.isDarkModeNotifier,
+                              themeModeNotifier: widget.themeModeNotifier,
                               successMessage: 'Membro salvo com sucesso!', // Passe a mensagem
                             ),
                           ),
@@ -835,7 +838,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                 ],
               ),
             ),
-            BottomSidebar(currentIndex: currentIndex, onTabTapped: onTabTapped, onThemeToggle: widget.onThemeToggle, isDarkModeNotifier: widget.isDarkModeNotifier, isKeyboardVisible: MediaQuery.of(context).viewInsets.bottom != 0),
+            BottomSidebar(currentIndex: currentIndex, onTabTapped: onTabTapped, onThemeToggle: widget.onThemeToggle, themeModeNotifier: widget.themeModeNotifier, isKeyboardVisible: MediaQuery.of(context).viewInsets.bottom != 0),
             if (_isBannerVisible)
               Positioned(
                 top: 10, // Posiciona o banner próximo ao topo
