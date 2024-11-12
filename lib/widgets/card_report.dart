@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import '../utils/constants/app_colors.dart';
+import '../services/pdf_generators/generateBirthdayListPdf.dart';
+import '../services/pdf_generators/generateAssemblyAttendancePdf.dart';
+import '../services/pdf_generators/generateFemaleCommunicantsPdf.dart';
+import '../services/pdf_generators/generateHeadquartersCommunicantsPdf.dart';
+import '../services/pdf_generators/generateMaleCommunicantsPdf.dart';
+import '../services/pdf_generators/generateNonFemaleCommunicantsPdf.dart';
+import '../services/pdf_generators/generateNonMaleCommunicantsPdf.dart';
+import '../services/pdf_generators/generateWeddingDatesPdf.dart';
 
 class CardReport extends StatefulWidget {
   final String nameReport;
@@ -60,13 +67,41 @@ class _CardReportState extends State<CardReport> {
                 duration: const Duration(milliseconds: 300),
                 decoration: BoxDecoration(
                   color: _isHovered
-                      ? const Color(0xFF037955) // Cor durante o hover (#037955)
-                      : Appcolors.green, // Cor padrão
+                      ? const Color.fromARGB(255, 0, 145, 101) // Cor durante o hover (#037955)
+                      : const Color(0xFF015B40), // Cor padrão
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: ElevatedButton(
                   onPressed: () {
-                    // Ação ao clicar no botão
+                    switch (widget.nameReport) {
+                      case "Lista de\nAniversariantes":
+                        generateBirthdayListPdf();
+                        break;
+                      case "Lista de Chamada\nAssembleia":
+                        generateAssemblyAttendancePdf();
+                        break;
+                      case "Lista de\nComungantes Mas":
+                        generateMaleCommunicantsPdf();
+                        break;
+                      case "Lista de\nComungantes Fem":
+                        generateFemaleCommunicantsPdf();
+                        break;
+                      case "Lista de Não\nComungantes Mas":
+                        generateNonMaleCommunicantsPdf();
+                        break;
+                      case "Lista de Não\nComungantes Fem":
+                        generateNonFemaleCommunicantsPdf();
+                        break;
+                      case "Lista de\nComungantes Sede":
+                        generateHeadquartersCommunicantsPdf();
+                        break;
+                      case "Lista de\nDatas de Casamento":
+                        generateWeddingDatesPdf();
+                        break;
+                      default:
+                        // Caso padrão se nenhum dos casos anteriores for correspondido
+                        break;
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent, // Transparente para o AnimatedContainer controlar a cor
