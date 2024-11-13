@@ -22,7 +22,6 @@ class CreateMembersScreen extends StatefulWidget {
   final Function(ThemeModeOptions) onThemeToggle;
   final ValueNotifier<ThemeModeOptions> themeModeNotifier;
 
-
   const CreateMembersScreen({
     super.key,
     required this.onThemeToggle,
@@ -149,24 +148,21 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
     }
   }
 
-  Future<void> _saveMember() async {
+  Future<bool> _saveMember() async {
     try {
       // Se houver uma imagem selecionada, faça o upload para o Firebase Storage
       String? imageUrl;
       if (_selectedImage != null) {
-      // Crie uma referência ao Firebase Storage
-      final storageRef = FirebaseStorage.instance
-          .ref()
-          .child('membros')
-          .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
+        // Crie uma referência ao Firebase Storage
+        final storageRef = FirebaseStorage.instance.ref().child('membros').child('${DateTime.now().millisecondsSinceEpoch}.jpg');
 
-      // Faça o upload do arquivo
-      final uploadTask = storageRef.putFile(_selectedImage!);
+        // Faça o upload do arquivo
+        final uploadTask = storageRef.putFile(_selectedImage!);
 
-      // Espere o upload ser concluído e pegue a URL da imagem
-      final snapshot = await uploadTask.whenComplete(() {});
-      imageUrl = await snapshot.ref.getDownloadURL();
-    }
+        // Espere o upload ser concluído e pegue a URL da imagem
+        final snapshot = await uploadTask.whenComplete(() {});
+        imageUrl = await snapshot.ref.getDownloadURL();
+      }
       // Cria o mapa com os dados do membro
       Map<String, dynamic> memberData = {
         'nomeCompleto': nomeCompletoController.text,
@@ -229,8 +225,10 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
       }
 
       _showBanner('Membro salvo com sucesso!', const Color(0xFF015B40));
+      return true; // Retorna true se o membro for salvo com sucesso
     } catch (e) {
       _showBanner('Erro ao salvar membro', const Color.fromARGB(255, 154, 27, 27));
+      return false; // Retorna false se ocorrer um erro
     }
   }
 
@@ -813,22 +811,30 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Center(
                       child: CustomButton(
                     text: 'Salvar',
-                    onPressed: () {
+                    onPressed: () async {
                       try {
-                        _saveMember();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Members(
-                              onThemeToggle: widget.onThemeToggle,
-                              themeModeNotifier: widget.themeModeNotifier,
-                              successMessage: 'Membro salvo com sucesso!', // Passe a mensagem
-                            ),
-                          ),
-                        );
-                      } catch (e) {
-                        _showBanner('Erro ao salvar membro', const Color.fromARGB(255, 154, 27, 27));
+                        // Use o bool retornado por _saveMember()
+                        bool success = await _saveMember();
 
+                        if (success) {
+                          // Se o membro foi salvo com sucesso
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Members(
+                                onThemeToggle: widget.onThemeToggle,
+                                themeModeNotifier: widget.themeModeNotifier,
+                                successMessage: 'Membro salvo com sucesso!', // Passe a mensagem
+                              ),
+                            ),
+                          );
+                        } else {
+                          // Se a função _saveMember indicar falha
+                          _showBanner('Erro ao salvar membro', const Color.fromARGB(255, 154, 27, 27));
+                        }
+                      } catch (e) {
+                        // Em caso de exceção
+                        _showBanner('Erro ao salvar membro', const Color.fromARGB(255, 154, 27, 27));
                         // ignore: avoid_print
                         print(e);
                       }
@@ -866,33 +872,31 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
   // Função para pegar a imagem da galeria
   // Função para pegar a imagem da galeria
   Future<void> _pickImage() async {
-  try {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    try {
+      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
 
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path);
-      });
+      if (pickedFile != null) {
+        setState(() {
+          _selectedImage = File(pickedFile.path);
+        });
 
-      // Faz o upload da imagem para o Firebase Storage
-      final storageRef = FirebaseStorage.instance
-          .ref()
-          .child('user_images/${DateTime.now().millisecondsSinceEpoch}.jpg');
-      
-      final uploadTask = storageRef.putFile(_selectedImage!);
-      final snapshot = await uploadTask;
-      final imageUrl = await snapshot.ref.getDownloadURL();
+        // Faz o upload da imagem para o Firebase Storage
+        final storageRef = FirebaseStorage.instance.ref().child('user_images/${DateTime.now().millisecondsSinceEpoch}.jpg');
 
-      print("Imagem carregada com sucesso: $imageUrl");
-      // Aqui, você pode salvar `imageUrl` no Firestore para armazenar o link da imagem
-    } else {
-      _showBanner('Seleção de imagem cancelada.', const Color.fromARGB(255, 142, 85, 0));
+        final uploadTask = storageRef.putFile(_selectedImage!);
+        final snapshot = await uploadTask;
+        final imageUrl = await snapshot.ref.getDownloadURL();
+
+        print("Imagem carregada com sucesso: $imageUrl");
+        // Aqui, você pode salvar `imageUrl` no Firestore para armazenar o link da imagem
+      } else {
+        _showBanner('Seleção de imagem cancelada.', const Color.fromARGB(255, 142, 85, 0));
+      }
+    } catch (e) {
+      _showBanner('Erro ao selecionar ou fazer upload da imagem: $e', const Color.fromARGB(255, 154, 27, 27));
+      print('Erro ao selecionar ou fazer upload da imagem: $e');
     }
-  } catch (e) {
-    _showBanner('Erro ao selecionar ou fazer upload da imagem: $e', const Color.fromARGB(255, 154, 27, 27));
-    print('Erro ao selecionar ou fazer upload da imagem: $e');
   }
-}
 
   // Função que utiliza o estilo do tema para os títulos
   Widget buildSectionTitle(BuildContext context, String title) {
