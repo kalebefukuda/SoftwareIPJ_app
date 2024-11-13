@@ -18,7 +18,11 @@ class MembersCountCard extends StatelessWidget {
       };
     } catch (e) {
       print("Erro ao carregar dados dos membros: $e");
-      return {'total': 0, 'homens': 0, 'mulheres': 0};
+      return {
+        'total': 0,
+        'homens': 0,
+        'mulheres': 0
+      };
     }
   }
 
@@ -33,9 +37,7 @@ class MembersCountCard extends StatelessWidget {
           return const Text('Erro ao carregar os dados dos membros');
         } else if (snapshot.hasData) {
           final memberData = snapshot.data!;
-          final svgPath = Theme.of(context).brightness == Brightness.dark
-              ? 'assets/images/4_card_dark1.svg'
-              : 'assets/images/4_card_light1.svg';
+          final svgPath = Theme.of(context).brightness == Brightness.dark ? 'assets/images/4_card_dark1.svg' : 'assets/images/4_card_light1.svg';
 
           return Container(
             decoration: BoxDecoration(
@@ -82,28 +84,68 @@ class MembersCountCard extends StatelessWidget {
   }
 
   Widget _buildAnimatedCountBox(BuildContext context, int targetCount) {
-    return TweenAnimationBuilder<int>(
-      tween: IntTween(begin: 0, end: targetCount),
-      duration: const Duration(seconds: 2),
-      builder: (context, count, child) {
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.secondary,
-            borderRadius: BorderRadius.circular(35),
-          ),
-          width: 80,
-          child: Center(
-            child: Text(
-              '$count',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Colors.white,
-                    fontSize: 19,
-                  ),
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.secondary,
+        borderRadius: BorderRadius.circular(35),
+      ),
+      width: 80,
+      child: _AnimatedCounter(targetCount: targetCount),
+    );
+  }
+}
+
+class _AnimatedCounter extends StatefulWidget {
+  final int targetCount;
+
+  const _AnimatedCounter({required this.targetCount});
+
+  @override
+  __AnimatedCounterState createState() => __AnimatedCounterState();
+}
+
+class __AnimatedCounterState extends State<_AnimatedCounter> {
+  int currentCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _startCounting();
+  }
+
+  void _startCounting() async {
+    for (int i = 0; i <= widget.targetCount; i++) {
+      await Future.delayed(const Duration(milliseconds: 50));
+      setState(() {
+        currentCount = i;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 100),
+      transitionBuilder: (child, animation) {
+        return SlideTransition(
+          position: animation.drive(
+            Tween<Offset>(
+              begin: const Offset(0, 0),
+              end: Offset.zero,
             ),
           ),
+          child: child,
         );
       },
+      child: Text(
+        '$currentCount',
+        key: ValueKey<int>(currentCount),
+        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              color: Colors.white,
+              fontSize: 19,
+            ),
+      ),
     );
   }
 }
