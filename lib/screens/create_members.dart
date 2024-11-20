@@ -1,5 +1,4 @@
 // ignore_for_file: unused_local_variable
-
 import '../app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -41,6 +40,9 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
   bool _isBannerVisible = false; // Controla a visibilidade do banner
   String _bannerMessage = ''; // Armazena a mensagem do banner
   Color _bannerColor = Colors.green; // Armazena a cor do banner
+
+  final _formKey = GlobalKey<FormState>(); // Adicionei o GlobalKey para o formulário
+  final Map<String, bool> _fieldErrors = {}; // Mapeia campos com erro para borda vermelha
 
   final MemberService _memberService = MemberService();
 
@@ -93,6 +95,38 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
   final TextEditingController reeleitoPresb3Controller = TextEditingController();
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
+
+  // Campos obrigatórios
+
+  // Validação dos campos
+  void _validateFields() {
+    setState(() {
+      _fieldErrors.clear();
+      // Verifica campos obrigatórios e adiciona ao mapa de erros
+      if (nomeCompletoController.text.trim().isEmpty) {
+        _fieldErrors['nomeCompleto'] = true;
+      }
+      if (dataNascimentoController.text.trim().isEmpty) {
+        _fieldErrors['dataNascimento'] = true;
+      }
+      if (numeroRolController.text.trim().isEmpty) {
+        _fieldErrors['numeroRol'] = true;
+      }
+      if (residenciaController.text.trim().isEmpty) {
+        _fieldErrors['residenciaLocal'] = true;
+      }
+      if (telefoneController.text.trim().isEmpty) {
+        _fieldErrors['telefone'] = true;
+      }
+      if (comunganteController.text.trim().isEmpty) {
+        _fieldErrors['comungante'] = true;
+      }
+      if (comunganteController.text.trim().isEmpty) {
+        _fieldErrors['sexo'] = true;
+      }
+      debugPrint('_fieldErrors: $_fieldErrors'); // Adicione esta linha para verificar
+    });
+  }
 
   @override
   void initState() {
@@ -289,6 +323,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
           centerTitle: true,
         ),
         body: Stack(
+          key: _formKey, // Associa a chave do formulário
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(23.0, 0.0, 23.0, 0.0), // Adiciona um padding inferior maior
@@ -335,6 +370,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                       controller: nomeCompletoController,
                       hintText: 'Nome Completo',
                       textInputAction: TextInputAction.next,
+                      borderColor: _fieldErrors['nomeCompleto'] == true ? Colors.red : Theme.of(context).inputDecorationTheme.focusColor,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -349,6 +385,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                             'NÃO'
                           ],
                           hintText: 'Comungante',
+                          borderColor: _fieldErrors['comungante'] == true ? Colors.red : Theme.of(context).inputDecorationTheme.focusColor,
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
@@ -363,6 +400,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                             FilteringTextInputFormatter.digitsOnly,
                             LengthLimitingTextInputFormatter(3), // Limita a 3 caracteres
                           ], // Filtra apenas números
+                          borderColor: _fieldErrors['numeroRol'] == true ? Colors.red : Theme.of(context).inputDecorationTheme.focusColor,
                         ),
                       ),
                     ],
@@ -378,11 +416,16 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                             'Masculino',
                             'Feminino'
                           ],
+                          borderColor: _fieldErrors['sexo'] == true ? Colors.red : Theme.of(context).inputDecorationTheme.focusColor,
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomDateTextField(controller: dataNascimentoController, hintText: 'Data de nascimento'),
+                        child: CustomDateTextField(
+                          controller: dataNascimentoController,
+                          hintText: 'Data de nascimento',
+                          borderColor: _fieldErrors['dataNascimento'] == true ? Colors.red : Theme.of(context).inputDecorationTheme.focusColor,
+                        ),
                       ),
                     ],
                   ),
@@ -454,6 +497,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           inputFormatters: [
                             PhoneInputFormatter(), // Utiliza o formatter personalizado
                           ],
+                          borderColor: _fieldErrors['telefone'] == true ? Colors.red : Theme.of(context).inputDecorationTheme.focusColor,
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
@@ -546,6 +590,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                             'Sede',
                             'Fora'
                           ],
+                          borderColor: _fieldErrors['residenciaLocal'] == true ? Colors.red : Theme.of(context).inputDecorationTheme.focusColor,
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
@@ -812,38 +857,30 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   ),
                   const SizedBox(height: 30),
                   Center(
-                      child: CustomButton(
-                    text: 'Salvar',
-                    onPressed: () async {
-                      try {
-                        // Use o bool retornado por _saveMember()
-                        bool success = await _saveMember();
-
-                        if (success) {
-                          // Se o membro foi salvo com sucesso
-                          Navigator.push(
-                            // ignore: use_build_context_synchronously
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Members(
-                                onThemeToggle: widget.onThemeToggle,
-                                themeModeNotifier: widget.themeModeNotifier,
-                                successMessage: 'Membro salvo com sucesso!', // Passe a mensagem
+                    child: CustomButton(
+                      text: 'Salvar',
+                      onPressed: () async {
+                        _validateFields(); // Valida os campos obrigatórios
+                        if (_fieldErrors.isEmpty) {
+                          bool success = await _saveMember();
+                          if (success) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Members(
+                                  onThemeToggle: widget.onThemeToggle,
+                                  themeModeNotifier: widget.themeModeNotifier,
+                                  successMessage: 'Membro salvo com sucesso!',
+                                ),
                               ),
-                            ),
-                          );
+                            );
+                          }
                         } else {
-                          // Se a função _saveMember indicar falha
-                          _showBanner('Erro ao salvar membro', const Color.fromARGB(255, 154, 27, 27));
+                          _showBanner('Por favor, preencha todos os campos obrigatórios.', Color.fromARGB(255, 154, 27, 27));
                         }
-                      } catch (e) {
-                        // Em caso de exceção
-                        _showBanner('Erro ao salvar membro', const Color.fromARGB(255, 154, 27, 27));
-                        // ignore: avoid_print
-                        print(e);
-                      }
-                    },
-                  )),
+                      },
+                    ),
+                  ),
                   const SizedBox(height: 100), //Esse Widget é para dar uma espaçamento final para a sidebar não sobrepor os itens da tela
                 ],
               ),

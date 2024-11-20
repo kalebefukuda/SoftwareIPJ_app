@@ -17,6 +17,7 @@ class CustomTextField extends StatefulWidget {
   final void Function(String value)? onChanged;
   final String? Function(String? value)? validator;
   final bool readOnly; // Adicione a propriedade readOnly
+  final Color? borderColor; // Adicione o parâmetro para borda
 
   const CustomTextField({
     super.key,
@@ -29,7 +30,8 @@ class CustomTextField extends StatefulWidget {
     this.textInputAction,
     this.onChanged,
     this.validator,
-    this.readOnly = false, // Define como false por padrão
+    this.readOnly = false,
+    this.borderColor,
   });
 
   @override
@@ -68,10 +70,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
           color: Theme.of(context).inputDecorationTheme.fillColor, // Usa a cor de fundo do tema
           borderRadius: BorderRadius.circular(15), // Aplica o radius ao container
           border: Border.all(
-            color: (isFocused && !widget.readOnly)
-                ? Theme.of(context).primaryColor
-                : Colors.transparent, // Apenas mostra a borda se focado e não em modo de leitura
-            width: (isFocused && !widget.readOnly) ? 2.0 : 1.0,
+            color: widget.borderColor ?? 
+                (isFocused ? Theme.of(context).primaryColor : Colors.transparent), // Usa a borda fornecida
+            width: 2.0,
           ),
         ),
         child: GestureDetector(
@@ -129,6 +130,7 @@ class CustomDateTextField extends CustomTextField {
     required super.controller,
     super.textInputAction, // Repassa textInputAction para uso em "Próximo" ou "Concluído"
     super.onChanged,
+    super.borderColor, // Inclua isso
   }) : super(
           obscureText: false,
           keyboardType: TextInputType.number,
@@ -187,6 +189,7 @@ class CustomCapitalizedTextField extends CustomTextField {
     final ValueChanged<String>? onChanged,
     super.textInputAction,
     bool? readOnly, // Repassa textInputAction para funcionar com "Próximo" e "Concluído"
+    super.borderColor, // Inclua isso
   }) : super(
           obscureText: false,
           onChanged: (value) {
