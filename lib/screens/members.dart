@@ -9,6 +9,7 @@ import '../widgets/sidebar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/member_service.dart';
 import '../widgets/custom_banner.dart';
+import 'package:diacritic/diacritic.dart';
 
 class Members extends StatefulWidget {
   final Function(ThemeModeOptions) onThemeToggle;
@@ -104,6 +105,15 @@ class _MembersState extends State<Members> {
                   ...doc.data() as Map<String, dynamic>
                 })
             .toList();
+
+        // Ordena a lista de membros em ordem alfabética pelo nome completo
+        membersData.sort((a, b) {
+          String nameA = a['nomeCompleto']?.toLowerCase() ?? '';
+          String nameB = b['nomeCompleto']?.toLowerCase() ?? '';
+          return nameA.compareTo(nameB);
+        });
+
+        // Copia a lista ordenada para filteredMembers
         filteredMembers = List.from(membersData);
       });
     } catch (e) {
@@ -112,11 +122,12 @@ class _MembersState extends State<Members> {
   }
 
   void _filterMembers() {
-    String query = _searchController.text.toLowerCase();
+    String query = removeDiacritics(_searchController.text.toLowerCase());
     setState(() {
       filteredMembers = membersData.where((member) {
-        // Verifica se o nome corresponde à pesquisa
-        bool matchesQuery = member['nomeCompleto']?.toLowerCase().contains(query) ?? false;
+        // Remove os acentos do nome completo antes de comparar
+        String nomeCompleto = member['nomeCompleto'] ?? '';
+        bool matchesQuery = removeDiacritics(nomeCompleto.toLowerCase()).contains(query);
 
         // Filtra por gênero
         bool matchesGender = true;
