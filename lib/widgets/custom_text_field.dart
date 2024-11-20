@@ -61,7 +61,6 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isFocused = _focusNode.hasFocus;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(15), // Aplica o radius diretamente no ClipRRect
@@ -70,8 +69,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
           color: Theme.of(context).inputDecorationTheme.fillColor, // Usa a cor de fundo do tema
           borderRadius: BorderRadius.circular(15), // Aplica o radius ao container
           border: Border.all(
-            color: widget.borderColor ?? 
-                (isFocused ? Theme.of(context).primaryColor : Colors.transparent), // Usa a borda fornecida
+            color: _focusNode.hasFocus
+                ? Theme.of(context).primaryColor // Prioridade para verde ao focar
+                : (widget.borderColor ?? Colors.transparent), // Vermelha ou transparente se não focado
             width: 2.0,
           ),
         ),

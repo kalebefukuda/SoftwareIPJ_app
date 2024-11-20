@@ -566,7 +566,7 @@ class _MembersState extends State<Members> {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      member['telefone'] ?? 'Telefone não disponível',
+                                      member['celular'] ?? ['telefone'],
                                       style: const TextStyle(
                                         color: Color(0xFFB5B5B5),
                                       ),
