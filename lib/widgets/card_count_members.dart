@@ -10,7 +10,7 @@ class MembersCountCard extends StatelessWidget {
   Future<Map<String, int>> _fetchMemberData() async {
     try {
       // Usa a função do serviço para obter as contagens reais
-      Map<String, int> counts = await memberService.getMemberCountByGender();
+      Map<String, int> counts = await memberService.getMemberCountByGenderAndCommunicant();
       return {
         'total': (counts['Masculino'] ?? 0) + (counts['Feminino'] ?? 0),
         'homens': counts['Masculino'] ?? 0,

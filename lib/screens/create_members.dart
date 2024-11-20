@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable
+
 import '../app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -309,6 +311,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                                     'assets/images/user-round.svg',
                                     height: 50,
                                     width: 50,
+                                    // ignore: deprecated_member_use
                                     color: Theme.of(context).iconTheme.color, // Usa a cor do iconTheme conforme o tema
                                   ),
                                 ],
@@ -819,6 +822,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                         if (success) {
                           // Se o membro foi salvo com sucesso
                           Navigator.push(
+                            // ignore: use_build_context_synchronously
                             context,
                             MaterialPageRoute(
                               builder: (context) => Members(
@@ -887,14 +891,12 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
         final snapshot = await uploadTask;
         final imageUrl = await snapshot.ref.getDownloadURL();
 
-        print("Imagem carregada com sucesso: $imageUrl");
         // Aqui, você pode salvar `imageUrl` no Firestore para armazenar o link da imagem
       } else {
         _showBanner('Seleção de imagem cancelada.', const Color.fromARGB(255, 142, 85, 0));
       }
     } catch (e) {
       _showBanner('Erro ao selecionar ou fazer upload da imagem: $e', const Color.fromARGB(255, 154, 27, 27));
-      print('Erro ao selecionar ou fazer upload da imagem: $e');
     }
   }
 

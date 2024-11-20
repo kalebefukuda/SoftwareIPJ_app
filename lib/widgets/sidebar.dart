@@ -1,4 +1,4 @@
-import 'package:SoftwareIPJ/app.dart';
+import 'package:softwareipj/app.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'dart:ui';

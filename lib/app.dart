@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:SoftwareIPJ/screens/start_screen.dart';
+import 'package:softwareipj/screens/start_screen.dart';
 
 // Enum para os modos de tema
 enum ThemeModeOptions {
@@ -13,6 +13,7 @@ class App extends StatefulWidget {
   const App({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _AppState createState() => _AppState();
 }
 
@@ -65,8 +66,9 @@ class _AppState extends State<App> {
           bodyLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: Colors.black),
           bodyMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: Colors.grey),
           bodySmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xFF015B40)),
-          titleMedium: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Color(0xFF015B40)),
           titleLarge: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white),
+          titleMedium: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Color(0xFF015B40)),
+          titleSmall: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Color(0xFF015B40)),
         ),
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFF015B40),
@@ -95,8 +97,9 @@ class _AppState extends State<App> {
           bodyLarge: TextStyle(fontSize: 14, color: Colors.white),
           bodyMedium: TextStyle(fontSize: 14, color: Colors.grey),
           bodySmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white),
-          titleMedium: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.white),
           titleLarge: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white),
+          titleMedium: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.white),
+          titleSmall: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Colors.black),
         ),
         appBarTheme: const AppBarTheme(
           backgroundColor: Color.fromARGB(255, 0, 0, 0),
