@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:SoftwareIPJ/app.dart'; // Importar o arquivo que define ThemeModeOptions
+import 'package:softwareipj/app.dart'; // Importar o arquivo que define ThemeModeOptions
 import 'login.dart'; // Importar a tela de login
 
 class StartScreen extends StatefulWidget {

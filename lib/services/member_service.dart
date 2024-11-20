@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MemberService {
-  final CollectionReference membersCollection =
-      FirebaseFirestore.instance.collection('members'); 
+  final CollectionReference membersCollection = FirebaseFirestore.instance.collection('members');
 
   /// Adiciona um novo membro ao Firestore.
   Future<void> addMember(Map<String, dynamic> memberData) async {
@@ -11,7 +10,7 @@ class MemberService {
       print("Membro adicionado com sucesso");
     } catch (e) {
       print("Erro ao adicionar membro: $e");
-      rethrow; 
+      rethrow;
     }
   }
 
@@ -37,49 +36,52 @@ class MemberService {
     }
   }
 
-  
   Future<DocumentSnapshot> getMember(String memberId) async {
     try {
-      return await membersCollection.doc(memberId).get(); 
+      return await membersCollection.doc(memberId).get();
     } catch (e) {
       print("Erro ao obter membro: $e");
       rethrow;
     }
   }
 
-  
-  Future<List<QueryDocumentSnapshot>> getAllMembers() async {
-    try {
-      QuerySnapshot querySnapshot = await membersCollection.get(); 
-      return querySnapshot.docs; 
-    } catch (e) {
-      print("Erro ao obter lista de membros: $e");
-      rethrow;
-    }
-  }
-
-  Future<Map<String, int>> getMemberCountByGender() async {
+  Future<Map<String, int>> getMemberCountByGenderAndCommunicant() async {
     try {
       int maleCount = 0;
       int femaleCount = 0;
+      int yesCommunicantCount = 0;
+      int noCommunicantCount = 0;
 
       QuerySnapshot snapshot = await membersCollection.get();
       for (var doc in snapshot.docs) {
-        String? gender = (doc.data() as Map<String, dynamic>)['sexo'];
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+        // Contagem de gênero
+        String? gender = data['sexo'];
         if (gender == 'Masculino') {
           maleCount++;
         } else if (gender == 'Feminino') {
           femaleCount++;
         }
+
+        // Contagem de comungantes
+        String? communicant = data['comungante'];
+        if (communicant == 'SIM') {
+          yesCommunicantCount++;
+        } else if (communicant == 'NÃO') {
+          noCommunicantCount++;
+        }
       }
 
-      return {'Masculino': maleCount, 'Feminino': femaleCount};
+      return {
+        'Masculino': maleCount,
+        'Feminino': femaleCount,
+        'SIM': yesCommunicantCount,
+        'NÃO': noCommunicantCount,
+      };
     } catch (e) {
-      print("Erro ao contar membros por gênero: $e");
+      print("Erro ao contar membros por gênero e comungantes: $e");
       rethrow;
     }
   }
 }
-
-
-

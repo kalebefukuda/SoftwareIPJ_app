@@ -1,13 +1,13 @@
-import 'package:SoftwareIPJ/screens/create_members.dart';
-import 'package:SoftwareIPJ/screens/members.dart';
-import 'package:SoftwareIPJ/screens/report.dart';
+import 'package:softwareipj/screens/create_members.dart';
+import 'package:softwareipj/screens/members.dart';
+import 'package:softwareipj/screens/report.dart';
 import 'package:flutter/material.dart';
 import '../widgets/card_register.dart';
 import '../widgets/card_members.dart';
 import '../widgets/card_report_home.dart';
 import '../widgets/card_count_members.dart';
 import '../widgets/custom_drawer.dart';
-import 'package:SoftwareIPJ/app.dart';
+import 'package:softwareipj/app.dart';
 
 class HomeScreen extends StatefulWidget {
   final Function(ThemeModeOptions) onThemeToggle;
@@ -20,6 +20,7 @@ class HomeScreen extends StatefulWidget {
   });
 
   @override
+  // ignore: library_private_types_in_public_api
   _HomeScreenState createState() => _HomeScreenState();
 }
 

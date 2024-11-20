@@ -1,7 +1,9 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import '../app.dart';
-import 'package:SoftwareIPJ/screens/view_member_screen.dart';
-import 'package:SoftwareIPJ/screens/create_members.dart';
-import 'package:SoftwareIPJ/utils/constants/app_colors.dart';
+import 'package:softwareipj/screens/view_member_screen.dart';
+import 'package:softwareipj/screens/create_members.dart';
+import 'package:softwareipj/utils/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../widgets/sidebar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,7 +13,7 @@ import '../widgets/custom_banner.dart';
 class Members extends StatefulWidget {
   final Function(ThemeModeOptions) onThemeToggle;
   final ValueNotifier<ThemeModeOptions> themeModeNotifier;
-  final String? successMessage; // Novo parâmetro para a mensagem de sucesso
+  final String? successMessage;
 
   const Members({
     super.key,
@@ -34,13 +36,17 @@ class _MembersState extends State<Members> {
   final TextEditingController _searchController = TextEditingController();
   int maleCount = 0;
   int femaleCount = 0;
+  int yesCommunicantCount = 0;
+  int noCommunicantCount = 0;
   bool filterMen = false;
   bool filterWomen = false;
+  bool filterCommunicant = false;
+  bool filterNonCommunicant = false;
   final MemberService memberService = MemberService();
 
-  bool _isBannerVisible = false; // Controla a visibilidade do banner
-  String _bannerMessage = ''; // Mensagem do banner
-  Color _bannerColor = Colors.green; // Cor do banner
+  bool _isBannerVisible = false;
+  String _bannerMessage = '';
+  Color _bannerColor = Colors.green;
 
   @override
   void initState() {
@@ -62,11 +68,12 @@ class _MembersState extends State<Members> {
 
   Future<void> _getMemberCounts() async {
     try {
-      // Usa a função do serviço para obter as contagens
-      Map<String, int> counts = await memberService.getMemberCountByGender();
+      Map<String, int> counts = await memberService.getMemberCountByGenderAndCommunicant();
       setState(() {
         maleCount = counts['Masculino'] ?? 0;
         femaleCount = counts['Feminino'] ?? 0;
+        yesCommunicantCount = counts['SIM'] ?? 0;
+        noCommunicantCount = counts['NÃO'] ?? 0;
       });
     } catch (e) {
       print("Erro ao obter contagem de membros: $e");
@@ -108,48 +115,71 @@ class _MembersState extends State<Members> {
     String query = _searchController.text.toLowerCase();
     setState(() {
       filteredMembers = membersData.where((member) {
+        // Verifica se o nome corresponde à pesquisa
         bool matchesQuery = member['nomeCompleto']?.toLowerCase().contains(query) ?? false;
-        bool matchesGender = true;
 
+        // Filtra por gênero
+        bool matchesGender = true;
         if (filterMen) {
           matchesGender = member['sexo'] == 'Masculino';
         } else if (filterWomen) {
           matchesGender = member['sexo'] == 'Feminino';
         }
 
-        return matchesQuery && matchesGender;
+        // Filtra por comungantes
+        bool matchesCommunicant = true;
+        if (filterCommunicant) {
+          matchesCommunicant = member['comungante'] == 'SIM';
+        } else if (filterNonCommunicant) {
+          matchesCommunicant = member['comungante'] == 'NÃO';
+        } else if (member['comungante'] == null) {
+          matchesCommunicant = false; // Exclua membros sem o campo 'comungante'
+        }
+
+        // Retorna se todos os critérios forem atendidos
+        return matchesQuery && matchesGender && matchesCommunicant;
       }).toList();
     });
   }
 
-  void _toggleGenderFilter(String gender) {
+  Color? _getFilterBackgroundColor(BuildContext context, bool isActive) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    if (isDarkMode) {
+      return isActive ? Theme.of(context).iconTheme.color : Theme.of(context).inputDecorationTheme.fillColor;
+    }
+
+    return isActive ? Theme.of(context).iconTheme.color?.withOpacity(0.3) : Theme.of(context).inputDecorationTheme.fillColor;
+  }
+
+  void _toggleGenderFilter(String filterType) {
     setState(() {
-      if (gender == 'Masculino') {
+      if (filterType == 'Masculino') {
         filterMen = !filterMen;
         if (filterMen) filterWomen = false;
-      } else if (gender == 'Feminino') {
+      } else if (filterType == 'Feminino') {
         filterWomen = !filterWomen;
         if (filterWomen) filterMen = false;
+      } else if (filterType == 'SIM') {
+        filterCommunicant = !filterCommunicant;
+        if (filterCommunicant) filterNonCommunicant = false;
+      } else if (filterType == 'NÃO') {
+        filterNonCommunicant = !filterNonCommunicant;
+        if (filterNonCommunicant) filterCommunicant = false;
       }
-
-      _filterMembers();
+      _filterMembers(); // Chama a função para aplicar os filtros
     });
   }
 
   Future<void> _deleteMember(String memberId) async {
     try {
-      // Obtém o documento original da coleção 'members'
       DocumentSnapshot memberSnapshot = await FirebaseFirestore.instance.collection('members').doc(memberId).get();
 
       if (memberSnapshot.exists) {
-        // Adiciona a data e hora da exclusão ao documento
         Map<String, dynamic> memberData = memberSnapshot.data() as Map<String, dynamic>;
-        memberData['deletedAt'] = DateTime.now().toIso8601String(); // Adiciona a data de exclusão
+        memberData['deletedAt'] = DateTime.now().toIso8601String();
 
-        // Copia o documento para a coleção 'deleted_members'
         await FirebaseFirestore.instance.collection('deleted_members').doc(memberId).set(memberData);
-
-        // Remove o documento da coleção 'members'
         await FirebaseFirestore.instance.collection('members').doc(memberId).delete();
 
         _fetchMembers();
@@ -326,41 +356,98 @@ class _MembersState extends State<Members> {
             ListView(
               padding: const EdgeInsets.all(15.0),
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    GestureDetector(
-                      onTap: () => _toggleGenderFilter('Masculino'),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: filterMen ? Color(0xFF015B40) : Colors.transparent,
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          '$maleCount Homens',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 16),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 20),
-                    GestureDetector(
-                      onTap: () => _toggleGenderFilter('Feminino'),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: filterWomen ? Color.fromARGB(117, 2, 161, 113) : Colors.transparent,
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          '$femaleCount Mulheres',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 16),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      GestureDetector(
+                        onTap: () => _toggleGenderFilter('Masculino'),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: _getFilterBackgroundColor(context, filterMen),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          padding: filterMen ? const EdgeInsets.symmetric(vertical: 7.0, horizontal: 14) : const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15),
+                          child: Text(
+                            '$maleCount Homens',
+                            style: filterMen
+                                ? Theme.of(context).textTheme.titleSmall
+                                : Theme.of(context).textTheme.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                      color: Theme.of(context).colorScheme.onSecondary,
+                                      fontSize: 14,
+                                    ),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 10),
+                      GestureDetector(
+                        onTap: () => _toggleGenderFilter('Feminino'),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: _getFilterBackgroundColor(context, filterWomen),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          padding: filterWomen ? const EdgeInsets.symmetric(vertical: 7.0, horizontal: 14) : const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15),
+                          child: Text(
+                            '$femaleCount Mulheres',
+                            style: filterWomen
+                                ? Theme.of(context).textTheme.titleSmall
+                                : Theme.of(context).textTheme.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                      color: Theme.of(context).colorScheme.onSecondary,
+                                      fontSize: 14,
+                                    ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      GestureDetector(
+                        onTap: () => _toggleGenderFilter('SIM'),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: _getFilterBackgroundColor(context, filterCommunicant),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          padding: filterCommunicant ? const EdgeInsets.symmetric(vertical: 7.0, horizontal: 14) : const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15),
+                          child: Text(
+                            '$yesCommunicantCount Comungantes',
+                            style: filterCommunicant
+                                ? Theme.of(context).textTheme.titleSmall
+                                : Theme.of(context).textTheme.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                      color: Theme.of(context).colorScheme.onSecondary,
+                                      fontSize: 14,
+                                    ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      GestureDetector(
+                        onTap: () => _toggleGenderFilter('NÃO'),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: _getFilterBackgroundColor(context, filterNonCommunicant),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                          padding: filterNonCommunicant ? const EdgeInsets.symmetric(vertical: 7.0, horizontal: 14) : const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15),
+                          child: Text(
+                            '$noCommunicantCount Não Comungantes',
+                            style: filterNonCommunicant
+                                ? Theme.of(context).textTheme.titleSmall
+                                : Theme.of(context).textTheme.titleSmall?.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                      color: Theme.of(context).colorScheme.onSecondary,
+                                      fontSize: 14,
+                                    ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 10),
                 TextField(
                   controller: _searchController,
                   focusNode: _searchFocusNode,
@@ -396,7 +483,6 @@ class _MembersState extends State<Members> {
                     },
                     child: Stack(
                       children: [
-                        // Botões de editar e deletar
                         Positioned.fill(
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
@@ -494,7 +580,7 @@ class _MembersState extends State<Members> {
                 child: CustomBanner(
                   message: _bannerMessage,
                   backgroundColor: _bannerColor,
-                  onDismissed: _hideBanner, // Callback para ocultar o banner após a animação,
+                  onDismissed: _hideBanner,
                 ),
               ),
             BottomSidebar(
