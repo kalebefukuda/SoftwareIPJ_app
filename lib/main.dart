@@ -1,13 +1,25 @@
 import 'package:flutter/material.dart';
 import 'app.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() async{
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+
+  try {
+    await dotenv.load(fileName: ".env");
+
+    final url = dotenv.env['SUPABASE_URL']!;
+    final anonKey = dotenv.env['SUPABASE_ANON_KEY']!;
+
+    await Supabase.initialize(
+      url: url,
+      anonKey: anonKey,
+    );
+
+  } catch (e) {
+    debugPrint('$e');
+  }
+
   runApp(const App());
 }
-

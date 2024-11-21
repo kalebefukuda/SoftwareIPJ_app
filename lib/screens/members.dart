@@ -10,6 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/member_service.dart';
 import '../widgets/custom_banner.dart';
 import 'package:diacritic/diacritic.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Members extends StatefulWidget {
   final Function(ThemeModeOptions) onThemeToggle;
@@ -67,14 +68,25 @@ class _MembersState extends State<Members> {
     _searchController.addListener(_filterMembers);
   }
 
-  Future<void> _getMemberCounts() async {
+    Future<void> _getMemberCounts() async {
     try {
-      Map<String, int> counts = await memberService.getMemberCountByGenderAndCommunicant();
+      final response = await Supabase.instance.client.from('membros').select();
+      if (response.isEmpty) {
+        setState(() {
+        maleCount = 0;
+        femaleCount = 0;
+        yesCommunicantCount = 0;
+        noCommunicantCount = 0;
+      });
+      }
+
+      List members = response as List;
       setState(() {
-        maleCount = counts['Masculino'] ?? 0;
-        femaleCount = counts['Feminino'] ?? 0;
-        yesCommunicantCount = counts['SIM'] ?? 0;
-        noCommunicantCount = counts['NÃO'] ?? 0;
+        maleCount = members.where((m) => m['sexo'] == 'Masculino').length;
+        femaleCount = members.where((m) => (m['sexo']) == 'Feminino').length;
+        yesCommunicantCount = members.where((m) => (m['comungante']) == 'SIM').length;
+        noCommunicantCount = members.where((m) => (m['comungante']) == 'NÃO').length;
+
       });
     } catch (e) {
       print("Erro ao obter contagem de membros: $e");
@@ -95,59 +107,57 @@ class _MembersState extends State<Members> {
   }
 
   Future<void> _fetchMembers() async {
-    try {
-      final QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('members').get();
+  try {
+    
+    final response = await Supabase.instance.client
+        .from('membros')
+        .select();
 
-      setState(() {
-        membersData = snapshot.docs
-            .map((doc) => {
-                  'id': doc.id,
-                  ...doc.data() as Map<String, dynamic>
-                })
-            .toList();
-
-        // Ordena a lista de membros em ordem alfabética pelo nome completo
-        membersData.sort((a, b) {
-          String nameA = a['nomeCompleto']?.toLowerCase() ?? '';
-          String nameB = b['nomeCompleto']?.toLowerCase() ?? '';
-          return nameA.compareTo(nameB);
-        });
-
-        // Copia a lista ordenada para filteredMembers
-        filteredMembers = List.from(membersData);
-      });
-    } catch (e) {
-      print("Erro ao buscar membros: $e");
+    if (response.isEmpty) {
+      _showBanner('Nenhum membro cadastrado', const Color.fromARGB(255, 10, 54, 216));
     }
+
+    // Converte os dados recebidos para uma lista de mapas
+    setState(() {
+      membersData = (response as List<dynamic>)
+          .map((data) => data as Map<String, dynamic>)
+          .toList();
+
+      // Ordena os membros por nome
+      membersData.sort((a, b) {
+        String nameA = a['nomeCompleto']?.toString().toLowerCase() ?? '';
+        String nameB = b['nomeCompleto']?.toString().toLowerCase() ?? '';
+        return nameA.compareTo(nameB);
+      });
+
+      // Copia a lista para os membros filtrados
+      filteredMembers = List.from(membersData);
+    });
+  } catch (e) {
+    print("Erro ao buscar membros: $e");
+    _showBanner('Erro ao buscar membros', const Color.fromARGB(255, 154, 27, 27));
   }
+}
 
   void _filterMembers() {
     String query = removeDiacritics(_searchController.text.toLowerCase());
     setState(() {
       filteredMembers = membersData.where((member) {
-        // Remove os acentos do nome completo antes de comparar
-        String nomeCompleto = member['nomeCompleto'] ?? '';
+        String nomeCompleto = member['nomeCompleto']?.toString() ?? '';
         bool matchesQuery = removeDiacritics(nomeCompleto.toLowerCase()).contains(query);
 
-        // Filtra por gênero
-        bool matchesGender = true;
-        if (filterMen) {
-          matchesGender = member['sexo'] == 'Masculino';
-        } else if (filterWomen) {
-          matchesGender = member['sexo'] == 'Feminino';
-        }
+        bool matchesGender = filterMen
+            ? member['sexo']?.toString() == 'Masculino'
+            : filterWomen
+                ? member['sexo']?.toString() == 'Feminino'
+                : true;
 
-        // Filtra por comungantes
-        bool matchesCommunicant = true;
-        if (filterCommunicant) {
-          matchesCommunicant = member['comungante'] == 'SIM';
-        } else if (filterNonCommunicant) {
-          matchesCommunicant = member['comungante'] == 'NÃO';
-        } else if (member['comungante'] == null) {
-          matchesCommunicant = false; // Exclua membros sem o campo 'comungante'
-        }
+        bool matchesCommunicant = filterCommunicant
+            ? member['comungante']?.toString() == 'SIM'
+            : filterNonCommunicant
+                ? member['comungante']?.toString() == 'NÃO'
+                : true;
 
-        // Retorna se todos os critérios forem atendidos
         return matchesQuery && matchesGender && matchesCommunicant;
       }).toList();
     });
@@ -182,27 +192,29 @@ class _MembersState extends State<Members> {
     });
   }
 
-  Future<void> _deleteMember(String memberId) async {
-    try {
-      DocumentSnapshot memberSnapshot = await FirebaseFirestore.instance.collection('members').doc(memberId).get();
+  Future<void> _deleteMember(int memberId) async {
+  try {
+    // Certifique-se de passar o memberId como int
+    final response = await Supabase.instance.client
+        .from('membros')
+        .delete()
+        .eq('id', memberId)
+        .select();
 
-      if (memberSnapshot.exists) {
-        Map<String, dynamic> memberData = memberSnapshot.data() as Map<String, dynamic>;
-        memberData['deletedAt'] = DateTime.now().toIso8601String();
-
-        await FirebaseFirestore.instance.collection('deleted_members').doc(memberId).set(memberData);
-        await FirebaseFirestore.instance.collection('members').doc(memberId).delete();
-
-        _fetchMembers();
-        _showBanner('Membro excluído!', const Color.fromARGB(255, 154, 27, 27));
-      } else {
-        print("Erro: Documento não encontrado na coleção 'members'.");
-      }
-    } catch (e) {
-      print("Erro ao mover membro para a coleção 'deleted_members': $e");
-      _showBanner('Erro ao excluir membro.', const Color.fromARGB(255, 154, 27, 27));
+    if (response == null || response.isEmpty) {
+      throw Exception('Erro ao excluir membro no banco de dados');
     }
+    _showBanner('Membro excluído com sucesso!', const Color(0xFF015B40));
+
+    await _fetchMembers();
+    await _getMemberCounts();
+
+  } catch (e) {
+    print("Erro ao excluir membro: $e");
+    _showBanner('Erro ao excluir membro.', const Color.fromARGB(255, 154, 27, 27));
   }
+}
+
 
   Future<bool> _confirmDelete(BuildContext context) async {
     return await showDialog(
@@ -485,7 +497,7 @@ class _MembersState extends State<Members> {
                 ),
                 const SizedBox(height: 16),
                 ...filteredMembers.map((member) {
-                  String memberId = member['id'];
+                  String memberId = member['id'].toString();
                   return GestureDetector(
                     onHorizontalDragUpdate: (details) => _onHorizontalDragUpdate(details, memberId),
                     onHorizontalDragEnd: (details) => _onHorizontalDragEnd(details, memberId),

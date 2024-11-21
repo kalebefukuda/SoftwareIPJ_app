@@ -29,6 +29,8 @@ dependencies:
   flutter_animate: ^4.5.0
   path_provider: ^2.1.5
   diacritic: ^0.1.3
+  supabase_flutter: ^2.8.1
+  flutter_dotenv: ^5.2.1
 
 dev_dependencies:
   flutter_test:
@@ -64,3 +66,4 @@ flutter:
     - assets/images/file.svg
     - assets/images/icons/appicon.png
     - assets/images/IPJ86Ver02_2.png
+    - .env
