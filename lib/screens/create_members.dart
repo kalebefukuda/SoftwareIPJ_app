@@ -1,4 +1,5 @@
 // ignore_for_file: unused_local_variable
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../app.dart';
 import 'package:flutter/material.dart';
@@ -41,6 +42,11 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
   bool _isBannerVisible = false; // Controla a visibilidade do banner
   String _bannerMessage = ''; // Armazena a mensagem do banner
   Color _bannerColor = Colors.green; // Armazena a cor do banner
+
+  final ScrollController _scrollController = ScrollController();
+
+  final _formKey = GlobalKey<FormState>(); // Adicionei o GlobalKey para o formulário
+  final Map<String, bool> _fieldErrors = {}; // Mapeia campos com erro para borda vermelha
 
   final MemberService _memberService = MemberService();
 
@@ -93,6 +99,81 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
   final TextEditingController reeleitoPresb3Controller = TextEditingController();
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
+
+  // Campos obrigatórios
+
+  // Validação dos campos
+  Future<void> _validateFields() async {
+    setState(() {
+      _fieldErrors.clear();
+    });
+
+    // Verifica campos obrigatórios e adiciona ao mapa de erros
+    if (nomeCompletoController.text.trim().isEmpty) {
+      _fieldErrors['nomeCompleto'] = true;
+    }
+    if (dataNascimentoController.text.trim().isEmpty) {
+      _fieldErrors['dataNascimento'] = true;
+    }
+    if (numeroRolController.text.trim().isEmpty) {
+      _fieldErrors['numeroRol'] = true;
+    }
+    if (residenciaController.text.trim().isEmpty) {
+      _fieldErrors['residenciaLocal'] = true;
+    }
+    if (celularController.text.trim().isEmpty) {
+      _fieldErrors['celular'] = true;
+    }
+    if (comunganteController.text.trim().isEmpty) {
+      _fieldErrors['comungante'] = true;
+    }
+    if (sexoController.text.trim().isEmpty) {
+      _fieldErrors['sexo'] = true;
+    }
+
+    // Verifica duplicidade do número de rol
+    if (numeroRolController.text.trim().isNotEmpty) {
+      bool isDuplicate = await _isNumeroRolDuplicado(numeroRolController.text);
+      if (isDuplicate) {
+        _fieldErrors['numeroRol'] = true;
+      }
+    }
+
+    // Após validar, role para o primeiro campo com erro
+    if (_fieldErrors.isNotEmpty) {
+      _scrollToFirstError();
+    }
+  }
+
+  void _scrollToFirstError() {
+    // Encontra o índice do primeiro erro
+    final firstErrorFieldKey = _fieldErrors.keys.first;
+    double offset = 0.0;
+
+    // Define a posição de rolagem com base no campo com erro
+    if (firstErrorFieldKey == 'nomeCompleto') {
+      offset = 100; // Posição aproximada do campo Nome Completo
+    } else if (firstErrorFieldKey == 'comungante') {
+      offset = 150; // Posição aproximada do campo Comuga te
+    } else if (firstErrorFieldKey == 'numeroRol') {
+      offset = 150; // Posição aproximada do campo Número de Rol
+    } else if (firstErrorFieldKey == 'sexo') {
+      offset = 200; // Posição aproximada do campo Sexo
+    } else if (firstErrorFieldKey == 'dataNascimento') {
+      offset = 200; // Posição aproximada do campo Data
+    } else if (firstErrorFieldKey == 'celular') {
+      offset = 800; // Posição aproximada do campo ComungCelularante
+    } else if (firstErrorFieldKey == 'residenciaLocal') {
+      offset = 1350; // Posição aproximada do campo Residencia Local
+    }
+
+    // Rola até a posição calculada
+    _scrollController.animateTo(
+      offset,
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeInOut,
+    );
+  }
 
   @override
   void initState() {
@@ -152,6 +233,11 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
 
   Future<bool> _saveMember() async {
     try {
+      // Valida se o número de rol já está cadastrado
+      if (await _isNumeroRolDuplicado(numeroRolController.text)) {
+        _showBanner('Número de Rol já cadastrado.', const Color.fromARGB(255, 154, 27, 27));
+        return false; // Interrompe o salvamento
+      }
       // Se houver uma imagem selecionada, faça o upload para o Firebase Storage
       String? imageUrl;
       if (_selectedImage != null) {
@@ -234,6 +320,27 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
     }
   }
 
+  Future<bool> _isNumeroRolDuplicado(String numeroRol) async {
+    if (numeroRol.isEmpty) return false;
+
+    try {
+      final querySnapshot = await FirebaseFirestore.instance.collection('members').where('numeroRol', isEqualTo: int.tryParse(numeroRol)).get();
+
+      // Verifica se encontrou documentos com o mesmo número de rol
+      if (querySnapshot.docs.isNotEmpty) {
+        // Se for edição, permite o mesmo número de rol se for do próprio membro
+        if (widget.memberData != null) {
+          return querySnapshot.docs.any((doc) => doc.id != widget.memberData!['id']);
+        }
+        return true; // Retorna true se encontrou duplicação
+      }
+      return false;
+    } catch (e) {
+      print("Erro ao verificar número de rol duplicado: $e");
+      return false;
+    }
+  }
+
   @override
   void dispose() {
     cepController.dispose();
@@ -242,6 +349,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
     complementoController.dispose();
     cidadeAtualController.dispose();
     estadoAtualController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -289,10 +397,12 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
           centerTitle: true,
         ),
         body: Stack(
+          key: _formKey, // Associa a chave do formulário
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(23.0, 0.0, 23.0, 0.0), // Adiciona um padding inferior maior
               child: ListView(
+                controller: _scrollController, // Adicione o controlador aqui
                 children: [
                   const SizedBox(height: 20),
                   // Adicionando o círculo de foto no início
@@ -335,6 +445,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                       controller: nomeCompletoController,
                       hintText: 'Nome Completo',
                       textInputAction: TextInputAction.next,
+                      borderColor: _fieldErrors['nomeCompleto'] == true ? Colors.red : null,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -349,6 +460,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                             'NÃO'
                           ],
                           hintText: 'Comungante',
+                          borderColor: _fieldErrors['comungante'] == true ? Colors.red : null,
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
@@ -362,7 +474,21 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
                             LengthLimitingTextInputFormatter(3), // Limita a 3 caracteres
-                          ], // Filtra apenas números
+                          ],
+                          onChanged: (value) async {
+                            // Verifica duplicação ao alterar o valor
+                            if (value.isNotEmpty) {
+                              bool isDuplicate = await _isNumeroRolDuplicado(value);
+                              setState(() {
+                                _fieldErrors['numeroRol'] = isDuplicate; // Define o erro em caso de duplicação
+                              });
+                            } else {
+                              setState(() {
+                                _fieldErrors['numeroRol'] = true; // Erro se estiver vazio
+                              });
+                            }
+                          },
+                          borderColor: _fieldErrors['numeroRol'] == true ? Colors.red : null, // Mostra a borda vermelha em caso de erro
                         ),
                       ),
                     ],
@@ -378,11 +504,16 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                             'Masculino',
                             'Feminino'
                           ],
+                          borderColor: _fieldErrors['sexo'] == true ? Colors.red : null,
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomDateTextField(controller: dataNascimentoController, hintText: 'Data de nascimento'),
+                        child: CustomDateTextField(
+                          controller: dataNascimentoController,
+                          hintText: 'Data de nascimento',
+                          borderColor: _fieldErrors['dataNascimento'] == true ? Colors.red : null,
+                        ),
                       ),
                     ],
                   ),
@@ -466,6 +597,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           inputFormatters: [
                             PhoneInputFormatter(), // Utiliza o formatter personalizado
                           ],
+                          borderColor: _fieldErrors['celular'] == true ? Colors.red : null,
                         ),
                       ),
                     ],
@@ -546,6 +678,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                             'Sede',
                             'Fora'
                           ],
+                          borderColor: _fieldErrors['residenciaLocal'] == true ? Colors.red : null,
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
@@ -812,38 +945,30 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   ),
                   const SizedBox(height: 30),
                   Center(
-                      child: CustomButton(
-                    text: 'Salvar',
-                    onPressed: () async {
-                      try {
-                        // Use o bool retornado por _saveMember()
-                        bool success = await _saveMember();
-
-                        if (success) {
-                          // Se o membro foi salvo com sucesso
-                          Navigator.push(
-                            // ignore: use_build_context_synchronously
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Members(
-                                onThemeToggle: widget.onThemeToggle,
-                                themeModeNotifier: widget.themeModeNotifier,
-                                successMessage: 'Membro salvo com sucesso!', // Passe a mensagem
+                    child: CustomButton(
+                      text: 'Salvar',
+                      onPressed: () async {
+                        _validateFields(); // Valida os campos obrigatórios
+                        if (_fieldErrors.isEmpty) {
+                          bool success = await _saveMember();
+                          if (success) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Members(
+                                  onThemeToggle: widget.onThemeToggle,
+                                  themeModeNotifier: widget.themeModeNotifier,
+                                  successMessage: 'Membro salvo com sucesso!',
+                                ),
                               ),
-                            ),
-                          );
+                            );
+                          }
                         } else {
-                          // Se a função _saveMember indicar falha
-                          _showBanner('Erro ao salvar membro', const Color.fromARGB(255, 154, 27, 27));
+                          _showBanner('Preencha os campos obrigatórios.', Color.fromARGB(255, 154, 27, 27));
                         }
-                      } catch (e) {
-                        // Em caso de exceção
-                        _showBanner('Erro ao salvar membro', const Color.fromARGB(255, 154, 27, 27));
-                        // ignore: avoid_print
-                        print(e);
-                      }
-                    },
-                  )),
+                      },
+                    ),
+                  ),
                   const SizedBox(height: 100), //Esse Widget é para dar uma espaçamento final para a sidebar não sobrepor os itens da tela
                 ],
               ),
