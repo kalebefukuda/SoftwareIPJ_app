@@ -1,25 +1,23 @@
 // ignore_for_file: unused_local_variable
-
 import '../app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'dart:io'; // Para lidar com o arquivo de imagem selecionado
-import 'package:image_picker/image_picker.dart'; // Pacote para selecionar a imagem
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import '../utils/constants/app_colors.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_button.dart';
-import '../widgets/local.dart'; // Importe o widget personalizado
-import '../widgets/custom_drop_down.dart'; // Campo de dropdown
-import '../widgets/sidebar.dart'; // Adiciona a sidebar
+import '../widgets/local.dart';
+import '../widgets/custom_drop_down.dart';
+import '../widgets/sidebar.dart';
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import '../widgets/custom_banner.dart';
 import '../services/member_service.dart';
 import '../screens/members.dart';
-import 'package:firebase_storage/firebase_storage.dart'; // Importe o Firebase Storage
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CreateMembersScreen extends StatefulWidget {
-  // final Function(bool) onThemeToggle;
   final Map<String, dynamic>? memberData; // Dados do membro, se for uma edição
   final Function(ThemeModeOptions) onThemeToggle;
   final ValueNotifier<ThemeModeOptions> themeModeNotifier;
@@ -152,24 +150,35 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
 
   Future<bool> _saveMember() async {
     try {
-      // Se houver uma imagem selecionada, faça o upload para o Firebase Storage
       String? imageUrl;
+
+      // Verifica se há uma imagem selecionada
       if (_selectedImage != null) {
-        // Crie uma referência ao Firebase Storage
-        final storageRef = FirebaseStorage.instance.ref().child('membros').child('${DateTime.now().millisecondsSinceEpoch}.jpg');
+        // Nome único para a imagem (ex.: timestamp)
+        final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
 
-        // Faça o upload do arquivo
-        final uploadTask = storageRef.putFile(_selectedImage!);
+        // Faz o upload da imagem para o Supabase Storage
+        final uploadResponse =
+            await Supabase.instance.client.storage.from('membros').upload(
+                  fileName,
+                  _selectedImage!,
+                );
 
-        // Espere o upload ser concluído e pegue a URL da imagem
-        final snapshot = await uploadTask.whenComplete(() {});
-        imageUrl = await snapshot.ref.getDownloadURL();
+        if (uploadResponse.isEmpty) {
+          throw Exception('Erro ao fazer upload da imagem');
+        }
+
+        // Obtém o URL público da imagem
+        imageUrl = Supabase.instance.client.storage
+            .from('membros')
+            .getPublicUrl(fileName);
       }
+
       // Cria o mapa com os dados do membro
       Map<String, dynamic> memberData = {
         'nomeCompleto': nomeCompletoController.text,
         'comungante': comunganteController.text,
-        'numeroRol': int.tryParse(numeroRolController.text) ?? 0,
+        'numeroRol': numeroRolController.text.toString(),
         'dataNascimento': dataNascimentoController.text,
         'sexo': sexoController.text,
         'cidadeNascimento': cidadeNascimentoController.text,
@@ -214,23 +223,26 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
         'reeleitoPresb1': reeleitoPresb1Controller.text,
         'reeleitoPresb2': reeleitoPresb2Controller.text,
         'reeleitoPresb3': reeleitoPresb3Controller.text,
-        'imageUrl': imageUrl, // Adicione a URL da imagem
+        'imagemMembro': imageUrl, // Salva o link público no banco de dados
       };
 
-      // Chama o serviço para adicionar o membro
-      if (widget.memberData != null) {
-        // Atualize o membro existente
-        await _memberService.updateMember(widget.memberData!['id'], memberData);
-      } else {
-        // Crie um novo membro
-        await _memberService.addMember(memberData);
+      // Insere os dados no Supabase
+      final insertResponse = await Supabase.instance.client
+          .from('membros')
+          .insert(memberData)
+          .select();
+
+      if (insertResponse.isEmpty) {
+        throw Exception('Erro ao salvar membro no banco de dados');
       }
 
       _showBanner('Membro salvo com sucesso!', const Color(0xFF015B40));
-      return true; // Retorna true se o membro for salvo com sucesso
+      return true;
     } catch (e) {
-      _showBanner('Erro ao salvar membro', const Color.fromARGB(255, 154, 27, 27));
-      return false; // Retorna false se ocorrer um erro
+      _showBanner(
+          'Erro ao salvar membro', const Color.fromARGB(255, 154, 27, 27));
+      print("Erro ao salvar membro: $e");
+      return false;
     }
   }
 
@@ -253,7 +265,6 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
     });
   }
 
-  // Definindo a função _hideBanner
   void _hideBanner() {
     setState(() {
       _isBannerVisible = false;
@@ -264,7 +275,8 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        FocusScope.of(context).unfocus(); // Esconde o teclado ao tocar fora dos campos
+        FocusScope.of(context)
+            .unfocus(); // Esconde o teclado ao tocar fora dos campos
       },
       child: Scaffold(
         appBar: AppBar(
@@ -284,25 +296,30 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
           ),
           title: Text(
             'Cadastro',
-            style: Theme.of(context).textTheme.titleLarge, // Usa o estilo do tema para o AppBar
+            style: Theme.of(context)
+                .textTheme
+                .titleLarge, // Usa o estilo do tema para o AppBar
           ),
           centerTitle: true,
         ),
         body: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(23.0, 0.0, 23.0, 0.0), // Adiciona um padding inferior maior
+              padding: const EdgeInsets.fromLTRB(
+                  23.0, 0.0, 23.0, 0.0), // Adiciona um padding inferior maior
               child: ListView(
                 children: [
                   const SizedBox(height: 20),
                   // Adicionando o círculo de foto no início
                   MouseRegion(
-                    cursor: SystemMouseCursors.click, // Define o cursor como 'pointer' ao passar o mouse
+                    cursor: SystemMouseCursors
+                        .click, // Define o cursor como 'pointer' ao passar o mouse
                     child: GestureDetector(
                       onTap: _pickImage, // Função para selecionar a imagem
                       child: CircleAvatar(
                         radius: 70,
-                        backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
+                        backgroundColor:
+                            Theme.of(context).inputDecorationTheme.fillColor,
                         child: _selectedImage == null
                             ? Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -312,7 +329,9 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                                     height: 50,
                                     width: 50,
                                     // ignore: deprecated_member_use
-                                    color: Theme.of(context).iconTheme.color, // Usa a cor do iconTheme conforme o tema
+                                    color: Theme.of(context)
+                                        .iconTheme
+                                        .color, // Usa a cor do iconTheme conforme o tema
                                   ),
                                 ],
                               )
@@ -328,7 +347,9 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     ),
                   ),
                   const SizedBox(height: 30),
-                  Center(child: buildSectionTitle(context, 'Informações Pessoais')),
+                  Center(
+                      child:
+                          buildSectionTitle(context, 'Informações Pessoais')),
                   const SizedBox(height: 20),
                   Center(
                     child: CustomCapitalizedTextField(
@@ -344,10 +365,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                         child: CustomDropdown(
                           labelText: 'Comungante',
                           controller: comunganteController,
-                          items: const [
-                            'SIM',
-                            'NÃO'
-                          ],
+                          items: const ['SIM', 'NÃO'],
                           hintText: 'Comungante',
                         ),
                       ),
@@ -360,8 +378,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           textInputAction: TextInputAction.next,
                           keyboardType: TextInputType.number, // Apenas números
                           inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(3), // Limita a 3 caracteres
+                            FilteringTextInputFormatter.allow(RegExp(r'[0-9]')), // Permite apenas números
                           ], // Filtra apenas números
                         ),
                       ),
@@ -374,15 +391,14 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                         child: CustomDropdown(
                           labelText: 'Sexo',
                           controller: sexoController,
-                          items: const [
-                            'Masculino',
-                            'Feminino'
-                          ],
+                          items: const ['Masculino', 'Feminino'],
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomDateTextField(controller: dataNascimentoController, hintText: 'Data de nascimento'),
+                        child: CustomDateTextField(
+                            controller: dataNascimentoController,
+                            hintText: 'Data de nascimento'),
                       ),
                     ],
                   ),
@@ -395,9 +411,11 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     onCityChanged: (value) {
                       final capitalized = capitalize(value);
                       if (capitalized != value) {
-                        cidadeNascimentoController.value = cidadeNascimentoController.value.copyWith(
+                        cidadeNascimentoController.value =
+                            cidadeNascimentoController.value.copyWith(
                           text: capitalized,
-                          selection: TextSelection.collapsed(offset: capitalized.length),
+                          selection: TextSelection.collapsed(
+                              offset: capitalized.length),
                         );
                       }
                     },
@@ -433,10 +451,13 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     controller: emailController,
                     hintText: 'E-mail',
                     obscureText: false,
-                    keyboardType: TextInputType.emailAddress, // Teclado de email
+                    keyboardType:
+                        TextInputType.emailAddress, // Teclado de email
                     textInputAction: TextInputAction.next,
                     validator: (value) {
-                      if (value == null || value.isEmpty || !isValidEmail(value)) {
+                      if (value == null ||
+                          value.isEmpty ||
+                          !isValidEmail(value)) {
                         return 'Por favor, insira um email válido';
                       }
                       return null;
@@ -450,7 +471,8 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           controller: telefoneController,
                           hintText: 'Telefone',
                           obscureText: false,
-                          keyboardType: TextInputType.phone, // Teclado de telefone
+                          keyboardType:
+                              TextInputType.phone, // Teclado de telefone
                           inputFormatters: [
                             PhoneInputFormatter(), // Utiliza o formatter personalizado
                           ],
@@ -462,7 +484,8 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           controller: celularController,
                           hintText: 'Celular',
                           obscureText: false,
-                          keyboardType: TextInputType.phone, // Teclado de telefone
+                          keyboardType:
+                              TextInputType.phone, // Teclado de telefone
                           inputFormatters: [
                             PhoneInputFormatter(), // Utiliza o formatter personalizado
                           ],
@@ -472,7 +495,8 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   ),
 
                   const SizedBox(height: 30),
-                  Center(child: buildSectionTitle(context, 'Localização Atual')),
+                  Center(
+                      child: buildSectionTitle(context, 'Localização Atual')),
                   const SizedBox(height: 20),
                   Row(
                     children: [
@@ -483,13 +507,19 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           onEnderecoEncontrado: (endereco) {
                             setState(() {
                               bairroController.text = endereco['bairro'] ?? '';
-                              enderecotController.text = endereco['logradouro'] ?? '';
-                              cidadeAtualController.text = endereco['localidade'] ?? '';
+                              enderecotController.text =
+                                  endereco['logradouro'] ?? '';
+                              cidadeAtualController.text =
+                                  endereco['localidade'] ?? '';
                               estadoAtualController.text = endereco['uf'] ?? '';
                             });
                           },
-                          onCepNaoEncontrado: () => _showBanner('CEP não encontrado.', const Color.fromARGB(255, 93, 14, 14)),
-                          onErro: () => _showBanner('Erro de conexão. Verifique sua internet.', const Color.fromARGB(255, 93, 14, 14)),
+                          onCepNaoEncontrado: () => _showBanner(
+                              'CEP não encontrado.',
+                              const Color.fromARGB(255, 93, 14, 14)),
+                          onErro: () => _showBanner(
+                              'Erro de conexão. Verifique sua internet.',
+                              const Color.fromARGB(255, 93, 14, 14)),
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
@@ -526,15 +556,18 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     onCityChanged: (value) {
                       final capitalized = capitalize(value);
                       if (capitalized != value) {
-                        cidadeAtualController.value = cidadeAtualController.value.copyWith(
+                        cidadeAtualController.value =
+                            cidadeAtualController.value.copyWith(
                           text: capitalized,
-                          selection: TextSelection.collapsed(offset: capitalized.length),
+                          selection: TextSelection.collapsed(
+                              offset: capitalized.length),
                         );
                       }
                     },
                   ),
                   const SizedBox(height: 30),
-                  Center(child: buildSectionTitle(context, 'Outras informações')),
+                  Center(
+                      child: buildSectionTitle(context, 'Outras informações')),
                   const SizedBox(height: 20),
                   Row(
                     children: [
@@ -542,10 +575,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                         child: CustomDropdown(
                           labelText: 'Local Residência',
                           controller: residenciaController,
-                          items: const [
-                            'Sede',
-                            'Fora'
-                          ],
+                          items: const ['Sede', 'Fora'],
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
@@ -606,7 +636,9 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     children: [
                       Flexible(
                         flex: 1,
-                        child: CustomDateTextField(controller: dataProfissaoController, hintText: 'Data'),
+                        child: CustomDateTextField(
+                            controller: dataProfissaoController,
+                            hintText: 'Data'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
@@ -626,7 +658,9 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     children: [
                       Flexible(
                         flex: 1,
-                        child: CustomDateTextField(controller: dataAdmissaoController, hintText: 'Data'),
+                        child: CustomDateTextField(
+                            controller: dataAdmissaoController,
+                            hintText: 'Data'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
@@ -667,7 +701,9 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     children: [
                       Flexible(
                         flex: 1,
-                        child: CustomDateTextField(controller: dataDemissaoController, hintText: 'Data'),
+                        child: CustomDateTextField(
+                            controller: dataDemissaoController,
+                            hintText: 'Data'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
@@ -707,7 +743,9 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDateTextField(controller: dataRolSeparadoController, hintText: 'Data'),
+                        child: CustomDateTextField(
+                            controller: dataRolSeparadoController,
+                            hintText: 'Data'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
@@ -734,7 +772,9 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDateTextField(controller: dataDiscRolSeparadoController, hintText: 'Data Disc.'),
+                        child: CustomDateTextField(
+                            controller: dataDiscRolSeparadoController,
+                            hintText: 'Data Disc.'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
@@ -764,11 +804,14 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDateTextField(controller: dataDiacController, hintText: 'Data'),
+                        child: CustomDateTextField(
+                            controller: dataDiacController, hintText: 'Data'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomDateTextField(controller: reeleitoDiac1Controller, hintText: 'Reeleito em'),
+                        child: CustomDateTextField(
+                            controller: reeleitoDiac1Controller,
+                            hintText: 'Reeleito em'),
                       ),
                     ],
                   ),
@@ -776,25 +819,33 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDateTextField(controller: reeleitoDiac2Controller, hintText: 'Reeleito em'),
+                        child: CustomDateTextField(
+                            controller: reeleitoDiac2Controller,
+                            hintText: 'Reeleito em'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomDateTextField(controller: reeleitoDiac3Controller, hintText: 'Reeleito em'),
+                        child: CustomDateTextField(
+                            controller: reeleitoDiac3Controller,
+                            hintText: 'Reeleito em'),
                       ),
                     ],
                   ),
                   const SizedBox(height: 30),
-                  Center(child: buildSectionTitle(context, 'Eleições Presbitero')),
+                  Center(
+                      child: buildSectionTitle(context, 'Eleições Presbitero')),
                   const SizedBox(height: 20),
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDateTextField(controller: dataPresbController, hintText: 'Data'),
+                        child: CustomDateTextField(
+                            controller: dataPresbController, hintText: 'Data'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomDateTextField(controller: reeleitoPresb1Controller, hintText: 'Reeleito em'),
+                        child: CustomDateTextField(
+                            controller: reeleitoPresb1Controller,
+                            hintText: 'Reeleito em'),
                       ),
                     ],
                   ),
@@ -802,11 +853,15 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDateTextField(controller: reeleitoPresb2Controller, hintText: 'Reeleito em'),
+                        child: CustomDateTextField(
+                            controller: reeleitoPresb2Controller,
+                            hintText: 'Reeleito em'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomDateTextField(controller: reeleitoPresb3Controller, hintText: 'Reeleito em'),
+                        child: CustomDateTextField(
+                            controller: reeleitoPresb3Controller,
+                            hintText: 'Reeleito em'),
                       ),
                     ],
                   ),
@@ -828,35 +883,47 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                               builder: (context) => Members(
                                 onThemeToggle: widget.onThemeToggle,
                                 themeModeNotifier: widget.themeModeNotifier,
-                                successMessage: 'Membro salvo com sucesso!', // Passe a mensagem
+                                successMessage:
+                                    'Membro salvo com sucesso!', // Passe a mensagem
                               ),
                             ),
                           );
                         } else {
                           // Se a função _saveMember indicar falha
-                          _showBanner('Erro ao salvar membro', const Color.fromARGB(255, 154, 27, 27));
+                          _showBanner('Erro ao salvar membro',
+                              const Color.fromARGB(255, 154, 27, 27));
                         }
                       } catch (e) {
                         // Em caso de exceção
-                        _showBanner('Erro ao salvar membro', const Color.fromARGB(255, 154, 27, 27));
+                        _showBanner('Erro ao salvar membro',
+                            const Color.fromARGB(255, 154, 27, 27));
                         // ignore: avoid_print
                         print(e);
                       }
                     },
                   )),
-                  const SizedBox(height: 100), //Esse Widget é para dar uma espaçamento final para a sidebar não sobrepor os itens da tela
+                  const SizedBox(
+                      height:
+                          100), //Esse Widget é para dar uma espaçamento final para a sidebar não sobrepor os itens da tela
                 ],
               ),
             ),
-            BottomSidebar(currentIndex: currentIndex, onTabTapped: onTabTapped, onThemeToggle: widget.onThemeToggle, themeModeNotifier: widget.themeModeNotifier, isKeyboardVisible: MediaQuery.of(context).viewInsets.bottom != 0),
+            BottomSidebar(
+                currentIndex: currentIndex,
+                onTabTapped: onTabTapped,
+                onThemeToggle: widget.onThemeToggle,
+                themeModeNotifier: widget.themeModeNotifier,
+                isKeyboardVisible:
+                    MediaQuery.of(context).viewInsets.bottom != 0),
             if (_isBannerVisible)
               Positioned(
-                top: 10, // Posiciona o banner próximo ao topo
-                right: 0, // Alinha o banner à direita
+                top: 10,
+                right: 0,
                 child: CustomBanner(
                   message: _bannerMessage, // Usa a mensagem do estado
                   backgroundColor: _bannerColor, // Usa a cor do estado
-                  onDismissed: _hideBanner, // Callback para ocultar o banner após a animação,
+                  onDismissed:
+                      _hideBanner, // Callback para ocultar o banner após a animação,
                 ),
               ),
           ],
@@ -872,8 +939,6 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
   }
 
 /* ----------------------FUNÇÕES----------------- */
-
-  // Função para pegar a imagem da galeria
   // Função para pegar a imagem da galeria
   Future<void> _pickImage() async {
     try {
@@ -883,20 +948,13 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
         setState(() {
           _selectedImage = File(pickedFile.path);
         });
-
-        // Faz o upload da imagem para o Firebase Storage
-        final storageRef = FirebaseStorage.instance.ref().child('user_images/${DateTime.now().millisecondsSinceEpoch}.jpg');
-
-        final uploadTask = storageRef.putFile(_selectedImage!);
-        final snapshot = await uploadTask;
-        final imageUrl = await snapshot.ref.getDownloadURL();
-
-        // Aqui, você pode salvar `imageUrl` no Firestore para armazenar o link da imagem
       } else {
-        _showBanner('Seleção de imagem cancelada.', const Color.fromARGB(255, 142, 85, 0));
+        _showBanner('Seleção de imagem cancelada.',
+            const Color.fromARGB(255, 142, 85, 0));
       }
     } catch (e) {
-      _showBanner('Erro ao selecionar ou fazer upload da imagem: $e', const Color.fromARGB(255, 154, 27, 27));
+      _showBanner('Erro ao selecionar ou fazer upload da imagem: $e',
+          const Color.fromARGB(255, 154, 27, 27));
     }
   }
 
@@ -906,7 +964,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
       padding: const EdgeInsets.symmetric(vertical: 12.0),
       child: Text(
         title,
-        style: Theme.of(context).textTheme.titleMedium, // Usa o estilo definido no tema
+        style: Theme.of(context).textTheme.titleMedium,
       ),
     );
   }
@@ -914,7 +972,12 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
 
 // Função para capitalizar cada palavra:
 String capitalize(String input) {
-  return input.split(' ').map((str) => str.isNotEmpty ? str[0].toUpperCase() + str.substring(1).toLowerCase() : '').join(' ');
+  return input
+      .split(' ')
+      .map((str) => str.isNotEmpty
+          ? str[0].toUpperCase() + str.substring(1).toLowerCase()
+          : '')
+      .join(' ');
 }
 
 // Função para validar o email:
