@@ -72,15 +72,21 @@ class _MembersState extends State<Members> {
     try {
       final response = await Supabase.instance.client.from('membros').select();
       if (response.isEmpty) {
-        throw Exception('Erro ao obter contagem de membros');
+        setState(() {
+        maleCount = 0;
+        femaleCount = 0;
+        yesCommunicantCount = 0;
+        noCommunicantCount = 0;
+      });
       }
 
       List members = response as List;
       setState(() {
-        maleCount = members.where((m) => (m['sexo']?.toString() ?? '') == 'Masculino').length;
-        femaleCount = members.where((m) => (m['sexo']?.toString() ?? '') == 'Feminino').length;
-        yesCommunicantCount = members.where((m) => (m['comungante']?.toString() ?? '') == 'SIM').length;
-        noCommunicantCount = members.where((m) => (m['comungante']?.toString() ?? '') == 'NÃO').length;
+        maleCount = members.where((m) => m['sexo'] == 'Masculino').length;
+        femaleCount = members.where((m) => (m['sexo']) == 'Feminino').length;
+        yesCommunicantCount = members.where((m) => (m['comungante']) == 'SIM').length;
+        noCommunicantCount = members.where((m) => (m['comungante']) == 'NÃO').length;
+
       });
     } catch (e) {
       print("Erro ao obter contagem de membros: $e");
@@ -102,13 +108,13 @@ class _MembersState extends State<Members> {
 
   Future<void> _fetchMembers() async {
   try {
-    // Realiza a consulta no Supabase e retorna os dados
+    
     final response = await Supabase.instance.client
         .from('membros')
         .select();
 
     if (response.isEmpty) {
-      throw Exception('Erro ao buscar membros');
+      _showBanner('Nenhum membro cadastrado', const Color.fromARGB(255, 10, 54, 216));
     }
 
     // Converte os dados recebidos para uma lista de mapas
@@ -186,20 +192,29 @@ class _MembersState extends State<Members> {
     });
   }
 
-  Future<void> _deleteMember(String memberId) async {
-    try {
-      final response = await Supabase.instance.client.from('membros').delete().eq('id', memberId);
-      if (response.error != null) {
-        throw Exception('Erro ao excluir membro: ${response.error!.message}');
-      }
+  Future<void> _deleteMember(int memberId) async {
+  try {
+    // Certifique-se de passar o memberId como int
+    final response = await Supabase.instance.client
+        .from('membros')
+        .delete()
+        .eq('id', memberId)
+        .select();
 
-      _fetchMembers();
-      _showBanner('Membro excluído!', const Color.fromARGB(255, 154, 27, 27));
-    } catch (e) {
-      print("Erro ao excluir membro: $e");
-      _showBanner('Erro ao excluir membro.', const Color.fromARGB(255, 154, 27, 27));
+    if (response == null || response.isEmpty) {
+      throw Exception('Erro ao excluir membro no banco de dados');
     }
+    _showBanner('Membro excluído com sucesso!', const Color(0xFF015B40));
+
+    await _fetchMembers();
+    await _getMemberCounts();
+
+  } catch (e) {
+    print("Erro ao excluir membro: $e");
+    _showBanner('Erro ao excluir membro.', const Color.fromARGB(255, 154, 27, 27));
   }
+}
+
 
   Future<bool> _confirmDelete(BuildContext context) async {
     return await showDialog(
@@ -482,7 +497,7 @@ class _MembersState extends State<Members> {
                 ),
                 const SizedBox(height: 16),
                 ...filteredMembers.map((member) {
-                  String memberId = member['id'];
+                  String memberId = member['id'].toString();
                   return GestureDetector(
                     onHorizontalDragUpdate: (details) => _onHorizontalDragUpdate(details, memberId),
                     onHorizontalDragEnd: (details) => _onHorizontalDragEnd(details, memberId),

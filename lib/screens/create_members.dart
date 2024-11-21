@@ -149,102 +149,115 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
   }
 
   Future<bool> _saveMember() async {
-    try {
-      String? imageUrl;
+  try {
+    String? imageUrl;
 
-      // Verifica se há uma imagem selecionada
-      if (_selectedImage != null) {
-        // Nome único para a imagem (ex.: timestamp)
-        final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+    // Verifica se há uma imagem selecionada
+    if (_selectedImage != null) {
+      // Nome único para a imagem (ex.: timestamp)
+      final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
 
-        // Faz o upload da imagem para o Supabase Storage
-        final uploadResponse =
-            await Supabase.instance.client.storage.from('membros').upload(
-                  fileName,
-                  _selectedImage!,
-                );
+      // Faz o upload da imagem para o Supabase Storage
+      await Supabase.instance.client.storage.from('membros').upload(
+            fileName,
+            _selectedImage!,
+          );
 
-        if (uploadResponse.isEmpty) {
-          throw Exception('Erro ao fazer upload da imagem');
-        }
+      // Obtém o URL público da imagem
+      imageUrl = Supabase.instance.client.storage
+          .from('membros')
+          .getPublicUrl(fileName);
+    }
 
-        // Obtém o URL público da imagem
-        imageUrl = Supabase.instance.client.storage
-            .from('membros')
-            .getPublicUrl(fileName);
+    // Cria o mapa com os dados do membro
+    Map<String, dynamic> memberData = {
+      'nomeCompleto': nomeCompletoController.text,
+      'comungante': comunganteController.text,
+      'numeroRol': numeroRolController.text,
+      'dataNascimento': dataNascimentoController.text,
+      'sexo': sexoController.text,
+      'cidadeNascimento': cidadeNascimentoController.text,
+      'estadoNascimento': estadoNascimentoController.text,
+      'nomePai': nomePaiController.text,
+      'nomeMae': nomeMaeController.text,
+      'escolaridade': escolaridadeController.text,
+      'profissao': profissaoController.text,
+      'email': emailController.text,
+      'telefone': telefoneController.text,
+      'celular': celularController.text,
+      'cep': cepController.text,
+      'bairro': bairroController.text,
+      'endereco': enderecotController.text,
+      'complemento': complementoController.text,
+      'cidadeAtual': cidadeAtualController.text,
+      'estadoAtual': estadoAtualController.text,
+      'residencia': residenciaController.text,
+      'estadoCivil': estadoCivilController.text,
+      'religiao': religiaoController.text,
+      'dataBatismo': dataBatismoController.text,
+      'oficianteBatismo': oficianteBatismoController.text,
+      'dataProfissao': dataProfissaoController.text,
+      'oficianteProfissao': oficianteProfissaoController.text,
+      'dataAdmissao': dataAdmissaoController.text,
+      'ataAdmissao': ataAdmissaoController.text,
+      'formaAdmissao': formaAdmissaoController.text,
+      'dataDemissao': dataDemissaoController.text,
+      'ataDemissao': ataDemissaoController.text,
+      'formaDemissao': formaDemissaoController.text,
+      'dataRolSeparado': dataRolSeparadoController.text,
+      'ataRolSeparado': ataRolSeparadoController.text,
+      'casamentoRolSeparado': casamentoRolSeparadoController.text,
+      'dataDiscRolSeparado': dataDiscRolSeparadoController.text,
+      'ataDiscRolSeparado': ataDiscRolSeparadoController.text,
+      'discRolSeparado': discRolSeparadoController.text,
+      'dataDiac': dataDiacController.text,
+      'reeleitoDiac1': reeleitoDiac1Controller.text,
+      'reeleitoDiac2': reeleitoDiac2Controller.text,
+      'reeleitoDiac3': reeleitoDiac3Controller.text,
+      'dataPresb': dataPresbController.text,
+      'reeleitoPresb1': reeleitoPresb1Controller.text,
+      'reeleitoPresb2': reeleitoPresb2Controller.text,
+      'reeleitoPresb3': reeleitoPresb3Controller.text,
+      'imagemMembro': imageUrl,
+    };
+
+    // Verifica se é uma edição ou criação
+    if (widget.memberData != null) {
+      // É uma edição, então faz update
+      final response = await Supabase.instance.client
+          .from('membros')
+          .update(memberData)
+          .eq('id', widget.memberData!['id'])
+          .select();
+
+      if (response == null || response.isEmpty) {
+        throw Exception('Erro ao atualizar membro no banco de dados');
       }
 
-      // Cria o mapa com os dados do membro
-      Map<String, dynamic> memberData = {
-        'nomeCompleto': nomeCompletoController.text,
-        'comungante': comunganteController.text,
-        'numeroRol': numeroRolController.text.toString(),
-        'dataNascimento': dataNascimentoController.text,
-        'sexo': sexoController.text,
-        'cidadeNascimento': cidadeNascimentoController.text,
-        'estadoNascimento': estadoNascimentoController.text,
-        'nomePai': nomePaiController.text,
-        'nomeMae': nomeMaeController.text,
-        'escolaridade': escolaridadeController.text,
-        'profissao': profissaoController.text,
-        'email': emailController.text,
-        'telefone': telefoneController.text,
-        'celular': celularController.text,
-        'cep': cepController.text,
-        'bairro': bairroController.text,
-        'endereco': enderecotController.text,
-        'complemento': complementoController.text,
-        'cidadeAtual': cidadeAtualController.text,
-        'estadoAtual': estadoAtualController.text,
-        'residencia': residenciaController.text,
-        'estadoCivil': estadoCivilController.text,
-        'religiao': religiaoController.text,
-        'dataBatismo': dataBatismoController.text,
-        'oficianteBatismo': oficianteBatismoController.text,
-        'dataProfissao': dataProfissaoController.text,
-        'oficianteProfissao': oficianteProfissaoController.text,
-        'dataAdmissao': dataAdmissaoController.text,
-        'ataAdmissao': ataAdmissaoController.text,
-        'formaAdmissao': formaAdmissaoController.text,
-        'dataDemissao': dataDemissaoController.text,
-        'ataDemissao': ataDemissaoController.text,
-        'formaDemissao': formaDemissaoController.text,
-        'dataRolSeparado': dataRolSeparadoController.text,
-        'ataRolSeparado': ataRolSeparadoController.text,
-        'casamentoRolSeparado': casamentoRolSeparadoController.text,
-        'dataDiscRolSeparado': dataDiscRolSeparadoController.text,
-        'ataDiscRolSeparado': ataDiscRolSeparadoController.text,
-        'discRolSeparado': discRolSeparadoController.text,
-        'dataDiac': dataDiacController.text,
-        'reeleitoDiac1': reeleitoDiac1Controller.text,
-        'reeleitoDiac2': reeleitoDiac2Controller.text,
-        'reeleitoDiac3': reeleitoDiac3Controller.text,
-        'dataPresb': dataPresbController.text,
-        'reeleitoPresb1': reeleitoPresb1Controller.text,
-        'reeleitoPresb2': reeleitoPresb2Controller.text,
-        'reeleitoPresb3': reeleitoPresb3Controller.text,
-        'imagemMembro': imageUrl, // Salva o link público no banco de dados
-      };
-
-      // Insere os dados no Supabase
-      final insertResponse = await Supabase.instance.client
+      _showBanner('Membro atualizado com sucesso!', const Color(0xFF015B40));
+    } else {
+      // É uma criação, então insere um novo registro
+      final response = await Supabase.instance.client
           .from('membros')
           .insert(memberData)
           .select();
 
-      if (insertResponse.isEmpty) {
+      if (response == null || response.isEmpty) {
         throw Exception('Erro ao salvar membro no banco de dados');
       }
 
       _showBanner('Membro salvo com sucesso!', const Color(0xFF015B40));
-      return true;
-    } catch (e) {
-      _showBanner(
-          'Erro ao salvar membro', const Color.fromARGB(255, 154, 27, 27));
-      print("Erro ao salvar membro: $e");
-      return false;
     }
+
+    return true;
+  } catch (e) {
+    _showBanner(
+        'Erro ao salvar membro', const Color.fromARGB(255, 154, 27, 27));
+    print("Erro ao salvar membro: $e");
+    return false;
   }
+}
+
 
   @override
   void dispose() {

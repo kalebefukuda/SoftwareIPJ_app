@@ -66,3 +66,4 @@ flutter:
     - assets/images/file.svg
     - assets/images/icons/appicon.png
     - assets/images/IPJ86Ver02_2.png
+    - .env
