@@ -13,7 +13,6 @@ import '../widgets/custom_drop_down.dart';
 import '../widgets/sidebar.dart';
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import '../widgets/custom_banner.dart';
-import '../services/member_service.dart';
 import '../screens/members.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -44,8 +43,6 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
 
   final _formKey = GlobalKey<FormState>(); // Adicionei o GlobalKey para o formulário
   final Map<String, bool> _fieldErrors = {}; // Mapeia campos com erro para borda vermelha
-
-  final MemberService _memberService = MemberService();
 
   final TextEditingController nomeCompletoController = TextEditingController();
   final TextEditingController comunganteController = TextEditingController();
@@ -97,7 +94,31 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
 
-  // Campos obrigatórios
+  Future<String?> _uploadImageToSupabase(File imageFile) async {
+    try {
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final fileName = '$timestamp.jpg';
+
+      print('Iniciando upload... Arquivo: $fileName');
+      print('Tamanho do arquivo: ${imageFile.lengthSync()} bytes');
+
+      final response = await Supabase.instance.client.storage.from('membros_storage').upload(fileName, imageFile);
+
+      print('Resposta do Supabase: $response');
+
+      if (response.isEmpty) {
+        print('Erro ao fazer upload: Resposta vazia');
+        return null;
+      }
+
+      final publicUrl = Supabase.instance.client.storage.from('membros_storage').getPublicUrl(fileName);
+      print('URL pública gerada: $publicUrl');
+      return publicUrl;
+    } catch (e) {
+      print('Erro ao fazer upload da imagem: $e');
+      return null;
+    }
+  }
 
   // Validação dos campos
   Future<void> _validateFields() async {
@@ -229,143 +250,119 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
   }
 
   Future<bool> _saveMember() async {
-  try {
-    String? imageUrl;
+    try {
+      String? imageUrl;
+      final user = Supabase.instance.client.auth.currentUser;
 
-    // Verifica se há uma imagem selecionada
-    if (_selectedImage != null) {
-      // Nome único para a imagem (ex.: timestamp)
-      final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
-
-      // Faz o upload da imagem para o Supabase Storage
-      await Supabase.instance.client.storage.from('membros').upload(
-            fileName,
-            _selectedImage!
-          );
-
-      // Obtém o URL público da imagem
-      imageUrl = Supabase.instance.client.storage
-          .from('membros')
-          .getPublicUrl(fileName);
-    }
-
-    // Cria o mapa com os dados do membro
-    Map<String, dynamic> memberData = {
-      'nomeCompleto': nomeCompletoController.text,
-      'comungante': comunganteController.text,
-      'numeroRol': numeroRolController.text,
-      'dataNascimento': dataNascimentoController.text,
-      'sexo': sexoController.text,
-      'cidadeNascimento': cidadeNascimentoController.text,
-      'estadoNascimento': estadoNascimentoController.text,
-      'nomePai': nomePaiController.text,
-      'nomeMae': nomeMaeController.text,
-      'escolaridade': escolaridadeController.text,
-      'profissao': profissaoController.text,
-      'email': emailController.text,
-      'telefone': telefoneController.text,
-      'celular': celularController.text,
-      'cep': cepController.text,
-      'bairro': bairroController.text,
-      'endereco': enderecotController.text,
-      'complemento': complementoController.text,
-      'cidadeAtual': cidadeAtualController.text,
-      'estadoAtual': estadoAtualController.text,
-      'residencia': residenciaController.text,
-      'estadoCivil': estadoCivilController.text,
-      'religiao': religiaoController.text,
-      'dataBatismo': dataBatismoController.text,
-      'oficianteBatismo': oficianteBatismoController.text,
-      'dataProfissao': dataProfissaoController.text,
-      'oficianteProfissao': oficianteProfissaoController.text,
-      'dataAdmissao': dataAdmissaoController.text,
-      'ataAdmissao': ataAdmissaoController.text,
-      'formaAdmissao': formaAdmissaoController.text,
-      'dataDemissao': dataDemissaoController.text,
-      'ataDemissao': ataDemissaoController.text,
-      'formaDemissao': formaDemissaoController.text,
-      'dataRolSeparado': dataRolSeparadoController.text,
-      'ataRolSeparado': ataRolSeparadoController.text,
-      'casamentoRolSeparado': casamentoRolSeparadoController.text,
-      'dataDiscRolSeparado': dataDiscRolSeparadoController.text,
-      'ataDiscRolSeparado': ataDiscRolSeparadoController.text,
-      'discRolSeparado': discRolSeparadoController.text,
-      'dataDiac': dataDiacController.text,
-      'reeleitoDiac1': reeleitoDiac1Controller.text,
-      'reeleitoDiac2': reeleitoDiac2Controller.text,
-      'reeleitoDiac3': reeleitoDiac3Controller.text,
-      'dataPresb': dataPresbController.text,
-      'reeleitoPresb1': reeleitoPresb1Controller.text,
-      'reeleitoPresb2': reeleitoPresb2Controller.text,
-      'reeleitoPresb3': reeleitoPresb3Controller.text,
-      'imagemMembro': imageUrl,
-    };
-
-    // Verifica se é uma edição ou criação
-    if (widget.memberData != null) {
-      // É uma edição, então faz update
-      final response = await Supabase.instance.client
-          .from('membros')
-          .update(memberData)
-          .eq('id', widget.memberData!['id'])
-          .select();
-
-      if (response.isEmpty) {
-        throw Exception('Erro ao atualizar membro no banco de dados');
-      }
-      if (await _isNumeroRolDuplicado(numeroRolController.text)) {
-        _showBanner('Número de Rol já cadastrado.', const Color.fromARGB(255, 154, 27, 27));
-        return false; // Interrompe o salvamento
+      // Verifica se há uma imagem selecionada
+      if (_selectedImage != null) {
+        imageUrl = await _uploadImageToSupabase(_selectedImage!);
+        if (imageUrl == null) {
+          _showBanner('Erro ao fazer upload da imagem.', const Color.fromARGB(255, 154, 27, 27));
+          return false; // Retorna falso se o upload falhar
+        }
       }
 
-      _showBanner('Membro atualizado com sucesso!', const Color(0xFF015B40));
-    } else {
-      // É uma criação, então insere um novo registro
-      final response = await Supabase.instance.client
-          .from('membros')
-          .insert(memberData)
-          .select();
+      // Cria o mapa com os dados do membro
+      Map<String, dynamic> memberData = {
+        'nomeCompleto': nomeCompletoController.text,
+        'comungante': comunganteController.text,
+        'numeroRol': numeroRolController.text,
+        'dataNascimento': dataNascimentoController.text,
+        'sexo': sexoController.text,
+        'cidadeNascimento': cidadeNascimentoController.text,
+        'estadoNascimento': estadoNascimentoController.text,
+        'nomePai': nomePaiController.text,
+        'nomeMae': nomeMaeController.text,
+        'escolaridade': escolaridadeController.text,
+        'profissao': profissaoController.text,
+        'email': emailController.text,
+        'telefone': telefoneController.text,
+        'celular': celularController.text,
+        'cep': cepController.text,
+        'bairro': bairroController.text,
+        'endereco': enderecotController.text,
+        'complemento': complementoController.text,
+        'cidadeAtual': cidadeAtualController.text,
+        'estadoAtual': estadoAtualController.text,
+        'residencia': residenciaController.text,
+        'estadoCivil': estadoCivilController.text,
+        'religiao': religiaoController.text,
+        'dataBatismo': dataBatismoController.text,
+        'oficianteBatismo': oficianteBatismoController.text,
+        'dataProfissao': dataProfissaoController.text,
+        'oficianteProfissao': oficianteProfissaoController.text,
+        'dataAdmissao': dataAdmissaoController.text,
+        'ataAdmissao': ataAdmissaoController.text,
+        'formaAdmissao': formaAdmissaoController.text,
+        'dataDemissao': dataDemissaoController.text,
+        'ataDemissao': ataDemissaoController.text,
+        'formaDemissao': formaDemissaoController.text,
+        'dataRolSeparado': dataRolSeparadoController.text,
+        'ataRolSeparado': ataRolSeparadoController.text,
+        'casamentoRolSeparado': casamentoRolSeparadoController.text,
+        'dataDiscRolSeparado': dataDiscRolSeparadoController.text,
+        'ataDiscRolSeparado': ataDiscRolSeparadoController.text,
+        'discRolSeparado': discRolSeparadoController.text,
+        'dataDiac': dataDiacController.text,
+        'reeleitoDiac1': reeleitoDiac1Controller.text,
+        'reeleitoDiac2': reeleitoDiac2Controller.text,
+        'reeleitoDiac3': reeleitoDiac3Controller.text,
+        'dataPresb': dataPresbController.text,
+        'reeleitoPresb1': reeleitoPresb1Controller.text,
+        'reeleitoPresb2': reeleitoPresb2Controller.text,
+        'reeleitoPresb3': reeleitoPresb3Controller.text,
+        'imagemMembro': imageUrl,
+      };
 
-      if (response.isEmpty) {
-        throw Exception('Erro ao salvar membro no banco de dados');
+      // Verifica se é uma edição ou criação
+      if (widget.memberData != null) {
+        // É uma edição, então faz update
+        final response = await Supabase.instance.client.from('membros').update(memberData).eq('id', widget.memberData!['id']).select();
+
+        if (response.isEmpty) {
+          throw Exception('Erro ao atualizar membro no banco de dados');
+        }
+
+        _showBanner('Membro atualizado com sucesso!', const Color(0xFF015B40));
+      } else {
+        // É uma criação, então insere um novo registro
+        final response = await Supabase.instance.client.from('membros').insert(memberData).select();
+
+        if (response.isEmpty) {
+          throw Exception('Erro ao salvar membro no banco de dados');
+        }
+
+        _showBanner('Membro salvo com sucesso!', const Color(0xFF015B40));
       }
 
-      _showBanner('Membro salvo com sucesso!', const Color(0xFF015B40));
-    }
-
-    return true;
-  } catch (e) {
-    _showBanner(
-        'Erro ao salvar membro', const Color.fromARGB(255, 154, 27, 27));
-    print("Erro ao salvar membro: $e");
-    return false;
-  }
-}
-
-
- Future<bool> _isNumeroRolDuplicado(String numeroRol) async {
-  if (numeroRol.isEmpty) return false;
-
-  try {
-    final response = await Supabase.instance.client
-        .from('membros')
-        .select('id')
-        .eq('numeroRol', numeroRol);
-
-    if (response.isEmpty) {
+      return true;
+    } catch (e) {
+      _showBanner('Erro ao salvar membro.', const Color.fromARGB(255, 154, 27, 27));
+      print("Erro ao salvar membro: $e");
       return false;
     }
-    
-    if (widget.memberData != null) {
-      return response.any((data) => data['id'] != widget.memberData!['id']);
-    }
-    return true;
-    
-  } catch (e) {
-    print("Erro ao verificar número de rol duplicado: $e");
-    return false;
   }
-}
+
+  Future<bool> _isNumeroRolDuplicado(String numeroRol) async {
+    if (numeroRol.isEmpty) return false;
+
+    try {
+      final response = await Supabase.instance.client.from('membros').select('id').eq('numeroRol', numeroRol);
+
+      if (response.isEmpty) {
+        return false;
+      }
+
+      if (widget.memberData != null) {
+        return response.any((data) => data['id'] != widget.memberData!['id']);
+      }
+      return true;
+    } catch (e) {
+      print("Erro ao verificar número de rol duplicado: $e");
+      return false;
+    }
+  }
 
   @override
   void dispose() {
@@ -397,8 +394,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        FocusScope.of(context)
-            .unfocus(); // Esconde o teclado ao tocar fora dos campos
+        FocusScope.of(context).unfocus(); // Esconde o teclado ao tocar fora dos campos
       },
       child: Scaffold(
         appBar: AppBar(
@@ -418,9 +414,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
           ),
           title: Text(
             'Cadastro',
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge, // Usa o estilo do tema para o AppBar
+            style: Theme.of(context).textTheme.titleLarge, // Usa o estilo do tema para o AppBar
           ),
           centerTitle: true,
         ),
@@ -428,52 +422,52 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
           key: _formKey, // Associa a chave do formulário
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(
-                  23.0, 0.0, 23.0, 0.0), // Adiciona um padding inferior maior
+              padding: const EdgeInsets.fromLTRB(23.0, 0.0, 23.0, 0.0), // Adiciona um padding inferior maior
               child: ListView(
                 controller: _scrollController, // Adicione o controlador aqui
                 children: [
                   const SizedBox(height: 20),
                   // Adicionando o círculo de foto no início
                   MouseRegion(
-                    cursor: SystemMouseCursors
-                        .click, // Define o cursor como 'pointer' ao passar o mouse
+                    cursor: SystemMouseCursors.click, // Define o cursor como 'pointer' ao passar o mouse
                     child: GestureDetector(
                       onTap: _pickImage, // Função para selecionar a imagem
                       child: CircleAvatar(
                         radius: 70,
-                        backgroundColor:
-                            Theme.of(context).inputDecorationTheme.fillColor,
-                        child: _selectedImage == null
-                            ? Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/images/user-round.svg',
-                                    height: 50,
-                                    width: 50,
-                                    // ignore: deprecated_member_use
-                                    color: Theme.of(context)
-                                        .iconTheme
-                                        .color, // Usa a cor do iconTheme conforme o tema
-                                  ),
-                                ],
-                              )
-                            : ClipOval(
-                                child: Image.file(
+                        backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
+                        child: ClipOval(
+                          child: _selectedImage != null
+                              ? Image.file(
                                   _selectedImage!,
                                   width: 140,
                                   height: 140,
                                   fit: BoxFit.cover,
-                                ),
-                              ),
+                                )
+                              : (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty)
+                                  ? Image.network(
+                                      widget.memberData!['imagemMembro'],
+                                      width: 140,
+                                      height: 140,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) => SvgPicture.asset(
+                                        'assets/images/user-round.svg',
+                                        height: 50,
+                                        width: 50,
+                                        color: Theme.of(context).iconTheme.color,
+                                      ),
+                                    )
+                                  : SvgPicture.asset(
+                                      'assets/images/user-round.svg',
+                                      height: 50,
+                                      width: 50,
+                                      color: Theme.of(context).iconTheme.color,
+                                    ),
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 30),
-                  Center(
-                      child:
-                          buildSectionTitle(context, 'Informações Pessoais')),
+                  Center(child: buildSectionTitle(context, 'Informações Pessoais')),
                   const SizedBox(height: 20),
                   Center(
                     child: CustomCapitalizedTextField(
@@ -490,7 +484,10 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                         child: CustomDropdown(
                           labelText: 'Comungante',
                           controller: comunganteController,
-                          items: const ['SIM', 'NÃO'],
+                          items: const [
+                            'SIM',
+                            'NÃO'
+                          ],
                           hintText: 'Comungante',
                           borderColor: _fieldErrors['comungante'] == true ? Colors.red : null,
                         ),
@@ -558,11 +555,9 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     onCityChanged: (value) {
                       final capitalized = capitalize(value);
                       if (capitalized != value) {
-                        cidadeNascimentoController.value =
-                            cidadeNascimentoController.value.copyWith(
+                        cidadeNascimentoController.value = cidadeNascimentoController.value.copyWith(
                           text: capitalized,
-                          selection: TextSelection.collapsed(
-                              offset: capitalized.length),
+                          selection: TextSelection.collapsed(offset: capitalized.length),
                         );
                       }
                     },
@@ -598,13 +593,10 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     controller: emailController,
                     hintText: 'E-mail',
                     obscureText: false,
-                    keyboardType:
-                        TextInputType.emailAddress, // Teclado de email
+                    keyboardType: TextInputType.emailAddress, // Teclado de email
                     textInputAction: TextInputAction.next,
                     validator: (value) {
-                      if (value == null ||
-                          value.isEmpty ||
-                          !isValidEmail(value)) {
+                      if (value == null || value.isEmpty || !isValidEmail(value)) {
                         return 'Por favor, insira um email válido';
                       }
                       return null;
@@ -618,8 +610,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           controller: telefoneController,
                           hintText: 'Telefone',
                           obscureText: false,
-                          keyboardType:
-                              TextInputType.phone, // Teclado de telefone
+                          keyboardType: TextInputType.phone, // Teclado de telefone
                           inputFormatters: [
                             PhoneInputFormatter(), // Utiliza o formatter personalizado
                           ],
@@ -631,8 +622,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           controller: celularController,
                           hintText: 'Celular',
                           obscureText: false,
-                          keyboardType:
-                              TextInputType.phone, // Teclado de telefone
+                          keyboardType: TextInputType.phone, // Teclado de telefone
                           inputFormatters: [
                             PhoneInputFormatter(), // Utiliza o formatter personalizado
                           ],
@@ -643,8 +633,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   ),
 
                   const SizedBox(height: 30),
-                  Center(
-                      child: buildSectionTitle(context, 'Localização Atual')),
+                  Center(child: buildSectionTitle(context, 'Localização Atual')),
                   const SizedBox(height: 20),
                   Row(
                     children: [
@@ -655,19 +644,13 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           onEnderecoEncontrado: (endereco) {
                             setState(() {
                               bairroController.text = endereco['bairro'] ?? '';
-                              enderecotController.text =
-                                  endereco['logradouro'] ?? '';
-                              cidadeAtualController.text =
-                                  endereco['localidade'] ?? '';
+                              enderecotController.text = endereco['logradouro'] ?? '';
+                              cidadeAtualController.text = endereco['localidade'] ?? '';
                               estadoAtualController.text = endereco['uf'] ?? '';
                             });
                           },
-                          onCepNaoEncontrado: () => _showBanner(
-                              'CEP não encontrado.',
-                              const Color.fromARGB(255, 93, 14, 14)),
-                          onErro: () => _showBanner(
-                              'Erro de conexão. Verifique sua internet.',
-                              const Color.fromARGB(255, 93, 14, 14)),
+                          onCepNaoEncontrado: () => _showBanner('CEP não encontrado.', const Color.fromARGB(255, 93, 14, 14)),
+                          onErro: () => _showBanner('Erro de conexão. Verifique sua internet.', const Color.fromARGB(255, 93, 14, 14)),
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
@@ -704,18 +687,15 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     onCityChanged: (value) {
                       final capitalized = capitalize(value);
                       if (capitalized != value) {
-                        cidadeAtualController.value =
-                            cidadeAtualController.value.copyWith(
+                        cidadeAtualController.value = cidadeAtualController.value.copyWith(
                           text: capitalized,
-                          selection: TextSelection.collapsed(
-                              offset: capitalized.length),
+                          selection: TextSelection.collapsed(offset: capitalized.length),
                         );
                       }
                     },
                   ),
                   const SizedBox(height: 30),
-                  Center(
-                      child: buildSectionTitle(context, 'Outras informações')),
+                  Center(child: buildSectionTitle(context, 'Outras informações')),
                   const SizedBox(height: 20),
                   Row(
                     children: [
@@ -788,9 +768,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     children: [
                       Flexible(
                         flex: 1,
-                        child: CustomDateTextField(
-                            controller: dataProfissaoController,
-                            hintText: 'Data'),
+                        child: CustomDateTextField(controller: dataProfissaoController, hintText: 'Data'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
@@ -810,9 +788,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     children: [
                       Flexible(
                         flex: 1,
-                        child: CustomDateTextField(
-                            controller: dataAdmissaoController,
-                            hintText: 'Data'),
+                        child: CustomDateTextField(controller: dataAdmissaoController, hintText: 'Data'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
@@ -853,9 +829,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     children: [
                       Flexible(
                         flex: 1,
-                        child: CustomDateTextField(
-                            controller: dataDemissaoController,
-                            hintText: 'Data'),
+                        child: CustomDateTextField(controller: dataDemissaoController, hintText: 'Data'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
@@ -895,9 +869,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDateTextField(
-                            controller: dataRolSeparadoController,
-                            hintText: 'Data'),
+                        child: CustomDateTextField(controller: dataRolSeparadoController, hintText: 'Data'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
@@ -924,9 +896,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDateTextField(
-                            controller: dataDiscRolSeparadoController,
-                            hintText: 'Data Disc.'),
+                        child: CustomDateTextField(controller: dataDiscRolSeparadoController, hintText: 'Data Disc.'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
@@ -956,14 +926,11 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDateTextField(
-                            controller: dataDiacController, hintText: 'Data'),
+                        child: CustomDateTextField(controller: dataDiacController, hintText: 'Data'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomDateTextField(
-                            controller: reeleitoDiac1Controller,
-                            hintText: 'Reeleito em'),
+                        child: CustomDateTextField(controller: reeleitoDiac1Controller, hintText: 'Reeleito em'),
                       ),
                     ],
                   ),
@@ -971,33 +938,25 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDateTextField(
-                            controller: reeleitoDiac2Controller,
-                            hintText: 'Reeleito em'),
+                        child: CustomDateTextField(controller: reeleitoDiac2Controller, hintText: 'Reeleito em'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomDateTextField(
-                            controller: reeleitoDiac3Controller,
-                            hintText: 'Reeleito em'),
+                        child: CustomDateTextField(controller: reeleitoDiac3Controller, hintText: 'Reeleito em'),
                       ),
                     ],
                   ),
                   const SizedBox(height: 30),
-                  Center(
-                      child: buildSectionTitle(context, 'Eleições Presbitero')),
+                  Center(child: buildSectionTitle(context, 'Eleições Presbitero')),
                   const SizedBox(height: 20),
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDateTextField(
-                            controller: dataPresbController, hintText: 'Data'),
+                        child: CustomDateTextField(controller: dataPresbController, hintText: 'Data'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomDateTextField(
-                            controller: reeleitoPresb1Controller,
-                            hintText: 'Reeleito em'),
+                        child: CustomDateTextField(controller: reeleitoPresb1Controller, hintText: 'Reeleito em'),
                       ),
                     ],
                   ),
@@ -1005,15 +964,11 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   Row(
                     children: [
                       Flexible(
-                        child: CustomDateTextField(
-                            controller: reeleitoPresb2Controller,
-                            hintText: 'Reeleito em'),
+                        child: CustomDateTextField(controller: reeleitoPresb2Controller, hintText: 'Reeleito em'),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomDateTextField(
-                            controller: reeleitoPresb3Controller,
-                            hintText: 'Reeleito em'),
+                        child: CustomDateTextField(controller: reeleitoPresb3Controller, hintText: 'Reeleito em'),
                       ),
                     ],
                   ),
@@ -1047,13 +1002,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                 ],
               ),
             ),
-            BottomSidebar(
-                currentIndex: currentIndex,
-                onTabTapped: onTabTapped,
-                onThemeToggle: widget.onThemeToggle,
-                themeModeNotifier: widget.themeModeNotifier,
-                isKeyboardVisible:
-                    MediaQuery.of(context).viewInsets.bottom != 0),
+            BottomSidebar(currentIndex: currentIndex, onTabTapped: onTabTapped, onThemeToggle: widget.onThemeToggle, themeModeNotifier: widget.themeModeNotifier, isKeyboardVisible: MediaQuery.of(context).viewInsets.bottom != 0),
             if (_isBannerVisible)
               Positioned(
                 top: 10,
@@ -1061,8 +1010,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                 child: CustomBanner(
                   message: _bannerMessage, // Usa a mensagem do estado
                   backgroundColor: _bannerColor, // Usa a cor do estado
-                  onDismissed:
-                      _hideBanner, // Callback para ocultar o banner após a animação,
+                  onDismissed: _hideBanner, // Callback para ocultar o banner após a animação,
                 ),
               ),
           ],
@@ -1088,12 +1036,10 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
           _selectedImage = File(pickedFile.path);
         });
       } else {
-        _showBanner('Seleção de imagem cancelada.',
-            const Color.fromARGB(255, 142, 85, 0));
+        _showBanner('Seleção de imagem cancelada.', const Color.fromARGB(255, 142, 85, 0));
       }
     } catch (e) {
-      _showBanner('Erro ao selecionar ou fazer upload da imagem: $e',
-          const Color.fromARGB(255, 154, 27, 27));
+      _showBanner('Erro ao selecionar ou fazer upload da imagem: $e', const Color.fromARGB(255, 154, 27, 27));
     }
   }
 
@@ -1111,12 +1057,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
 
 // Função para capitalizar cada palavra:
 String capitalize(String input) {
-  return input
-      .split(' ')
-      .map((str) => str.isNotEmpty
-          ? str[0].toUpperCase() + str.substring(1).toLowerCase()
-          : '')
-      .join(' ');
+  return input.split(' ').map((str) => str.isNotEmpty ? str[0].toUpperCase() + str.substring(1).toLowerCase() : '').join(' ');
 }
 
 // Função para validar o email:
