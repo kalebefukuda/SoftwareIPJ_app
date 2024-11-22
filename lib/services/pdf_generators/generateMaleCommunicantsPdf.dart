@@ -45,26 +45,25 @@ Future<void> generateMaleCommunicantsPdf() async {
 
   final response = await Supabase.instance.client
       .from('membros')
-      .select('nomeCompleto, dataNascimento, numeroRol, residencia, sexo, comungante')
+      .select('nomeCompleto, dataNascimento, numeroRol, residencia')
       .eq('sexo', 'Masculino')
       .eq('comungante', 'SIM');
 
   final data = response as List<dynamic>;
 
   if (data.isNotEmpty) {
-    for (var doc in data) {
-      var data = doc.data();
-      membersList.add({
-        "name": data['nomeCompleto'] ?? "Nome não disponível",
-        "birthday": data['dataNascimento'] ?? "Data não disponível",
-        "rol": data['numeroRol']?.toString() ?? "Rol não disponível",
-        "residence": data['residencia'] ?? "Residência não disponível",
-      });
-    }
+    for (var item in data) {
+        membersList.add({
+          "name": item['nomeCompleto'] ?? "Nome não disponível",
+          "birthday": item['dataNascimento'] ?? "Data não disponível",
+          "rol": item['numeroRol']?.toString() ?? "Rol não disponível",
+          "residence": item['residencia'] ?? "Residência não disponível",
+        });
+      }
     // Ordene por nome
     membersList.sort((a, b) => a["name"]!.compareTo(b["name"]!));
   } else {
-    print("Nenhum dado encontrado no Firestore.");
+    print("Nenhum dado encontrado no Supabase.");
   }
 
   // Paginação do conteúdo
