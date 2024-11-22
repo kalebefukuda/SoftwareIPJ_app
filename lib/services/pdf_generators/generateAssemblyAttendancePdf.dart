@@ -2,7 +2,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -42,18 +42,23 @@ Future<void> generateAssemblyAttendancePdf() async {
 
   List<String> memberNames = [];
 
-  // Obtenha os dados do Firestore
-  final snapshot = await FirebaseFirestore.instance.collection('members').get();
+  // Obtenha os dados do Supabase
+  try {
+    final response = await Supabase.instance.client
+        .from('membros')
+        .select('nomeCompleto');
 
-  if (snapshot.docs.isNotEmpty) {
-    for (var doc in snapshot.docs) {
-      var data = doc.data();
-      String name = data['nomeCompleto'];
-      memberNames.add(name);
+    if (response.isEmpty) {
+      print("Nenhum dado encontrado no Supabase.");
+      return;
     }
+
+    final data = response as List<dynamic>;
+    memberNames = data.map((item) => item['nomeCompleto'] as String).toList();
     memberNames.sort((a, b) => a.compareTo(b));
-  } else {
-    print("Nenhum dado encontrado no Firestore.");
+  } catch (e) {
+    print("Erro ao buscar dados no Supabase: $e");
+    return;
   }
 
   // Paginação do conteúdo

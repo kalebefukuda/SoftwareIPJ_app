@@ -240,7 +240,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
       // Faz o upload da imagem para o Supabase Storage
       await Supabase.instance.client.storage.from('membros').upload(
             fileName,
-            _selectedImage!,
+            _selectedImage!
           );
 
       // Obtém o URL público da imagem
@@ -310,7 +310,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
           .eq('id', widget.memberData!['id'])
           .select();
 
-      if (response == null || response.isEmpty) {
+      if (response.isEmpty) {
         throw Exception('Erro ao atualizar membro no banco de dados');
       }
       if (await _isNumeroRolDuplicado(numeroRolController.text)) {
@@ -326,7 +326,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
           .insert(memberData)
           .select();
 
-      if (response == null || response.isEmpty) {
+      if (response.isEmpty) {
         throw Exception('Erro ao salvar membro no banco de dados');
       }
 
