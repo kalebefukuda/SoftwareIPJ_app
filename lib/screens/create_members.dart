@@ -313,7 +313,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
         'reeleitoPresb2': reeleitoPresb2Controller.text,
         'reeleitoPresb3': reeleitoPresb3Controller.text,
         'imagemMembro': imageUrl,
-        'created_at': DateTime.now().toUtc().toIso8601String(),
+        'created_at': DateTime.now().toIso8601String(),
       };
 
       // Verifica se é uma edição ou criação

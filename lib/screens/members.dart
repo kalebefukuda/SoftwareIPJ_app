@@ -196,10 +196,7 @@ class _MembersState extends State<Members> {
       final memberData = Map<String, dynamic>.from(memberResponse);
 
       // Passo 2: Adicionar o timestamp de exclusão
-      memberData['deleted_at'] = DateTime.now().toUtc().toIso8601String();
-
-      // Remove o campo `id` para evitar conflitos na tabela de backup
-      memberData.remove('id');
+      memberData['deleted_at'] = DateTime.now().toIso8601String();
 
       // Passo 3: Inserir o membro na tabela `membros_deleted`
       final insertResponse = await Supabase.instance.client.from('membros_deleted').insert(memberData).select();
