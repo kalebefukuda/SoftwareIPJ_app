@@ -2,7 +2,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -42,21 +42,21 @@ Future<void> generateNonFemaleCommunicantsPdf() async {
 
   List<Map<String, String>> membersList = [];
 
-  // Obtenha os dados do Firestore com filtro por "Sede" no atributo "residencia"
-  final snapshot = await FirebaseFirestore.instance
-    .collection('members')
-    .where('sexo', isEqualTo: 'Feminino')
-    .where('comungante', isEqualTo: 'NÃO')
-    .get();
+  final response = await Supabase.instance.client
+      .from('membros')
+      .select('nomeCompleto, dataNascimento, numeroRol, residencia, sexo, comungante')
+      .eq('sexo', 'Feminino')
+      .eq('comungante', 'NÃO');
 
-  if (snapshot.docs.isNotEmpty) {
-    for (var doc in snapshot.docs) {
-      var data = doc.data();
+  final data = response as List<dynamic>;
+
+  if (data.isNotEmpty) {
+    for (var item in data) {
       membersList.add({
-        "name": data['nomeCompleto'] ?? "Nome não disponível",
-        "birthday": data['dataNascimento'] ?? "Data não disponível",
-        "rol": data['numeroRol']?.toString() ?? "Rol não disponível",
-        "residence": data['residencia'] ?? "Residência não disponível",
+        "name": item['nomeCompleto'] ?? "Nome não disponível",
+        "birthday": item['dataNascimento'] ?? "Data não disponível",
+        "rol": item['numeroRol']?.toString() ?? "Rol não disponível",
+        "residence": item['residencia'] ?? "Residência não disponível",
       });
     }
     // Ordene por nome

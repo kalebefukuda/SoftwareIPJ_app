@@ -2,7 +2,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -11,11 +11,10 @@ import 'package:flutter/services.dart' show rootBundle;
 Future<void> generateFemaleCommunicantsPdf() async {
   final pdf = pw.Document();
 
-  // Inicializar a configuração de data para Português do Brasil
   await initializeDateFormatting('pt_BR', null);
 
-  // Carregar a fonte Poppins
-  final poppinsFont = pw.Font.ttf(await rootBundle.load('assets/fonts/Poppins-Regular.ttf'));
+  final poppinsFont =
+      pw.Font.ttf(await rootBundle.load('assets/fonts/Poppins-Regular.ttf'));
 
   // Carregar a imagem da logo
   final imageData = await rootBundle.load('assets/images/IPJ86Ver02_2.png');
@@ -42,28 +41,34 @@ Future<void> generateFemaleCommunicantsPdf() async {
 
   List<Map<String, String>> membersList = [];
 
-  // Obtenha os dados do Firestore com filtro por "Sede" no atributo "residencia"
-  final snapshot = await FirebaseFirestore.instance
-      .collection('members')
-      .where('sexo', isEqualTo: 'Feminino')
-      .where('comungante', isEqualTo: 'SIM')
-      .get();
+  // Obtenha os dados do Supabase com filtro por sexo "Feminino" e comungante "SIM"
+    final response = await Supabase.instance.client
+        .from('membros')
+        .select('nomeCompleto, dataNascimento, numeroRol, residencia')
+        .eq('sexo', 'Feminino')
+        .eq('comungante', 'SIM');
 
-  if (snapshot.docs.isNotEmpty) {
-    for (var doc in snapshot.docs) {
-      var data = doc.data();
-      membersList.add({
-        "name": data['nomeCompleto'] ?? "Nome não disponível",
-        "birthday": data['dataNascimento'] ?? "Data não disponível",
-        "rol": data['numeroRol']?.toString() ?? "Rol não disponível",
-        "residence": data['residencia'] ?? "Residência não disponível",
-      });
+    if (response.isEmpty) {
+      print("Nenhum dado encontrado no Supabase.");
+      return;
     }
-    // Ordene por nome
-    membersList.sort((a, b) => a["name"]!.compareTo(b["name"]!));
-  } else {
-    print("Nenhum dado encontrado no Firestore.");
-  }
+
+    final data = response as List<dynamic>;
+
+    if (data.isNotEmpty) {
+      for (var item in data) {
+        membersList.add({
+          "name": item['nomeCompleto'] ?? "Nome não disponível",
+          "birthday": item['dataNascimento'] ?? "Data não disponível",
+          "rol": item['numeroRol']?.toString() ?? "Rol não disponível",
+          "residence": item['residencia'] ?? "Residência não disponível",
+        });
+      }
+      // Ordenar por nome
+      membersList.sort((a, b) => a["name"]!.compareTo(b["name"]!));
+    } else {
+      print("Nenhum dado encontrado no Supabase.");
+    }
 
   // Paginação do conteúdo
   pdf.addPage(
@@ -88,7 +93,8 @@ Future<void> generateFemaleCommunicantsPdf() async {
                 style: headerStyle,
               ),
             ),
-            pw.Divider(thickness: 0.5, color: PdfColors.black), // Linha de divisão
+            pw.Divider(
+                thickness: 0.5, color: PdfColors.black), // Linha de divisão
           ],
         );
       },
@@ -178,7 +184,7 @@ Future<void> generateFemaleCommunicantsPdf() async {
                     ),
                   ],
                 );
-              }),
+              }).toList(),
             ],
           ),
         ];
@@ -186,7 +192,9 @@ Future<void> generateFemaleCommunicantsPdf() async {
       footer: (pw.Context context) {
         return pw.Column(
           children: [
-            pw.Divider(thickness: 0.5, color: PdfColors.black), // Linha de divisão no rodapé
+            pw.Divider(
+                thickness: 0.5,
+                color: PdfColors.black), // Linha de divisão no rodapé
             pw.Padding(
               padding: const pw.EdgeInsets.only(top: 8),
               child: pw.Row(
@@ -194,7 +202,8 @@ Future<void> generateFemaleCommunicantsPdf() async {
                 children: [
                   // Data atual no lado esquerdo
                   pw.Text(
-                    DateFormat('EEEE, dd MMMM yyyy', 'pt_BR').format(DateTime.now()),
+                    DateFormat('EEEE, dd MMMM yyyy', 'pt_BR')
+                        .format(DateTime.now()),
                     style: pw.TextStyle(font: poppinsFont, fontSize: 10),
                   ),
                   // Numeração de páginas no lado direito
@@ -217,9 +226,7 @@ Future<void> generateFemaleCommunicantsPdf() async {
   await file.writeAsBytes(await pdf.save());
 
   // Compartilhe o arquivo PDF
-  Share.shareFiles([
-    file.path
-  ]);
+  Share.shareFiles([file.path]);
 
   print("PDF salvo em: ${file.path}");
 }

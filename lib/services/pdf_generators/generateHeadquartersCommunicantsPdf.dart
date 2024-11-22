@@ -2,7 +2,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -42,22 +42,22 @@ Future<void> generateHeadquartersCommunicantsPdf() async {
 
   List<Map<String, String>> membersList = [];
 
-  // Obtenha os dados do Firestore com filtro por "Sede" no atributo "residencia"
-  final snapshot = await FirebaseFirestore.instance
-      .collection('members')
-      .where('residencia', isEqualTo: 'Sede')
-      .get();
+   final response = await Supabase.instance.client
+        .from('membros')
+        .select('nomeCompleto, dataNascimento, numeroRol, residencia')
+        .eq('residencia', 'Sede');
 
-  if (snapshot.docs.isNotEmpty) {
-    for (var doc in snapshot.docs) {
-      var data = doc.data();
-      membersList.add({
-        "name": data['nomeCompleto'] ?? "Nome não disponível",
-        "birthday": data['dataNascimento'] ?? "Data não disponível",
-        "rol": data['numeroRol']?.toString() ?? "Rol não disponível",
-        "residence": data['residencia'] ?? "Residência não disponível",
-      });
-    }
+  final data = response as List<dynamic>;
+
+  if (data.isNotEmpty) {
+      for (var item in data) {
+        membersList.add({
+          "name": item['nomeCompleto'] ?? "Nome não disponível",
+          "birthday": item['dataNascimento'] ?? "Data não disponível",
+          "rol": item['numeroRol']?.toString() ?? "Rol não disponível",
+          "residence": item['residencia'] ?? "Residência não disponível",
+        });
+      }
     // Ordene por nome
     membersList.sort((a, b) => a["name"]!.compareTo(b["name"]!));
   } else {
