@@ -3,7 +3,7 @@ import 'package:pdf/widgets.dart' as pw;
 // ignore: depend_on_referenced_packages
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -44,23 +44,27 @@ Future<void> generateWeddingDatesPdf() async {
   // Listas para armazenar os casais
   Map<String, List<Map<String, dynamic>>> groupedMembers = {};
 
-  // Obtenha os dados do Firestore
-  final snapshot = await FirebaseFirestore.instance.collection('members').get();
+  final response = await Supabase.instance.client
+      .from('membros')
+      .select('nomeCompleto, casamentoRolSeparado');
+  
+  final data = response as List<dynamic>;
 
-  if (snapshot.docs.isNotEmpty) {
-    for (var doc in snapshot.docs) {
-      var data = doc.data();
-      String? weddingDate = data['casamentoRolSeparado'];
+
+  if (data.isNotEmpty) {
+    for (var item in data) {
+      String? weddingDate = item['casamentoRolSeparado'];
 
       if (weddingDate != null && weddingDate.isNotEmpty) {
         // Agrupar membros pela data de casamento
         groupedMembers.putIfAbsent(weddingDate, () => []).add({
-          'name': data['nomeCompleto'] ?? 'Nome não disponível',
+          'name': item['nomeCompleto'] ?? 'Nome não disponível',
           'weddingDate': weddingDate,
         });
       }
     }
   } else {
+     print("Nenhum dado encontrado no Supabase.");
   }
 
   // Filtrar apenas datas com exatamente 2 membros

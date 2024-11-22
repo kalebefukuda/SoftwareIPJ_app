@@ -2,7 +2,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -42,30 +42,48 @@ Future<void> generateBirthdayListPdf() async {
 
   List<Map<String, dynamic>> birthdayList = [];
 
-  // Obtenha os dados do Firestore
-  final snapshot = await FirebaseFirestore.instance.collection('members').where('dataNascimento', isGreaterThan: "").get();
+  // Obtenha os dados do Supabase
+  try {
+    final response = await Supabase.instance.client
+        .from('membros')
+        .select('nomeCompleto, dataNascimento')
+        .neq('dataNascimento', '') ;
 
-  if (snapshot.docs.isNotEmpty) {
-    for (var doc in snapshot.docs) {
-      var data = doc.data();
-      String birthday = data['dataNascimento'];
-
-      try {
-        DateTime birthDate = DateFormat('dd/MM/yyyy').parse(birthday);
-        String formattedDate = DateFormat('dd/MM/yyyy').format(birthDate);
-
-        birthdayList.add({
-          "name": data['nomeCompleto'],
-          "birthday": formattedDate,
-          "age": calculateAge(birthDate.toIso8601String()),
-        });
-      } catch (e) {
-        print("Erro ao converter a data: $e");
-      }
+    if (response.isEmpty) {
+      print("Nenhum dado encontrado no Supabase.");
+      return;
     }
-    birthdayList.sort((a, b) => a["name"].compareTo(b["name"]));
-  } else {
-    print("Nenhum dado encontrado no Firestore.");
+
+    final data = response as List<dynamic>;
+
+    if (data.isNotEmpty) {
+      for (var item in data) {
+        String? birthday = item['dataNascimento'];
+
+        if (birthday != null && birthday.isNotEmpty) {
+          try {
+            DateTime birthDate = DateTime.parse(birthday);
+            String formattedDate = DateFormat('dd/MM/yyyy').format(birthDate);
+
+            birthdayList.add({
+              "name": item['nomeCompleto'],
+              "birthday": formattedDate,
+              "age": calculateAge(birthDate),
+            });
+          } catch (e) {
+            print("Erro ao converter a data: $e");
+          }
+        }
+      }
+
+      // Ordenar a lista de aniversariantes por nome
+      birthdayList.sort((a, b) => a["name"].compareTo(b["name"]));
+    } else {
+      print("Nenhum dado encontrado no Supabase.");
+    }
+  } catch (e) {
+    print("Erro ao buscar dados no Supabase: $e");
+    return;
   }
 
   // Paginação do conteúdo
@@ -211,8 +229,7 @@ Future<void> generateBirthdayListPdf() async {
 }
 
 // Função para calcular a idade
-int calculateAge(String birthday) {
-  DateTime birthDate = DateTime.parse(birthday);
+int calculateAge(DateTime birthDate) {
   DateTime today = DateTime.now();
   int age = today.year - birthDate.year;
   if (today.month < birthDate.month || (today.month == birthDate.month && today.day < birthDate.day)) {

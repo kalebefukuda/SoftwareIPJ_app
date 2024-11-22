@@ -2,7 +2,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -42,11 +42,17 @@ Future<void> generateMaleCommunicantsPdf() async {
 
   List<Map<String, String>> membersList = [];
 
-  // Obtenha os dados do Firestore com filtro por "Sede" no atributo "residencia"
-  final snapshot = await FirebaseFirestore.instance.collection('members').where('sexo', isEqualTo: 'Masculino').where('comungante', isEqualTo: 'SIM').get();
 
-  if (snapshot.docs.isNotEmpty) {
-    for (var doc in snapshot.docs) {
+  final response = await Supabase.instance.client
+      .from('membros')
+      .select('nomeCompleto, dataNascimento, numeroRol, residencia, sexo, comungante')
+      .eq('sexo', 'Masculino')
+      .eq('comungante', 'SIM');
+
+  final data = response as List<dynamic>;
+
+  if (data.isNotEmpty) {
+    for (var doc in data) {
       var data = doc.data();
       membersList.add({
         "name": data['nomeCompleto'] ?? "Nome não disponível",
