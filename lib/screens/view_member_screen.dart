@@ -20,7 +20,7 @@ class ViewMemberScreen extends StatefulWidget {
     super.key,
     required this.onThemeToggle,
     this.memberData,
-    this.isReadOnly = true, 
+    this.isReadOnly = true,
     required this.themeModeNotifier,
   });
 
@@ -201,27 +201,27 @@ class _ViewMemberScreenState extends State<ViewMemberScreen> {
                       child: CircleAvatar(
                         radius: 70,
                         backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
-                        child: _selectedImage == null
-                            ? Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SvgPicture.asset(
+                        child: ClipOval(
+                          child: (widget.memberData != null && (widget.memberData?['imagemMembro'] ?? '').isNotEmpty)
+                              ? Image.network(
+                                  widget.memberData?['imagemMembro'] ?? '',
+                                  width: 140,
+                                  height: 140,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) => SvgPicture.asset(
                                     'assets/images/user-round.svg',
                                     height: 50,
                                     width: 50,
-                                    // ignore: deprecated_member_use
-                                    color: Theme.of(context).iconTheme.color, // Usa a cor do iconTheme conforme o tema
+                                    color: Theme.of(context).iconTheme.color,
                                   ),
-                                ],
-                              )
-                            : ClipOval(
-                                child: Image.file(
-                                  _selectedImage!,
-                                  width: 100,
-                                  height: 100,
-                                  fit: BoxFit.cover,
+                                )
+                              : SvgPicture.asset(
+                                  'assets/images/user-round.svg',
+                                  height: 50,
+                                  width: 50,
+                                  color: Theme.of(context).iconTheme.color,
                                 ),
-                              ),
+                        ),
                       ),
                     ),
                   ),
