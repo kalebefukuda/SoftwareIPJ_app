@@ -112,7 +112,6 @@ class _MembersState extends State<Members> {
         _showBanner('Nenhum membro cadastrado', const Color.fromARGB(255, 10, 54, 216));
       }
 
-      // Converte os dados recebidos para uma lista de mapas
       setState(() {
         membersData = (response as List<dynamic>).map((data) => data as Map<String, dynamic>).toList();
 
@@ -123,7 +122,6 @@ class _MembersState extends State<Members> {
           return nameA.compareTo(nameB);
         });
 
-        // Copia a lista para os membros filtrados
         filteredMembers = List.from(membersData);
       });
     } catch (e) {
@@ -187,16 +185,40 @@ class _MembersState extends State<Members> {
 
   Future<void> _deleteMember(int memberId) async {
     try {
-      // Certifique-se de passar o memberId como int
-      final response = await Supabase.instance.client.from('membros').delete().eq('id', memberId).select();
+      // Passo 1: Buscar os dados do membro da tabela `membros`
+      final memberResponse = await Supabase.instance.client.from('membros').select().eq('id', memberId).single();
 
-      if (response == null || response.isEmpty) {
-        throw Exception('Erro ao excluir membro no banco de dados');
+      if (memberResponse == null) {
+        throw Exception('Membro não encontrado no banco de dados.');
       }
-      _showBanner('Membro excluído com sucesso!', const Color(0xFF015B40));
 
-      await _fetchMembers();
-      await _getMemberCounts();
+      // Extrai os dados do membro como um mapa
+      final memberData = Map<String, dynamic>.from(memberResponse);
+
+      // Passo 2: Adicionar o timestamp de exclusão
+      memberData['deleted_at'] = DateTime.now().toUtc().toIso8601String();
+
+      // Remove o campo `id` para evitar conflitos na tabela de backup
+      memberData.remove('id');
+
+      // Passo 3: Inserir o membro na tabela `membros_deleted`
+      final insertResponse = await Supabase.instance.client.from('membros_deleted').insert(memberData).select();
+
+      if (insertResponse == null || insertResponse.isEmpty) {
+        throw Exception('Erro ao mover membro para a tabela de backup.');
+      }
+
+      // Passo 4: Remover o membro da tabela `membros`
+      final deleteResponse = await Supabase.instance.client.from('membros').delete().eq('id', memberId).select();
+
+      if (deleteResponse == null || deleteResponse.isEmpty) {
+        throw Exception('Erro ao excluir membro da tabela principal.');
+      }
+
+      // Exibe mensagem de sucesso no app
+      _showBanner('Membro Excluido!', const Color.fromARGB(255, 154, 27, 27));
+      await _fetchMembers(); // Atualiza a lista de membros
+      await _getMemberCounts(); // Atualiza as contagens de gênero e comungantes
     } catch (e) {
       print("Erro ao excluir membro: $e");
       _showBanner('Erro ao excluir membro.', const Color.fromARGB(255, 154, 27, 27));
