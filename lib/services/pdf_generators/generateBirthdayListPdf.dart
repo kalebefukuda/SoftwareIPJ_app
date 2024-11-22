@@ -42,19 +42,12 @@ Future<void> generateBirthdayListPdf() async {
 
   List<Map<String, dynamic>> birthdayList = [];
 
-  // Obtenha os dados do Supabase
-  try {
-    final response = await Supabase.instance.client
-        .from('membros')
-        .select('nomeCompleto, dataNascimento')
-        .neq('dataNascimento', '') ;
+  final response = await Supabase.instance.client
+      .from('membros')
+      .select('nomeCompleto, dataNascimento')
+      .neq('dataNascimento', '');
 
-    if (response.isEmpty) {
-      print("Nenhum dado encontrado no Supabase.");
-      return;
-    }
-
-    final data = response as List<dynamic>;
+  final data = response as List<dynamic>;
 
     if (data.isNotEmpty) {
       for (var item in data) {
@@ -62,7 +55,7 @@ Future<void> generateBirthdayListPdf() async {
 
         if (birthday != null && birthday.isNotEmpty) {
           try {
-            DateTime birthDate = DateTime.parse(birthday);
+            DateTime birthDate = DateFormat('dd/MM/yyyy').parse(birthday);
             String formattedDate = DateFormat('dd/MM/yyyy').format(birthDate);
 
             birthdayList.add({
@@ -71,7 +64,7 @@ Future<void> generateBirthdayListPdf() async {
               "age": calculateAge(birthDate),
             });
           } catch (e) {
-            print("Erro ao converter a data: $e");
+            print("Erro ao converter a data ($birthday): $e");
           }
         }
       }
@@ -81,10 +74,6 @@ Future<void> generateBirthdayListPdf() async {
     } else {
       print("Nenhum dado encontrado no Supabase.");
     }
-  } catch (e) {
-    print("Erro ao buscar dados no Supabase: $e");
-    return;
-  }
 
   // Paginação do conteúdo
   pdf.addPage(
