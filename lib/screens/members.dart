@@ -6,7 +6,6 @@ import 'package:softwareipj/screens/create_members.dart';
 import 'package:softwareipj/utils/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../widgets/sidebar.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../services/member_service.dart';
 import '../widgets/custom_banner.dart';
 import 'package:diacritic/diacritic.dart';
@@ -68,16 +67,16 @@ class _MembersState extends State<Members> {
     _searchController.addListener(_filterMembers);
   }
 
-    Future<void> _getMemberCounts() async {
+  Future<void> _getMemberCounts() async {
     try {
       final response = await Supabase.instance.client.from('membros').select();
       if (response.isEmpty) {
         setState(() {
-        maleCount = 0;
-        femaleCount = 0;
-        yesCommunicantCount = 0;
-        noCommunicantCount = 0;
-      });
+          maleCount = 0;
+          femaleCount = 0;
+          yesCommunicantCount = 0;
+          noCommunicantCount = 0;
+        });
       }
 
       List members = response as List;
@@ -86,7 +85,6 @@ class _MembersState extends State<Members> {
         femaleCount = members.where((m) => (m['sexo']) == 'Feminino').length;
         yesCommunicantCount = members.where((m) => (m['comungante']) == 'SIM').length;
         noCommunicantCount = members.where((m) => (m['comungante']) == 'NÃO').length;
-
       });
     } catch (e) {
       print("Erro ao obter contagem de membros: $e");
@@ -107,37 +105,30 @@ class _MembersState extends State<Members> {
   }
 
   Future<void> _fetchMembers() async {
-  try {
-    
-    final response = await Supabase.instance.client
-        .from('membros')
-        .select();
+    try {
+      final response = await Supabase.instance.client.from('membros').select();
 
-    if (response.isEmpty) {
-      _showBanner('Nenhum membro cadastrado', const Color.fromARGB(255, 10, 54, 216));
-    }
+      if (response.isEmpty) {
+        _showBanner('Nenhum membro cadastrado', const Color.fromARGB(255, 10, 54, 216));
+      }
 
-    // Converte os dados recebidos para uma lista de mapas
-    setState(() {
-      membersData = (response as List<dynamic>)
-          .map((data) => data as Map<String, dynamic>)
-          .toList();
+      setState(() {
+        membersData = (response as List<dynamic>).map((data) => data as Map<String, dynamic>).toList();
 
-      // Ordena os membros por nome
-      membersData.sort((a, b) {
-        String nameA = a['nomeCompleto']?.toString().toLowerCase() ?? '';
-        String nameB = b['nomeCompleto']?.toString().toLowerCase() ?? '';
-        return nameA.compareTo(nameB);
+        // Ordena os membros por nome
+        membersData.sort((a, b) {
+          String nameA = a['nomeCompleto']?.toString().toLowerCase() ?? '';
+          String nameB = b['nomeCompleto']?.toString().toLowerCase() ?? '';
+          return nameA.compareTo(nameB);
+        });
+
+        filteredMembers = List.from(membersData);
       });
-
-      // Copia a lista para os membros filtrados
-      filteredMembers = List.from(membersData);
-    });
-  } catch (e) {
-    print("Erro ao buscar membros: $e");
-    _showBanner('Erro ao buscar membros', const Color.fromARGB(255, 154, 27, 27));
+    } catch (e) {
+      print("Erro ao buscar membros: $e");
+      _showBanner('Erro ao buscar membros', const Color.fromARGB(255, 154, 27, 27));
+    }
   }
-}
 
   void _filterMembers() {
     String query = removeDiacritics(_searchController.text.toLowerCase());
@@ -193,28 +184,43 @@ class _MembersState extends State<Members> {
   }
 
   Future<void> _deleteMember(int memberId) async {
-  try {
-    // Certifique-se de passar o memberId como int
-    final response = await Supabase.instance.client
-        .from('membros')
-        .delete()
-        .eq('id', memberId)
-        .select();
+    try {
+      // Passo 1: Buscar os dados do membro da tabela `membros`
+      final memberResponse = await Supabase.instance.client.from('membros').select().eq('id', memberId).single();
 
-    if (response == null || response.isEmpty) {
-      throw Exception('Erro ao excluir membro no banco de dados');
+      if (memberResponse == null) {
+        throw Exception('Membro não encontrado no banco de dados.');
+      }
+
+      // Extrai os dados do membro como um mapa
+      final memberData = Map<String, dynamic>.from(memberResponse);
+
+      // Passo 2: Adicionar o timestamp de exclusão
+      memberData['deleted_at'] = DateTime.now().toIso8601String();
+
+      // Passo 3: Inserir o membro na tabela `membros_deleted`
+      final insertResponse = await Supabase.instance.client.from('membros_deleted').insert(memberData).select();
+
+      if (insertResponse == null || insertResponse.isEmpty) {
+        throw Exception('Erro ao mover membro para a tabela de backup.');
+      }
+
+      // Passo 4: Remover o membro da tabela `membros`
+      final deleteResponse = await Supabase.instance.client.from('membros').delete().eq('id', memberId).select();
+
+      if (deleteResponse == null || deleteResponse.isEmpty) {
+        throw Exception('Erro ao excluir membro da tabela principal.');
+      }
+
+      // Exibe mensagem de sucesso no app
+      _showBanner('Membro Excluido!', const Color.fromARGB(255, 154, 27, 27));
+      await _fetchMembers(); // Atualiza a lista de membros
+      await _getMemberCounts(); // Atualiza as contagens de gênero e comungantes
+    } catch (e) {
+      print("Erro ao excluir membro: $e");
+      _showBanner('Erro ao excluir membro.', const Color.fromARGB(255, 154, 27, 27));
     }
-    _showBanner('Membro excluído com sucesso!', const Color(0xFF015B40));
-
-    await _fetchMembers();
-    await _getMemberCounts();
-
-  } catch (e) {
-    print("Erro ao excluir membro: $e");
-    _showBanner('Erro ao excluir membro.', const Color.fromARGB(255, 154, 27, 27));
   }
-}
-
 
   Future<bool> _confirmDelete(BuildContext context) async {
     return await showDialog(
@@ -564,7 +570,10 @@ class _MembersState extends State<Members> {
                             children: [
                               CircleAvatar(
                                 radius: 28,
-                                backgroundImage: member['foto'] != null && member['foto'] is String ? NetworkImage(member['foto']) : const AssetImage('assets/images/avatar_placeholder.png') as ImageProvider,
+                                backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
+                                backgroundImage: (member['imagemMembro'] != null && member['imagemMembro'] is String)
+                                    ? NetworkImage(member['imagemMembro']) // Usa a URL pública
+                                    : const AssetImage('assets/images/avatar_placeholder.png') as ImageProvider,
                               ),
                               const SizedBox(width: 16),
                               Expanded(
@@ -578,7 +587,10 @@ class _MembersState extends State<Members> {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      member['celular'] ?? ['telefone'],
+                                      member['celular'] ??
+                                          [
+                                            'telefone'
+                                          ],
                                       style: const TextStyle(
                                         color: Color(0xFFB5B5B5),
                                       ),
