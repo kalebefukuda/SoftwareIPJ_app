@@ -364,49 +364,42 @@ class _MembersState extends State<Members> {
   }
 
   void _sortByAge() {
+    _filterMembers();
     setState(() {
-      membersData.sort((a, b) {
-        // Obtém as datas de nascimento
+      filteredMembers.sort((a, b) {
         DateTime? dateA = a['dataNascimento'] != null ? DateTime.tryParse(a['dataNascimento']) : null;
         DateTime? dateB = b['dataNascimento'] != null ? DateTime.tryParse(b['dataNascimento']) : null;
 
         if (dateA == null || dateB == null) {
-          // Mantém membros sem data de nascimento no final da lista
           return dateA == null ? 1 : -1;
         }
 
-        // Calcula a idade com base na data atual
         int ageA = DateTime.now().difference(dateA).inDays ~/ 365;
         int ageB = DateTime.now().difference(dateB).inDays ~/ 365;
-
-        // Ordena de forma crescente por idade
         return ageA.compareTo(ageB);
       });
-
-      // Atualiza a lista filtrada
-      filteredMembers = List.from(membersData);
     });
   }
 
   void _sortByRol() {
+    _filterMembers();
     setState(() {
-      membersData.sort((a, b) {
+      filteredMembers.sort((a, b) {
         int rolA = int.tryParse(a['numeroRol'] ?? '0') ?? 0;
         int rolB = int.tryParse(b['numeroRol'] ?? '0') ?? 0;
         return rolA.compareTo(rolB);
       });
-      filteredMembers = List.from(membersData);
     });
   }
 
   void _sortAlphabetically() {
+    _filterMembers();
     setState(() {
-      membersData.sort((a, b) {
+      filteredMembers.sort((a, b) {
         String nameA = a['nomeCompleto']?.toString().toLowerCase() ?? '';
         String nameB = b['nomeCompleto']?.toString().toLowerCase() ?? '';
         return nameA.compareTo(nameB);
       });
-      filteredMembers = List.from(membersData);
     });
   }
 
@@ -582,12 +575,8 @@ class _MembersState extends State<Members> {
                           child: Text(
                             'Idade (1-100)',
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: _selectedSort == 'Idade'
-                                      ? Theme.of(context).textTheme.titleMedium?.color
-                                      : Colors.grey,
-                                  fontWeight: _selectedSort == 'Idade'
-                                      ? FontWeight.w700
-                                      : FontWeight.w500,
+                                  color: _selectedSort == 'Idade' ? Theme.of(context).textTheme.titleMedium?.color : Colors.grey,
+                                  fontWeight: _selectedSort == 'Idade' ? FontWeight.w700 : FontWeight.w500,
                                   fontSize: 14,
                                 ),
                           ),
@@ -597,12 +586,8 @@ class _MembersState extends State<Members> {
                           child: Text(
                             'Número de Rol (0-999)',
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: _selectedSort == 'Número de Rol'
-                                      ? Theme.of(context).textTheme.titleMedium?.color
-                                      : Colors.grey,
-                                  fontWeight: _selectedSort == 'Número de Rol'
-                                      ? FontWeight.w700
-                                      : FontWeight.w500,
+                                  color: _selectedSort == 'Número de Rol' ? Theme.of(context).textTheme.titleMedium?.color : Colors.grey,
+                                  fontWeight: _selectedSort == 'Número de Rol' ? FontWeight.w700 : FontWeight.w500,
                                   fontSize: 14,
                                 ),
                           ),
@@ -612,12 +597,8 @@ class _MembersState extends State<Members> {
                           child: Text(
                             'Ordem Alfabética (A-Z)',
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: _selectedSort == 'Alfabética'
-                                      ? Theme.of(context).textTheme.titleMedium?.color
-                                      : Colors.grey,
-                                  fontWeight: _selectedSort == 'Alfabética'
-                                      ? FontWeight.w700
-                                      : FontWeight.w500,
+                                  color: _selectedSort == 'Alfabética' ? Theme.of(context).textTheme.titleMedium?.color : Colors.grey,
+                                  fontWeight: _selectedSort == 'Alfabética' ? FontWeight.w700 : FontWeight.w500,
                                   fontSize: 14,
                                 ),
                           ),
