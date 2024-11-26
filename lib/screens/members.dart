@@ -1,5 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+
 import '../app.dart';
 import 'package:softwareipj/screens/view_member_screen.dart';
 import 'package:softwareipj/screens/create_members.dart';
@@ -48,6 +50,8 @@ class _MembersState extends State<Members> {
   bool _isBannerVisible = false;
   String _bannerMessage = '';
   Color _bannerColor = Colors.green;
+
+  String? _selectedSort; // Variável para armazenar o tipo de ordenação selecionado
 
   @override
   void initState() {
@@ -135,7 +139,9 @@ class _MembersState extends State<Members> {
     setState(() {
       filteredMembers = membersData.where((member) {
         String nomeCompleto = member['nomeCompleto']?.toString() ?? '';
-        bool matchesQuery = removeDiacritics(nomeCompleto.toLowerCase()).contains(query);
+        String numeroRol = member['numeroRol']?.toString() ?? '';
+
+        bool matchesQuery = removeDiacritics(nomeCompleto.toLowerCase()).contains(query) || numeroRol.contains(query);
 
         bool matchesGender = filterMen
             ? member['sexo']?.toString() == 'Masculino'
@@ -359,6 +365,90 @@ class _MembersState extends State<Members> {
     });
   }
 
+  void _sortByAge() {
+    _filterMembers();
+    setState(() {
+      filteredMembers.sort((a, b) {
+        // Extrai as datas de nascimento
+        String? dateAString = a['dataNascimento'] as String?;
+        String? dateBString = b['dataNascimento'] as String?;
+
+        // Converte as datas para objetos DateTime
+        DateTime? dateA = dateAString != null ? _parseDate(dateAString) : null;
+        DateTime? dateB = dateBString != null ? _parseDate(dateBString) : null;
+
+        // Se ambas as datas são nulas, considera como iguais
+        if (dateA == null && dateB == null) return 0;
+
+        // Se apenas uma das datas é nula, coloca ela como "mais velha"
+        if (dateA == null) return 1;
+        if (dateB == null) return -1;
+
+        // Calcula as idades e compara
+        int ageA = DateTime.now().difference(dateA).inDays ~/ 365;
+        int ageB = DateTime.now().difference(dateB).inDays ~/ 365;
+
+        return ageA.compareTo(ageB); // Ordena em ordem crescente
+      });
+    });
+  }
+
+  void _sortByRol() {
+    _filterMembers();
+    setState(() {
+      filteredMembers.sort((a, b) {
+        int rolA = int.tryParse(a['numeroRol'] ?? '0') ?? 0;
+        int rolB = int.tryParse(b['numeroRol'] ?? '0') ?? 0;
+        return rolA.compareTo(rolB);
+      });
+    });
+  }
+
+  void _sortAlphabetically() {
+    _filterMembers();
+    setState(() {
+      filteredMembers.sort((a, b) {
+        String nameA = a['nomeCompleto']?.toString().toLowerCase() ?? '';
+        String nameB = b['nomeCompleto']?.toString().toLowerCase() ?? '';
+        return nameA.compareTo(nameB);
+      });
+    });
+  }
+
+  int? _calculateAge(String? dateOfBirth) {
+    if (dateOfBirth == null || dateOfBirth.isEmpty) return null;
+
+    try {
+      final birthDate = _parseDate(dateOfBirth);
+      if (birthDate == null) return null;
+
+      final today = DateTime.now();
+      int age = today.year - birthDate.year;
+
+      if (today.month < birthDate.month || (today.month == birthDate.month && today.day < birthDate.day)) {
+        age--;
+      }
+      return age;
+    } catch (e) {
+      print('Erro ao calcular a idade: $e');
+      return null;
+    }
+  }
+
+  DateTime? _parseDate(String date) {
+    try {
+      final parts = date.split('/');
+      if (parts.length == 3) {
+        // Reorganiza a data para o formato ISO 8601
+        final formattedDate = '${parts[2]}-${parts[1].padLeft(2, '0')}-${parts[0].padLeft(2, '0')}';
+        return DateTime.parse(formattedDate);
+      }
+    } catch (e) {
+      print('Erro ao converter data: $e');
+    }
+    return null; // Retorna null se a conversão falhar
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -476,25 +566,96 @@ class _MembersState extends State<Members> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: _searchController,
-                  focusNode: _searchFocusNode,
-                  decoration: InputDecoration(
-                    hintText: 'Pesquisar',
-                    hintStyle: const TextStyle(fontSize: 17, color: Color(0xFFB5B5B5), fontWeight: FontWeight.w400),
-                    filled: true,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 1),
-                    fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide.none,
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        focusNode: _searchFocusNode,
+                        decoration: InputDecoration(
+                          hintText: 'Pesquisar',
+                          hintStyle: const TextStyle(
+                            fontSize: 17,
+                            color: Color(0xFFB5B5B5),
+                            fontWeight: FontWeight.w400,
+                          ),
+                          filled: true,
+                          contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 1),
+                          fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide.none,
+                          ),
+                          prefixIcon: const Icon(
+                            Icons.search,
+                            size: 20,
+                            color: Color(0xFFB5B5B5),
+                          ),
+                        ),
+                      ),
                     ),
-                    prefixIcon: const Icon(
-                      Icons.search,
-                      color: Color(0xFFB5B5B5),
+                    const SizedBox(width: 10),
+                    PopupMenuButton<String>(
+                      icon: Icon(
+                        PhosphorIcons.funnelSimple(),
+                        size: 25.0,
+                      ),
+                      onSelected: (value) {
+                        setState(() {
+                          _selectedSort = value; // Atualiza a seleção
+                        });
+
+                        if (value == 'Idade') {
+                          _sortByAge();
+                        } else if (value == 'Número de Rol') {
+                          _sortByRol();
+                        } else if (value == 'Alfabética') {
+                          _sortAlphabetically();
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        PopupMenuItem(
+                          value: 'Idade',
+                          child: Text(
+                            'Idade (1-100)',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: _selectedSort == 'Idade' ? Theme.of(context).textTheme.titleMedium?.color : Colors.grey,
+                                  fontWeight: _selectedSort == 'Idade' ? FontWeight.w700 : FontWeight.w500,
+                                  fontSize: 14,
+                                ),
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: 'Número de Rol',
+                          child: Text(
+                            'Número de Rol (0-999)',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: _selectedSort == 'Número de Rol' ? Theme.of(context).textTheme.titleMedium?.color : Colors.grey,
+                                  fontWeight: _selectedSort == 'Número de Rol' ? FontWeight.w700 : FontWeight.w500,
+                                  fontSize: 14,
+                                ),
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: 'Alfabética',
+                          child: Text(
+                            'Ordem Alfabética (A-Z)',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: _selectedSort == 'Alfabética' ? Theme.of(context).textTheme.titleMedium?.color : Colors.grey,
+                                  fontWeight: _selectedSort == 'Alfabética' ? FontWeight.w700 : FontWeight.w500,
+                                  fontSize: 14,
+                                ),
+                          ),
+                        ),
+                      ],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      offset: const Offset(0, 50),
                     ),
-                  ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -586,14 +747,31 @@ class _MembersState extends State<Members> {
                                       style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 16),
                                     ),
                                     const SizedBox(height: 4),
-                                    Text(
-                                      member['celular'] ??
-                                          [
-                                            'telefone'
-                                          ],
-                                      style: const TextStyle(
-                                        color: Color(0xFFB5B5B5),
-                                      ),
+                                    Row(
+                                      children: [
+                                        if (member['dataNascimento'] != null && member['dataNascimento'] is String) ...[
+                                          Icon(
+                                            Icons.cake, // Ícone de bolo
+                                            color: const Color(0xFFB5B5B5),
+                                            size: 16,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            '${_calculateAge(member['dataNascimento']) ?? 'N/A'} anos', // Calcula e exibe a idade
+                                            style: const TextStyle(),
+                                          ),
+                                          const SizedBox(width: 16), // Espaço entre idade e telefone
+                                        ],
+                                        Icon(
+                                          Icons.phone_iphone_rounded, // Ícone de telefone
+                                          color: const Color(0xFFB5B5B5),
+                                          size: 16,
+                                        ),
+                                        Text(
+                                          member['celular'] ?? 'Telefone não disponível',
+                                          style: const TextStyle(),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
