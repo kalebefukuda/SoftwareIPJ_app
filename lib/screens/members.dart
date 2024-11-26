@@ -139,7 +139,9 @@ class _MembersState extends State<Members> {
     setState(() {
       filteredMembers = membersData.where((member) {
         String nomeCompleto = member['nomeCompleto']?.toString() ?? '';
-        bool matchesQuery = removeDiacritics(nomeCompleto.toLowerCase()).contains(query);
+        String numeroRol = member['numeroRol']?.toString() ?? '';
+
+        bool matchesQuery = removeDiacritics(nomeCompleto.toLowerCase()).contains(query) || numeroRol.contains(query);
 
         bool matchesGender = filterMen
             ? member['sexo']?.toString() == 'Masculino'
@@ -364,32 +366,32 @@ class _MembersState extends State<Members> {
   }
 
   void _sortByAge() {
-  _filterMembers();
-  setState(() {
-    filteredMembers.sort((a, b) {
-      // Extrai as datas de nascimento
-      String? dateAString = a['dataNascimento'] as String?;
-      String? dateBString = b['dataNascimento'] as String?;
+    _filterMembers();
+    setState(() {
+      filteredMembers.sort((a, b) {
+        // Extrai as datas de nascimento
+        String? dateAString = a['dataNascimento'] as String?;
+        String? dateBString = b['dataNascimento'] as String?;
 
-      // Converte as datas para objetos DateTime
-      DateTime? dateA = dateAString != null ? _parseDate(dateAString) : null;
-      DateTime? dateB = dateBString != null ? _parseDate(dateBString) : null;
+        // Converte as datas para objetos DateTime
+        DateTime? dateA = dateAString != null ? _parseDate(dateAString) : null;
+        DateTime? dateB = dateBString != null ? _parseDate(dateBString) : null;
 
-      // Se ambas as datas são nulas, considera como iguais
-      if (dateA == null && dateB == null) return 0;
+        // Se ambas as datas são nulas, considera como iguais
+        if (dateA == null && dateB == null) return 0;
 
-      // Se apenas uma das datas é nula, coloca ela como "mais velha"
-      if (dateA == null) return 1;
-      if (dateB == null) return -1;
+        // Se apenas uma das datas é nula, coloca ela como "mais velha"
+        if (dateA == null) return 1;
+        if (dateB == null) return -1;
 
-      // Calcula as idades e compara
-      int ageA = DateTime.now().difference(dateA).inDays ~/ 365;
-      int ageB = DateTime.now().difference(dateB).inDays ~/ 365;
+        // Calcula as idades e compara
+        int ageA = DateTime.now().difference(dateA).inDays ~/ 365;
+        int ageB = DateTime.now().difference(dateB).inDays ~/ 365;
 
-      return ageA.compareTo(ageB); // Ordena em ordem crescente
+        return ageA.compareTo(ageB); // Ordena em ordem crescente
+      });
     });
-  });
-}
+  }
 
   void _sortByRol() {
     _filterMembers();
@@ -756,8 +758,7 @@ class _MembersState extends State<Members> {
                                           const SizedBox(width: 4),
                                           Text(
                                             '${_calculateAge(member['dataNascimento']) ?? 'N/A'} anos', // Calcula e exibe a idade
-                                            style: const TextStyle(
-                                            ),
+                                            style: const TextStyle(),
                                           ),
                                           const SizedBox(width: 16), // Espaço entre idade e telefone
                                         ],
@@ -768,9 +769,7 @@ class _MembersState extends State<Members> {
                                         ),
                                         Text(
                                           member['celular'] ?? 'Telefone não disponível',
-                                          style: const TextStyle(
-                                            
-                                          ),
+                                          style: const TextStyle(),
                                         ),
                                       ],
                                     ),
