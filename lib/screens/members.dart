@@ -1,5 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+
 import '../app.dart';
 import 'package:softwareipj/screens/view_member_screen.dart';
 import 'package:softwareipj/screens/create_members.dart';
@@ -359,6 +361,53 @@ class _MembersState extends State<Members> {
     });
   }
 
+  void _sortByAge() {
+    setState(() {
+      membersData.sort((a, b) {
+        // Obtém as datas de nascimento
+        DateTime? dateA = a['dataNascimento'] != null ? DateTime.tryParse(a['dataNascimento']) : null;
+        DateTime? dateB = b['dataNascimento'] != null ? DateTime.tryParse(b['dataNascimento']) : null;
+
+        if (dateA == null || dateB == null) {
+          // Mantém membros sem data de nascimento no final da lista
+          return dateA == null ? 1 : -1;
+        }
+
+        // Calcula a idade com base na data atual
+        int ageA = DateTime.now().difference(dateA).inDays ~/ 365;
+        int ageB = DateTime.now().difference(dateB).inDays ~/ 365;
+
+        // Ordena de forma crescente por idade
+        return ageA.compareTo(ageB);
+      });
+
+      // Atualiza a lista filtrada
+      filteredMembers = List.from(membersData);
+    });
+  }
+
+  void _sortByRol() {
+    setState(() {
+      membersData.sort((a, b) {
+        int rolA = int.tryParse(a['numeroRol'] ?? '0') ?? 0;
+        int rolB = int.tryParse(b['numeroRol'] ?? '0') ?? 0;
+        return rolA.compareTo(rolB);
+      });
+      filteredMembers = List.from(membersData);
+    });
+  }
+
+  void _sortAlphabetically() {
+    setState(() {
+      membersData.sort((a, b) {
+        String nameA = a['nomeCompleto']?.toString().toLowerCase() ?? '';
+        String nameB = b['nomeCompleto']?.toString().toLowerCase() ?? '';
+        return nameA.compareTo(nameB);
+      });
+      filteredMembers = List.from(membersData);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -476,25 +525,89 @@ class _MembersState extends State<Members> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: _searchController,
-                  focusNode: _searchFocusNode,
-                  decoration: InputDecoration(
-                    hintText: 'Pesquisar',
-                    hintStyle: const TextStyle(fontSize: 17, color: Color(0xFFB5B5B5), fontWeight: FontWeight.w400),
-                    filled: true,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 1),
-                    fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide.none,
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        focusNode: _searchFocusNode,
+                        decoration: InputDecoration(
+                          hintText: 'Pesquisar',
+                          hintStyle: const TextStyle(
+                            fontSize: 17,
+                            color: Color(0xFFB5B5B5),
+                            fontWeight: FontWeight.w400,
+                          ),
+                          filled: true,
+                          contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 1),
+                          fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide.none,
+                          ),
+                          prefixIcon: const Icon(
+                            Icons.search,
+                            size: 20,
+                            color: Color(0xFFB5B5B5),
+                          ),
+                        ),
+                      ),
                     ),
-                    prefixIcon: const Icon(
-                      Icons.search,
-                      color: Color(0xFFB5B5B5),
+                    const SizedBox(width: 10),
+                    PopupMenuButton<String>(
+                      icon: Icon(
+                        PhosphorIcons.funnelSimple(),
+                        size: 25.0,
+                      ),
+                      onSelected: (value) {
+                        if (value == 'Idade') {
+                          _sortByAge();
+                        } else if (value == 'Número de Rol') {
+                          _sortByRol();
+                        } else if (value == 'Alfabética') {
+                          _sortAlphabetically();
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        PopupMenuItem(
+                          value: 'Idade',
+                          child: Text(
+                            'Idade',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14,
+                                ),
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: 'Número de Rol',
+                          child: Text(
+                            'Número de Rol (Crescente)',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14,
+                                ),
+                          ),
+                        ),
+                        PopupMenuItem(
+                          value: 'Alfabética',
+                          child: Text(
+                            'Ordem Alfabética (A-Z)',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14,
+                                ),
+                          ),
+                        ),
+                      ],
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      offset: const Offset(0, 50), // Posiciona abaixo do ícone
                     ),
-                  ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 Text(

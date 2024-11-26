@@ -1,7 +1,6 @@
 import 'package:softwareipj/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'dart:io'; // Para lidar com o arquivo de imagem selecionado
 import 'package:image_picker/image_picker.dart'; // Pacote para selecionar a imagem
 import '../utils/constants/app_colors.dart';
 import '../widgets/custom_text_field.dart';
@@ -81,7 +80,6 @@ class _ViewMemberScreenState extends State<ViewMemberScreen> {
   final TextEditingController reeleitoPresb1Controller = TextEditingController();
   final TextEditingController reeleitoPresb2Controller = TextEditingController();
   final TextEditingController reeleitoPresb3Controller = TextEditingController();
-  File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
 
   @override
@@ -785,7 +783,7 @@ class _ViewMemberScreenState extends State<ViewMemberScreen> {
 
     if (pickedFile != null) {
       setState(() {
-        _selectedImage = File(pickedFile.path); // Atualiza o estado com a imagem selecionada
+// Atualiza o estado com a imagem selecionada
       });
     }
   }
