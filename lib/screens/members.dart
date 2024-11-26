@@ -51,6 +51,8 @@ class _MembersState extends State<Members> {
   String _bannerMessage = '';
   Color _bannerColor = Colors.green;
 
+  String? _selectedSort; // Variável para armazenar o tipo de ordenação selecionado
+
   @override
   void initState() {
     super.initState();
@@ -562,6 +564,10 @@ class _MembersState extends State<Members> {
                         size: 25.0,
                       ),
                       onSelected: (value) {
+                        setState(() {
+                          _selectedSort = value; // Atualiza a seleção
+                        });
+
                         if (value == 'Idade') {
                           _sortByAge();
                         } else if (value == 'Número de Rol') {
@@ -574,9 +580,14 @@ class _MembersState extends State<Members> {
                         PopupMenuItem(
                           value: 'Idade',
                           child: Text(
-                            'Idade',
+                            'Idade (1-100)',
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w500,
+                                  color: _selectedSort == 'Idade'
+                                      ? Theme.of(context).textTheme.titleMedium?.color
+                                      : Colors.grey,
+                                  fontWeight: _selectedSort == 'Idade'
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
                                   fontSize: 14,
                                 ),
                           ),
@@ -584,9 +595,14 @@ class _MembersState extends State<Members> {
                         PopupMenuItem(
                           value: 'Número de Rol',
                           child: Text(
-                            'Número de Rol (Crescente)',
+                            'Número de Rol (0-999)',
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w500,
+                                  color: _selectedSort == 'Número de Rol'
+                                      ? Theme.of(context).textTheme.titleMedium?.color
+                                      : Colors.grey,
+                                  fontWeight: _selectedSort == 'Número de Rol'
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
                                   fontSize: 14,
                                 ),
                           ),
@@ -596,7 +612,12 @@ class _MembersState extends State<Members> {
                           child: Text(
                             'Ordem Alfabética (A-Z)',
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w500,
+                                  color: _selectedSort == 'Alfabética'
+                                      ? Theme.of(context).textTheme.titleMedium?.color
+                                      : Colors.grey,
+                                  fontWeight: _selectedSort == 'Alfabética'
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
                                   fontSize: 14,
                                 ),
                           ),
@@ -605,7 +626,7 @@ class _MembersState extends State<Members> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      offset: const Offset(0, 50), // Posiciona abaixo do ícone
+                      offset: const Offset(0, 50),
                     ),
                   ],
                 ),
