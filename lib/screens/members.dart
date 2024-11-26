@@ -364,22 +364,32 @@ class _MembersState extends State<Members> {
   }
 
   void _sortByAge() {
-    _filterMembers();
-    setState(() {
-      filteredMembers.sort((a, b) {
-        DateTime? dateA = a['dataNascimento'] != null ? DateTime.tryParse(a['dataNascimento']) : null;
-        DateTime? dateB = b['dataNascimento'] != null ? DateTime.tryParse(b['dataNascimento']) : null;
+  _filterMembers();
+  setState(() {
+    filteredMembers.sort((a, b) {
+      // Extrai as datas de nascimento
+      String? dateAString = a['dataNascimento'] as String?;
+      String? dateBString = b['dataNascimento'] as String?;
 
-        if (dateA == null || dateB == null) {
-          return dateA == null ? 1 : -1;
-        }
+      // Converte as datas para objetos DateTime
+      DateTime? dateA = dateAString != null ? _parseDate(dateAString) : null;
+      DateTime? dateB = dateBString != null ? _parseDate(dateBString) : null;
 
-        int ageA = DateTime.now().difference(dateA).inDays ~/ 365;
-        int ageB = DateTime.now().difference(dateB).inDays ~/ 365;
-        return ageA.compareTo(ageB);
-      });
+      // Se ambas as datas são nulas, considera como iguais
+      if (dateA == null && dateB == null) return 0;
+
+      // Se apenas uma das datas é nula, coloca ela como "mais velha"
+      if (dateA == null) return 1;
+      if (dateB == null) return -1;
+
+      // Calcula as idades e compara
+      int ageA = DateTime.now().difference(dateA).inDays ~/ 365;
+      int ageB = DateTime.now().difference(dateB).inDays ~/ 365;
+
+      return ageA.compareTo(ageB); // Ordena em ordem crescente
     });
-  }
+  });
+}
 
   void _sortByRol() {
     _filterMembers();
@@ -401,6 +411,40 @@ class _MembersState extends State<Members> {
         return nameA.compareTo(nameB);
       });
     });
+  }
+
+  int? _calculateAge(String? dateOfBirth) {
+    if (dateOfBirth == null || dateOfBirth.isEmpty) return null;
+
+    try {
+      final birthDate = _parseDate(dateOfBirth);
+      if (birthDate == null) return null;
+
+      final today = DateTime.now();
+      int age = today.year - birthDate.year;
+
+      if (today.month < birthDate.month || (today.month == birthDate.month && today.day < birthDate.day)) {
+        age--;
+      }
+      return age;
+    } catch (e) {
+      print('Erro ao calcular a idade: $e');
+      return null;
+    }
+  }
+
+  DateTime? _parseDate(String date) {
+    try {
+      final parts = date.split('/');
+      if (parts.length == 3) {
+        // Reorganiza a data para o formato ISO 8601
+        final formattedDate = '${parts[2]}-${parts[1].padLeft(2, '0')}-${parts[0].padLeft(2, '0')}';
+        return DateTime.parse(formattedDate);
+      }
+    } catch (e) {
+      print('Erro ao converter data: $e');
+    }
+    return null; // Retorna null se a conversão falhar
   }
 
   @override
@@ -701,14 +745,34 @@ class _MembersState extends State<Members> {
                                       style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 16),
                                     ),
                                     const SizedBox(height: 4),
-                                    Text(
-                                      member['celular'] ??
-                                          [
-                                            'telefone'
-                                          ],
-                                      style: const TextStyle(
-                                        color: Color(0xFFB5B5B5),
-                                      ),
+                                    Row(
+                                      children: [
+                                        if (member['dataNascimento'] != null && member['dataNascimento'] is String) ...[
+                                          Icon(
+                                            Icons.cake, // Ícone de bolo
+                                            color: const Color(0xFFB5B5B5),
+                                            size: 16,
+                                          ),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            '${_calculateAge(member['dataNascimento']) ?? 'N/A'} anos', // Calcula e exibe a idade
+                                            style: const TextStyle(
+                                            ),
+                                          ),
+                                          const SizedBox(width: 16), // Espaço entre idade e telefone
+                                        ],
+                                        Icon(
+                                          Icons.phone_iphone_rounded, // Ícone de telefone
+                                          color: const Color(0xFFB5B5B5),
+                                          size: 16,
+                                        ),
+                                        Text(
+                                          member['celular'] ?? 'Telefone não disponível',
+                                          style: const TextStyle(
+                                            
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
