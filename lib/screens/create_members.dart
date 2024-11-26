@@ -94,8 +94,23 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
 
-  Future<String?> _uploadImageToSupabase(File imageFile) async {
+  Future<String?> _uploadImageToSupabase(File imageFile, {String? oldImageUrl}) async {
     try {
+      // Excluir a foto antiga, se houver uma
+      if (oldImageUrl != null && oldImageUrl.isNotEmpty) {
+        final oldFileName = oldImageUrl.split('/').last; // Nome do arquivo antigo
+        final deleteResponse = await Supabase.instance.client.storage.from('membros_storage').remove([
+          oldFileName
+        ]);
+
+        if (deleteResponse.isEmpty) {
+          print('Nenhum arquivo foi excluído. Verifique se o arquivo existe: $oldFileName');
+        } else {
+          print('Imagem antiga removida com sucesso: $oldFileName');
+        }
+      }
+
+      // Fazer o upload da nova imagem
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final fileName = '$timestamp.jpg';
 
@@ -103,8 +118,6 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
       print('Tamanho do arquivo: ${imageFile.lengthSync()} bytes');
 
       final response = await Supabase.instance.client.storage.from('membros_storage').upload(fileName, imageFile);
-
-      print('Resposta do Supabase: $response');
 
       if (response.isEmpty) {
         print('Erro ao fazer upload: Resposta vazia');
@@ -254,12 +267,15 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
       String? imageUrl;
       final user = Supabase.instance.client.auth.currentUser;
 
-      // Verifica se há uma imagem selecionada
+      // Verificar se há uma nova imagem para fazer upload
       if (_selectedImage != null) {
-        imageUrl = await _uploadImageToSupabase(_selectedImage!);
+        imageUrl = await _uploadImageToSupabase(
+          _selectedImage!,
+          oldImageUrl: widget.memberData?['imagemMembro'], // Passa a URL da imagem antiga
+        );
         if (imageUrl == null) {
           _showBanner('Erro ao fazer upload da imagem.', const Color.fromARGB(255, 154, 27, 27));
-          return false; // Retorna falso se o upload falhar
+          return false;
         }
       }
 
@@ -431,40 +447,84 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   // Adicionando o círculo de foto no início
                   MouseRegion(
                     cursor: SystemMouseCursors.click, // Define o cursor como 'pointer' ao passar o mouse
-                    child: GestureDetector(
-                      onTap: _pickImage, // Função para selecionar a imagem
-                      child: CircleAvatar(
-                        radius: 70,
-                        backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
-                        child: ClipOval(
-                          child: _selectedImage != null
-                              ? Image.file(
-                                  _selectedImage!,
-                                  width: 140,
-                                  height: 140,
-                                  fit: BoxFit.cover,
-                                )
-                              : (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty)
-                                  ? Image.network(
-                                      widget.memberData!['imagemMembro'],
+                    child: Column(
+                      children: [
+                        GestureDetector(
+                          onTap: _pickImage, // Função para selecionar a imagem
+                          child: CircleAvatar(
+                            radius: 70,
+                            backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
+                            child: ClipOval(
+                              child: _selectedImage != null
+                                  ? Image.file(
+                                      _selectedImage!,
                                       width: 140,
                                       height: 140,
                                       fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) => SvgPicture.asset(
-                                        'assets/images/user-round.svg',
-                                        height: 50,
-                                        width: 50,
-                                        color: Theme.of(context).iconTheme.color,
-                                      ),
                                     )
-                                  : SvgPicture.asset(
-                                      'assets/images/user-round.svg',
-                                      height: 50,
-                                      width: 50,
-                                      color: Theme.of(context).iconTheme.color,
-                                    ),
+                                  : (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty)
+                                      ? Image.network(
+                                          widget.memberData!['imagemMembro'],
+                                          width: 140,
+                                          height: 140,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) => SvgPicture.asset(
+                                            'assets/images/user-round.svg',
+                                            height: 50,
+                                            width: 50,
+                                            color: Theme.of(context).iconTheme.color,
+                                          ),
+                                        )
+                                      : SvgPicture.asset(
+                                          'assets/images/user-round.svg',
+                                          height: 50,
+                                          width: 50,
+                                          color: Theme.of(context).iconTheme.color,
+                                        ),
+                            ),
+                          ),
                         ),
-                      ),
+                        // Adiciona o botão "Remover Foto" somente se houver uma foto carregada
+                        if (_selectedImage != null || (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty))
+                          TextButton(
+                            onPressed: () async {
+                              try {
+                                // Remover imagem associada ao membro
+                                if (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty) {
+                                  final oldFileName = widget.memberData!['imagemMembro'].split('/').last;
+                                  final deleteResponse = await Supabase.instance.client.storage.from('membros_storage').remove([
+                                    oldFileName
+                                  ]);
+
+                                  if (deleteResponse.isEmpty) {
+                                    print('Nenhum arquivo foi excluído. Verifique se o arquivo existe: $oldFileName');
+                                  } else {
+                                    print('Imagem antiga removida: $oldFileName');
+                                  }
+                                }
+
+                                // Limpar o estado da imagem
+                                setState(() {
+                                  _selectedImage = null;
+                                  if (widget.memberData != null) {
+                                    widget.memberData!['imagemMembro'] = ''; // Remove a URL no caso de edição
+                                  }
+                                });
+                              } catch (e) {
+                                _showBanner('Erro ao remover a imagem.', const Color.fromARGB(255, 154, 27, 27));
+                                print('Erro ao remover imagem: $e');
+                              }
+                            },
+                            child: const Text(
+                              'Remover Foto',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: 30),
