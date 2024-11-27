@@ -759,21 +759,8 @@ class _MembersState extends State<Members> {
                                     const SizedBox(height: 4),
                                     Row(
                                       children: [
-                                        if (member['dataNascimento'] != null && member['dataNascimento'] is String) ...[
-                                          Icon(
-                                            Icons.cake, // Ícone de bolo
-                                            color: const Color(0xFFB5B5B5),
-                                            size: 16,
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            '${_calculateAge(member['dataNascimento']) ?? 'N/A'} anos', // Calcula e exibe a idade
-                                            style: const TextStyle(),
-                                          ),
-                                          const SizedBox(width: 16), // Espaço entre idade e telefone
-                                        ],
                                         Icon(
-                                          Icons.phone_iphone_rounded, // Ícone de telefone
+                                          Icons.phone_iphone_rounded,
                                           color: const Color(0xFFB5B5B5),
                                           size: 16,
                                         ),
