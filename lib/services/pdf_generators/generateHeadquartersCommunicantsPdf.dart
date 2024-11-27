@@ -61,7 +61,7 @@ Future<void> generateHeadquartersCommunicantsPdf() async {
     // Ordene por nome
     membersList.sort((a, b) => a["name"]!.compareTo(b["name"]!));
   } else {
-    print("Nenhum dado encontrado no Firestore.");
+    print("Nenhum dado encontrado no Database.");
   }
 
   // Paginação do conteúdo
