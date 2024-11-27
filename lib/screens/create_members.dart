@@ -1,28 +1,31 @@
+// ignore_for_file: unused_local_variable
+import '../app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'dart:io'; // Para lidar com o arquivo de imagem selecionado
-import 'package:image_picker/image_picker.dart'; // Pacote para selecionar a imagem
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import '../utils/constants/app_colors.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_button.dart';
-import '../widgets/local.dart'; // Importe o widget personalizado
-import '../widgets/custom_drop_down.dart'; // Campo de dropdown
-import '../widgets/sidebar.dart'; // Adiciona a sidebar
+import '../widgets/local.dart';
+import '../widgets/custom_drop_down.dart';
+import '../widgets/sidebar.dart';
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import '../widgets/custom_banner.dart';
-import '../services/member_service.dart';
+import '../screens/members.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CreateMembersScreen extends StatefulWidget {
-  final Function(bool) onThemeToggle;
-  final ValueNotifier<bool> isDarkModeNotifier;
   final Map<String, dynamic>? memberData; // Dados do membro, se for uma edição
+  final Function(ThemeModeOptions) onThemeToggle;
+  final ValueNotifier<ThemeModeOptions> themeModeNotifier;
 
   const CreateMembersScreen({
     super.key,
     required this.onThemeToggle,
-    required this.isDarkModeNotifier,
     this.memberData,
+    required this.themeModeNotifier,
   });
 
   @override
@@ -36,7 +39,10 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
   String _bannerMessage = ''; // Armazena a mensagem do banner
   Color _bannerColor = Colors.green; // Armazena a cor do banner
 
-  final MemberService _memberService = MemberService();
+  final ScrollController _scrollController = ScrollController();
+
+  final _formKey = GlobalKey<FormState>(); // Adicionei o GlobalKey para o formulário
+  final Map<String, bool> _fieldErrors = {}; // Mapeia campos com erro para borda vermelha
 
   final TextEditingController nomeCompletoController = TextEditingController();
   final TextEditingController comunganteController = TextEditingController();
@@ -87,6 +93,118 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
   final TextEditingController reeleitoPresb3Controller = TextEditingController();
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
+
+  Future<String?> _uploadImageToSupabase(File imageFile, {String? oldImageUrl}) async {
+    try {
+      // Excluir a foto antiga, se houver uma
+      if (oldImageUrl != null && oldImageUrl.isNotEmpty) {
+        final oldFileName = oldImageUrl.split('/').last; // Nome do arquivo antigo
+        final deleteResponse = await Supabase.instance.client.storage.from('membros_storage').remove([
+          oldFileName
+        ]);
+
+        if (deleteResponse.isEmpty) {
+          print('Nenhum arquivo foi excluído. Verifique se o arquivo existe: $oldFileName');
+        } else {
+          print('Imagem antiga removida com sucesso: $oldFileName');
+        }
+      }
+
+      // Fazer o upload da nova imagem
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final fileName = '$timestamp.jpg';
+
+      print('Iniciando upload... Arquivo: $fileName');
+      print('Tamanho do arquivo: ${imageFile.lengthSync()} bytes');
+
+      final response = await Supabase.instance.client.storage.from('membros_storage').upload(fileName, imageFile);
+
+      if (response.isEmpty) {
+        print('Erro ao fazer upload: Resposta vazia');
+        return null;
+      }
+
+      final publicUrl = Supabase.instance.client.storage.from('membros_storage').getPublicUrl(fileName);
+      print('URL pública gerada: $publicUrl');
+      return publicUrl;
+    } catch (e) {
+      print('Erro ao fazer upload da imagem: $e');
+      return null;
+    }
+  }
+
+  // Validação dos campos
+  Future<void> _validateFields() async {
+    setState(() {
+      _fieldErrors.clear();
+    });
+
+    // Verifica campos obrigatórios e adiciona ao mapa de erros
+    if (nomeCompletoController.text.trim().isEmpty) {
+      _fieldErrors['nomeCompleto'] = true;
+    }
+    if (dataNascimentoController.text.trim().isEmpty) {
+      _fieldErrors['dataNascimento'] = true;
+    }
+    if (numeroRolController.text.trim().isEmpty) {
+      _fieldErrors['numeroRol'] = true;
+    }
+    if (residenciaController.text.trim().isEmpty) {
+      _fieldErrors['residenciaLocal'] = true;
+    }
+    if (celularController.text.trim().isEmpty) {
+      _fieldErrors['celular'] = true;
+    }
+    if (comunganteController.text.trim().isEmpty) {
+      _fieldErrors['comungante'] = true;
+    }
+    if (sexoController.text.trim().isEmpty) {
+      _fieldErrors['sexo'] = true;
+    }
+
+    // Verifica duplicidade do número de rol
+    if (numeroRolController.text.trim().isNotEmpty) {
+      bool isDuplicate = await _isNumeroRolDuplicado(numeroRolController.text);
+      if (isDuplicate) {
+        _fieldErrors['numeroRol'] = true;
+      }
+    }
+
+    // Após validar, role para o primeiro campo com erro
+    if (_fieldErrors.isNotEmpty) {
+      _scrollToFirstError();
+    }
+  }
+
+  void _scrollToFirstError() {
+    // Encontra o índice do primeiro erro
+    final firstErrorFieldKey = _fieldErrors.keys.first;
+    double offset = 0.0;
+
+    // Define a posição de rolagem com base no campo com erro
+    if (firstErrorFieldKey == 'nomeCompleto') {
+      offset = 100; // Posição aproximada do campo Nome Completo
+    } else if (firstErrorFieldKey == 'comungante') {
+      offset = 150; // Posição aproximada do campo Comuga te
+    } else if (firstErrorFieldKey == 'numeroRol') {
+      offset = 150; // Posição aproximada do campo Número de Rol
+    } else if (firstErrorFieldKey == 'sexo') {
+      offset = 200; // Posição aproximada do campo Sexo
+    } else if (firstErrorFieldKey == 'dataNascimento') {
+      offset = 200; // Posição aproximada do campo Data
+    } else if (firstErrorFieldKey == 'celular') {
+      offset = 800; // Posição aproximada do campo ComungCelularante
+    } else if (firstErrorFieldKey == 'residenciaLocal') {
+      offset = 1350; // Posição aproximada do campo Residencia Local
+    }
+
+    // Rola até a posição calculada
+    _scrollController.animateTo(
+      offset,
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeInOut,
+    );
+  }
 
   @override
   void initState() {
@@ -144,13 +262,28 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
     }
   }
 
-  Future<void> _saveMember() async {
+  Future<bool> _saveMember() async {
     try {
+      String? imageUrl;
+      final user = Supabase.instance.client.auth.currentUser;
+
+      // Verificar se há uma nova imagem para fazer upload
+      if (_selectedImage != null) {
+        imageUrl = await _uploadImageToSupabase(
+          _selectedImage!,
+          oldImageUrl: widget.memberData?['imagemMembro'], // Passa a URL da imagem antiga
+        );
+        if (imageUrl == null) {
+          _showBanner('Erro ao fazer upload da imagem.', const Color.fromARGB(255, 154, 27, 27));
+          return false;
+        }
+      }
+
       // Cria o mapa com os dados do membro
       Map<String, dynamic> memberData = {
         'nomeCompleto': nomeCompletoController.text,
         'comungante': comunganteController.text,
-        'numeroRol': int.tryParse(numeroRolController.text) ?? 0,
+        'numeroRol': numeroRolController.text,
         'dataNascimento': dataNascimentoController.text,
         'sexo': sexoController.text,
         'cidadeNascimento': cidadeNascimentoController.text,
@@ -195,20 +328,56 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
         'reeleitoPresb1': reeleitoPresb1Controller.text,
         'reeleitoPresb2': reeleitoPresb2Controller.text,
         'reeleitoPresb3': reeleitoPresb3Controller.text,
+        'imagemMembro': imageUrl,
+        'created_at': DateTime.now().toIso8601String(),
       };
 
-      // Chama o serviço para adicionar o membro
+      // Verifica se é uma edição ou criação
       if (widget.memberData != null) {
-        // Atualize o membro existente
-        await _memberService.updateMember(widget.memberData!['id'], memberData);
+        // É uma edição, então faz update
+        final response = await Supabase.instance.client.from('membros').update(memberData).eq('id', widget.memberData!['id']).select();
+
+        if (response.isEmpty) {
+          throw Exception('Erro ao atualizar membro no banco de dados');
+        }
+
+        _showBanner('Membro atualizado com sucesso!', const Color(0xFF015B40));
       } else {
-        // Crie um novo membro
-        await _memberService.addMember(memberData);
+        // É uma criação, então insere um novo registro
+        final response = await Supabase.instance.client.from('membros').insert(memberData).select();
+
+        if (response.isEmpty) {
+          throw Exception('Erro ao salvar membro no banco de dados');
+        }
+
+        _showBanner('Membro salvo com sucesso!', const Color(0xFF015B40));
       }
 
-      _showBanner('Membro salvo com sucesso!', const Color(0xFF015B40));
+      return true;
     } catch (e) {
-      _showBanner('Erro ao salvar membro', const Color.fromARGB(255, 154, 27, 27));
+      _showBanner('Erro ao salvar membro.', const Color.fromARGB(255, 154, 27, 27));
+      print("Erro ao salvar membro: $e");
+      return false;
+    }
+  }
+
+  Future<bool> _isNumeroRolDuplicado(String numeroRol) async {
+    if (numeroRol.isEmpty) return false;
+
+    try {
+      final response = await Supabase.instance.client.from('membros').select('id').eq('numeroRol', numeroRol);
+
+      if (response.isEmpty) {
+        return false;
+      }
+
+      if (widget.memberData != null) {
+        return response.any((data) => data['id'] != widget.memberData!['id']);
+      }
+      return true;
+    } catch (e) {
+      print("Erro ao verificar número de rol duplicado: $e");
+      return false;
     }
   }
 
@@ -220,6 +389,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
     complementoController.dispose();
     cidadeAtualController.dispose();
     estadoAtualController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -231,7 +401,6 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
     });
   }
 
-  // Definindo a função _hideBanner
   void _hideBanner() {
     setState(() {
       _isBannerVisible = false;
@@ -267,45 +436,110 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
           centerTitle: true,
         ),
         body: Stack(
+          key: _formKey, // Associa a chave do formulário
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(23.0, 0.0, 23.0, 0.0), // Adiciona um padding inferior maior
               child: ListView(
+                controller: _scrollController, // Adicione o controlador aqui
                 children: [
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 30),
                   // Adicionando o círculo de foto no início
                   MouseRegion(
-                    cursor: SystemMouseCursors.click, // Define o cursor como 'pointer' ao passar o mouse
-                    child: GestureDetector(
-                      onTap: _pickImage, // Função para selecionar a imagem
-                      child: CircleAvatar(
-                        radius: 70,
-                        backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
-                        child: _selectedImage == null
-                            ? Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/images/user-round.svg',
-                                    height: 50,
-                                    width: 50,
-                                    // ignore: deprecated_member_use
-                                    color: Theme.of(context).iconTheme.color, // Usa a cor do iconTheme conforme o tema
-                                  ),
-                                ],
-                              )
-                            : ClipOval(
-                                child: Image.file(
-                                  _selectedImage!,
-                                  width: 100,
-                                  height: 100,
-                                  fit: BoxFit.cover,
+                    cursor: SystemMouseCursors.click,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Coloca a imagem como fundo do Stack
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            GestureDetector(
+                              onTap: _pickImage, // Função para selecionar a imagem
+                              child: CircleAvatar(
+                                radius: 70,
+                                backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
+                                child: ClipOval(
+                                  child: _selectedImage != null
+                                      ? Image.file(
+                                          _selectedImage!,
+                                          width: 140,
+                                          height: 140,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty)
+                                          ? Image.network(
+                                              widget.memberData!['imagemMembro'],
+                                              width: 140,
+                                              height: 140,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (context, error, stackTrace) => SvgPicture.asset(
+                                                'assets/images/user-round.svg',
+                                                height: 50,
+                                                width: 50,
+                                                color: Theme.of(context).iconTheme.color,
+                                              ),
+                                            )
+                                          : SvgPicture.asset(
+                                              'assets/images/user-round.svg',
+                                              height: 50,
+                                              width: 50,
+                                              color: Theme.of(context).iconTheme.color,
+                                            ),
                                 ),
                               ),
-                      ),
+                            ),
+                            const SizedBox(height: 40), // Espaçamento fixo para "Informações Pessoais"
+                          ],
+                        ),
+
+                        // Botão "Remover Foto"
+                        if (_selectedImage != null || (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty))
+                          Positioned(
+                            bottom: -5, // Posiciona o botão logo abaixo do CircleAvatar
+                            child: TextButton(
+                              onPressed: () async {
+                                try {
+                                  // Remover imagem associada ao membro
+                                  if (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty) {
+                                    final oldFileName = widget.memberData!['imagemMembro'].split('/').last;
+                                    final deleteResponse = await Supabase.instance.client.storage.from('membros_storage').remove([
+                                      oldFileName
+                                    ]);
+
+                                    if (deleteResponse.isEmpty) {
+                                      print('Nenhum arquivo foi excluído. Verifique se o arquivo existe: $oldFileName');
+                                    } else {
+                                      print('Imagem antiga removida: $oldFileName');
+                                    }
+                                  }
+
+                                  // Limpar o estado da imagem
+                                  setState(() {
+                                    _selectedImage = null;
+                                    if (widget.memberData != null) {
+                                      widget.memberData!['imagemMembro'] = ''; // Remove a URL no caso de edição
+                                    }
+                                  });
+                                } catch (e) {
+                                  _showBanner('Erro ao remover a imagem.', const Color.fromARGB(255, 154, 27, 27));
+                                  print('Erro ao remover imagem: $e');
+                                }
+                              },
+                              child: const Text(
+                                'Remover Foto',
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  
                   Center(child: buildSectionTitle(context, 'Informações Pessoais')),
                   const SizedBox(height: 20),
                   Center(
@@ -313,6 +547,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                       controller: nomeCompletoController,
                       hintText: 'Nome Completo',
                       textInputAction: TextInputAction.next,
+                      borderColor: _fieldErrors['nomeCompleto'] == true ? Colors.red : null,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -327,6 +562,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                             'NÃO'
                           ],
                           hintText: 'Comungante',
+                          borderColor: _fieldErrors['comungante'] == true ? Colors.red : null,
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
@@ -340,7 +576,21 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
                             LengthLimitingTextInputFormatter(3), // Limita a 3 caracteres
-                          ], // Filtra apenas números
+                          ],
+                          onChanged: (value) async {
+                            // Verifica duplicação ao alterar o valor
+                            if (value.isNotEmpty) {
+                              bool isDuplicate = await _isNumeroRolDuplicado(value);
+                              setState(() {
+                                _fieldErrors['numeroRol'] = isDuplicate; // Define o erro em caso de duplicação
+                              });
+                            } else {
+                              setState(() {
+                                _fieldErrors['numeroRol'] = true; // Erro se estiver vazio
+                              });
+                            }
+                          },
+                          borderColor: _fieldErrors['numeroRol'] == true ? Colors.red : null, // Mostra a borda vermelha em caso de erro
                         ),
                       ),
                     ],
@@ -356,11 +606,16 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                             'Masculino',
                             'Feminino'
                           ],
+                          borderColor: _fieldErrors['sexo'] == true ? Colors.red : null,
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
                       Flexible(
-                        child: CustomDateTextField(controller: dataNascimentoController, hintText: 'Data de nascimento'),
+                        child: CustomDateTextField(
+                          controller: dataNascimentoController,
+                          hintText: 'Data de nascimento',
+                          borderColor: _fieldErrors['dataNascimento'] == true ? Colors.red : null,
+                        ),
                       ),
                     ],
                   ),
@@ -444,6 +699,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                           inputFormatters: [
                             PhoneInputFormatter(), // Utiliza o formatter personalizado
                           ],
+                          borderColor: _fieldErrors['celular'] == true ? Colors.red : null,
                         ),
                       ),
                     ],
@@ -524,6 +780,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                             'Sede',
                             'Fora'
                           ],
+                          borderColor: _fieldErrors['residenciaLocal'] == true ? Colors.red : null,
                         ),
                       ),
                       const SizedBox(width: 20), // Espaço entre os dois campos
@@ -790,26 +1047,40 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                   ),
                   const SizedBox(height: 30),
                   Center(
-                      child: CustomButton(
-                    text: 'Salvar',
-                    onPressed: () {
-                      try {
-                        _saveMember();
-                      } catch (e) {
-                        // ignore: avoid_print
-                        print(e);
-                      }
-                    },
-                  )),
+                    child: CustomButton(
+                      text: 'Salvar',
+                      onPressed: () async {
+                        _validateFields(); // Valida os campos obrigatórios
+                        if (_fieldErrors.isEmpty) {
+                          bool success = await _saveMember();
+                          if (success) {
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Members(
+                                  onThemeToggle: widget.onThemeToggle,
+                                  themeModeNotifier: widget.themeModeNotifier,
+                                  successMessage: 'Membro salvo com sucesso!',
+                                ),
+                              ),
+                              (route) => false, // Remove todas as rotas anteriores da pilha
+                            );
+                          }
+                        } else {
+                          _showBanner('Preencha os campos obrigatórios.', Color.fromARGB(255, 154, 27, 27));
+                        }
+                      },
+                    ),
+                  ),
                   const SizedBox(height: 100), //Esse Widget é para dar uma espaçamento final para a sidebar não sobrepor os itens da tela
                 ],
               ),
             ),
-            BottomSidebar(currentIndex: currentIndex, onTabTapped: onTabTapped, onThemeToggle: widget.onThemeToggle, isDarkModeNotifier: widget.isDarkModeNotifier, isKeyboardVisible: MediaQuery.of(context).viewInsets.bottom != 0),
+            BottomSidebar(currentIndex: currentIndex, onTabTapped: onTabTapped, onThemeToggle: widget.onThemeToggle, themeModeNotifier: widget.themeModeNotifier, isKeyboardVisible: MediaQuery.of(context).viewInsets.bottom != 0),
             if (_isBannerVisible)
               Positioned(
-                top: 10, // Posiciona o banner próximo ao topo
-                right: 0, // Alinha o banner à direita
+                top: 10,
+                right: 0,
                 child: CustomBanner(
                   message: _bannerMessage, // Usa a mensagem do estado
                   backgroundColor: _bannerColor, // Usa a cor do estado
@@ -829,15 +1100,20 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
   }
 
 /* ----------------------FUNÇÕES----------------- */
-
   // Função para pegar a imagem da galeria
   Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    try {
+      final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
 
-    if (pickedFile != null) {
-      setState(() {
-        _selectedImage = File(pickedFile.path); // Atualiza o estado com a imagem selecionada
-      });
+      if (pickedFile != null) {
+        setState(() {
+          _selectedImage = File(pickedFile.path);
+        });
+      } else {
+        _showBanner('Seleção de imagem cancelada.', const Color.fromARGB(255, 142, 85, 0));
+      }
+    } catch (e) {
+      _showBanner('Erro ao selecionar ou fazer upload da imagem: $e', const Color.fromARGB(255, 154, 27, 27));
     }
   }
 
@@ -847,7 +1123,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
       padding: const EdgeInsets.symmetric(vertical: 12.0),
       child: Text(
         title,
-        style: Theme.of(context).textTheme.titleMedium, // Usa o estilo definido no tema
+        style: Theme.of(context).textTheme.titleMedium,
       ),
     );
   }

@@ -1,8 +1,9 @@
-import 'package:SoftwareIPJ/screens/home.dart';
+import 'package:softwareipj/app.dart';
+import 'package:softwareipj/screens/home.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_button.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'dart:ui';
 
 class LoginScreen extends StatelessWidget {
@@ -11,27 +12,28 @@ class LoginScreen extends StatelessWidget {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final ValueNotifier<String> errorMessage = ValueNotifier<String>("");
 
-  final void Function(bool value) onThemeToggle;
-  final ValueNotifier<bool> isDarkModeNotifier;
+  final void Function(ThemeModeOptions) onThemeToggle;
+  final ValueNotifier<ThemeModeOptions> themeModeNotifier;
   final ValueNotifier<bool> isTextFieldFocused = ValueNotifier<bool>(false); // Notifier para monitorar o foco dos campos
 
   LoginScreen({
     super.key,
     required this.onThemeToggle,
-    required this.isDarkModeNotifier,
+    required this.themeModeNotifier,
   });
 
-  void login(BuildContext context) async {
+  void login(BuildContext context) {
     String usuario = loginController.text;
     String senha = passwordController.text;
 
+    // Simulação de login bem-sucedido com credenciais vazias (personalize conforme necessário)
     if (usuario == "" && senha == "") {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => HomeScreen(
             onThemeToggle: onThemeToggle,
-            isDarkModeNotifier: isDarkModeNotifier,
+            themeModeNotifier: themeModeNotifier,
           ),
         ),
       );
@@ -94,10 +96,10 @@ class LoginScreen extends StatelessWidget {
                             hintText: 'Login',
                             obscureText: false,
                             textInputAction: TextInputAction.next,
-                            icon: SvgPicture.asset(
-                              'assets/images/user.svg',
-                              height: 24,
+                            icon: PhosphorIcon(
+                              Icons.person_rounded,
                               color: Theme.of(context).primaryColor,
+                              size: 30,
                             ),
                           ),
                         ),
@@ -109,10 +111,10 @@ class LoginScreen extends StatelessWidget {
                             hintText: 'Senha',
                             obscureText: true,
                             textInputAction: TextInputAction.done,
-                            icon: SvgPicture.asset(
-                              'assets/images/lock.svg',
-                              height: 23,
+                            icon: PhosphorIcon(
+                              Icons.lock,
                               color: Theme.of(context).primaryColor,
+                              size: 30,
                             ),
                           ),
                         ),
@@ -131,8 +133,7 @@ class LoginScreen extends StatelessWidget {
                               style: const TextStyle(
                                 color: Colors.red,
                                 fontSize: 14,
-                                fontWeight: FontWeight.normal,
-                                // TESTE
+                                fontWeight: FontWeight.w500,
                               ),
                             );
                           },

@@ -5,6 +5,7 @@ class CustomDropdown extends StatefulWidget {
   final List<String> items;
   final TextEditingController controller;
   final String? hintText;
+  final Color? borderColor; // Adicione o parâmetro para borda
 
   const CustomDropdown({
     super.key,
@@ -12,6 +13,7 @@ class CustomDropdown extends StatefulWidget {
     required this.items,
     required this.controller,
     this.hintText,
+    this.borderColor,
   });
 
   @override
@@ -46,8 +48,8 @@ class _CustomDropdownState extends State<CustomDropdown> {
           color: Theme.of(context).inputDecorationTheme.fillColor, // Cor de fundo definida pelo tema
           borderRadius: BorderRadius.circular(15), // Radius para borda
           border: Border.all(
-            color: _focusNode.hasFocus ? Theme.of(context).primaryColor : Colors.transparent, // Usa a cor primária do tema
-            width: _focusNode.hasFocus ? 2.0 : 1.0, // Ajuste de largura da borda
+            color: widget.borderColor ?? (_focusNode.hasFocus ? Theme.of(context).primaryColor : Colors.transparent), // Usa a borda fornecida
+            width: 2.0,
           ),
         ),
         child: DropdownButtonFormField<String>(

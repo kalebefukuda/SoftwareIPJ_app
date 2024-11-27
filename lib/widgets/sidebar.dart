@@ -1,5 +1,6 @@
+import 'package:softwareipj/app.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'dart:ui';
 import '../screens/home.dart';
 import '../screens/report.dart';
@@ -9,8 +10,8 @@ import '../screens/members.dart';
 class BottomSidebar extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTabTapped;
-  final Function(bool) onThemeToggle;
-  final ValueNotifier<bool> isDarkModeNotifier;
+  final Function(ThemeModeOptions) onThemeToggle;
+  final ValueNotifier<ThemeModeOptions> themeModeNotifier;
   final bool isKeyboardVisible;
 
   const BottomSidebar({
@@ -18,8 +19,8 @@ class BottomSidebar extends StatelessWidget {
     required this.currentIndex,
     required this.onTabTapped,
     required this.onThemeToggle,
-    required this.isDarkModeNotifier,
     required this.isKeyboardVisible,
+    required this.themeModeNotifier,
   });
 
   @override
@@ -60,7 +61,7 @@ class BottomSidebar extends StatelessWidget {
                     filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Theme.of(context).inputDecorationTheme.fillColor?.withOpacity(0.85),
+                        color: Theme.of(context).inputDecorationTheme.fillColor?.withOpacity(0.70),
                         borderRadius: BorderRadius.circular(50),
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
@@ -77,19 +78,17 @@ class BottomSidebar extends StatelessWidget {
                                       MaterialPageRoute(
                                         builder: (context) => HomeScreen(
                                           onThemeToggle: onThemeToggle,
-                                          isDarkModeNotifier: isDarkModeNotifier,
+                                          themeModeNotifier: themeModeNotifier,
                                         ),
                                       ),
                                       (Route<dynamic> route) => false, // Remove todas as rotas anteriores
                                     );
                                     onTabTapped(0);
                                   },
-                            icon: SvgPicture.asset(
-                              'assets/images/house.svg',
-                              // ignore: deprecated_member_use
+                            icon: PhosphorIcon(
+                              PhosphorIcons.house(PhosphorIconsStyle.bold),
                               color: currentIndex == 0 ? Theme.of(context).primaryColor : Theme.of(context).colorScheme.tertiary,
-                              height: currentIndex == 0 ? 30 : 24,
-                              width: 24,
+                              size: currentIndex == 0 ? 30 : 24,
                             ),
                           ),
                           // Ícone Criar Membro
@@ -102,17 +101,16 @@ class BottomSidebar extends StatelessWidget {
                                       MaterialPageRoute(
                                         builder: (context) => CreateMembersScreen(
                                           onThemeToggle: onThemeToggle,
-                                          isDarkModeNotifier: isDarkModeNotifier,
+                                          themeModeNotifier: themeModeNotifier,
                                         ),
                                       ),
                                     );
                                     onTabTapped(1);
                                   },
-                            icon: SvgPicture.asset(
-                              'assets/images/create_member.svg',
-                              // ignore: deprecated_member_use
+                            icon: PhosphorIcon(
+                              PhosphorIcons.userPlus(PhosphorIconsStyle.bold),
                               color: currentIndex == 1 ? Theme.of(context).primaryColor : Theme.of(context).colorScheme.tertiary,
-                              height: currentIndex == 1 ? 30 : 24,
+                              size: currentIndex == 1 ? 30 : 24,
                             ),
                           ),
                           // Ícone Membros
@@ -125,18 +123,16 @@ class BottomSidebar extends StatelessWidget {
                                       MaterialPageRoute(
                                         builder: (context) => Members(
                                           onThemeToggle: onThemeToggle,
-                                          isDarkModeNotifier: isDarkModeNotifier,
+                                          themeModeNotifier: themeModeNotifier,
                                         ),
                                       ),
                                     );
                                     onTabTapped(2);
                                   },
-                            icon: SvgPicture.asset(
-                              'assets/images/members.svg',
-                              // ignore: deprecated_member_use
+                            icon: PhosphorIcon(
+                              PhosphorIcons.users(PhosphorIconsStyle.bold),
                               color: currentIndex == 2 ? Theme.of(context).primaryColor : Theme.of(context).colorScheme.tertiary,
-                              height: currentIndex == 2 ? 30 : 24,
-                              width: 24,
+                              size: currentIndex == 2 ? 30 : 24,
                             ),
                           ),
                           // Ícone Arquivo
@@ -149,18 +145,16 @@ class BottomSidebar extends StatelessWidget {
                                       MaterialPageRoute(
                                         builder: (context) => Report(
                                           onThemeToggle: onThemeToggle,
-                                          isDarkModeNotifier: isDarkModeNotifier,
+                                          themeModeNotifier: themeModeNotifier,
                                         ),
                                       ),
                                     );
                                     onTabTapped(3);
                                   },
-                            icon: SvgPicture.asset(
-                              'assets/images/file.svg',
-                              // ignore: deprecated_member_use
+                            icon: PhosphorIcon(
+                              PhosphorIcons.file(PhosphorIconsStyle.bold),
                               color: currentIndex == 3 ? Theme.of(context).primaryColor : Theme.of(context).colorScheme.tertiary,
-                              height: currentIndex == 3 ? 30 : 24,
-                              width: 24,
+                              size: currentIndex == 3 ? 30 : 24,
                             ),
                           ),
                         ],
