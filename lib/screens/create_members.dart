@@ -1042,7 +1042,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                         if (_fieldErrors.isEmpty) {
                           bool success = await _saveMember();
                           if (success) {
-                            Navigator.push(
+                            Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => Members(
@@ -1051,6 +1051,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                                   successMessage: 'Membro salvo com sucesso!',
                                 ),
                               ),
+                              (route) => false, // Remove todas as rotas anteriores da pilha
                             );
                           }
                         } else {

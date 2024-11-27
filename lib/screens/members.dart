@@ -1,6 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:softwareipj/screens/home.dart';
 
 import '../app.dart';
 import 'package:softwareipj/screens/view_member_screen.dart';
@@ -457,7 +458,16 @@ class _MembersState extends State<Members> {
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         leading: IconButton(
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomeScreen(
+                  onThemeToggle: widget.onThemeToggle,
+                  themeModeNotifier: widget.themeModeNotifier,
+                ),
+              ),
+              (route) => false, // Remove todas as rotas da pilha
+            );
           },
           icon: const Icon(
             Icons.chevron_left,
