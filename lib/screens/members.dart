@@ -1,6 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:softwareipj/screens/home.dart';
 
 import '../app.dart';
 import 'package:softwareipj/screens/view_member_screen.dart';
@@ -457,7 +458,16 @@ class _MembersState extends State<Members> {
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         leading: IconButton(
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomeScreen(
+                  onThemeToggle: widget.onThemeToggle,
+                  themeModeNotifier: widget.themeModeNotifier,
+                ),
+              ),
+              (route) => false, // Remove todas as rotas da pilha
+            );
           },
           icon: const Icon(
             Icons.chevron_left,
@@ -749,21 +759,8 @@ class _MembersState extends State<Members> {
                                     const SizedBox(height: 4),
                                     Row(
                                       children: [
-                                        if (member['dataNascimento'] != null && member['dataNascimento'] is String) ...[
-                                          Icon(
-                                            Icons.cake, // Ícone de bolo
-                                            color: const Color(0xFFB5B5B5),
-                                            size: 16,
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            '${_calculateAge(member['dataNascimento']) ?? 'N/A'} anos', // Calcula e exibe a idade
-                                            style: const TextStyle(),
-                                          ),
-                                          const SizedBox(width: 16), // Espaço entre idade e telefone
-                                        ],
                                         Icon(
-                                          Icons.phone_iphone_rounded, // Ícone de telefone
+                                          Icons.phone_iphone_rounded,
                                           color: const Color(0xFFB5B5B5),
                                           size: 16,
                                         ),

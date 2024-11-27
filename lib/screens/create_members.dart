@@ -443,91 +443,103 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
               child: ListView(
                 controller: _scrollController, // Adicione o controlador aqui
                 children: [
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 30),
                   // Adicionando o círculo de foto no início
                   MouseRegion(
-                    cursor: SystemMouseCursors.click, // Define o cursor como 'pointer' ao passar o mouse
-                    child: Column(
+                    cursor: SystemMouseCursors.click,
+                    child: Stack(
+                      alignment: Alignment.center,
                       children: [
-                        GestureDetector(
-                          onTap: _pickImage, // Função para selecionar a imagem
-                          child: CircleAvatar(
-                            radius: 70,
-                            backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
-                            child: ClipOval(
-                              child: _selectedImage != null
-                                  ? Image.file(
-                                      _selectedImage!,
-                                      width: 140,
-                                      height: 140,
-                                      fit: BoxFit.cover,
-                                    )
-                                  : (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty)
-                                      ? Image.network(
-                                          widget.memberData!['imagemMembro'],
+                        // Coloca a imagem como fundo do Stack
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            GestureDetector(
+                              onTap: _pickImage, // Função para selecionar a imagem
+                              child: CircleAvatar(
+                                radius: 70,
+                                backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
+                                child: ClipOval(
+                                  child: _selectedImage != null
+                                      ? Image.file(
+                                          _selectedImage!,
                                           width: 140,
                                           height: 140,
                                           fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) => SvgPicture.asset(
-                                            'assets/images/user-round.svg',
-                                            height: 50,
-                                            width: 50,
-                                            color: Theme.of(context).iconTheme.color,
-                                          ),
                                         )
-                                      : SvgPicture.asset(
-                                          'assets/images/user-round.svg',
-                                          height: 50,
-                                          width: 50,
-                                          color: Theme.of(context).iconTheme.color,
-                                        ),
+                                      : (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty)
+                                          ? Image.network(
+                                              widget.memberData!['imagemMembro'],
+                                              width: 140,
+                                              height: 140,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (context, error, stackTrace) => SvgPicture.asset(
+                                                'assets/images/user-round.svg',
+                                                height: 50,
+                                                width: 50,
+                                                color: Theme.of(context).iconTheme.color,
+                                              ),
+                                            )
+                                          : SvgPicture.asset(
+                                              'assets/images/user-round.svg',
+                                              height: 50,
+                                              width: 50,
+                                              color: Theme.of(context).iconTheme.color,
+                                            ),
+                                ),
+                              ),
                             ),
-                          ),
+                            const SizedBox(height: 40), // Espaçamento fixo para "Informações Pessoais"
+                          ],
                         ),
-                        // Adiciona o botão "Remover Foto" somente se houver uma foto carregada
+
+                        // Botão "Remover Foto"
                         if (_selectedImage != null || (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty))
-                          TextButton(
-                            onPressed: () async {
-                              try {
-                                // Remover imagem associada ao membro
-                                if (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty) {
-                                  final oldFileName = widget.memberData!['imagemMembro'].split('/').last;
-                                  final deleteResponse = await Supabase.instance.client.storage.from('membros_storage').remove([
-                                    oldFileName
-                                  ]);
+                          Positioned(
+                            bottom: -5, // Posiciona o botão logo abaixo do CircleAvatar
+                            child: TextButton(
+                              onPressed: () async {
+                                try {
+                                  // Remover imagem associada ao membro
+                                  if (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty) {
+                                    final oldFileName = widget.memberData!['imagemMembro'].split('/').last;
+                                    final deleteResponse = await Supabase.instance.client.storage.from('membros_storage').remove([
+                                      oldFileName
+                                    ]);
 
-                                  if (deleteResponse.isEmpty) {
-                                    print('Nenhum arquivo foi excluído. Verifique se o arquivo existe: $oldFileName');
-                                  } else {
-                                    print('Imagem antiga removida: $oldFileName');
+                                    if (deleteResponse.isEmpty) {
+                                      print('Nenhum arquivo foi excluído. Verifique se o arquivo existe: $oldFileName');
+                                    } else {
+                                      print('Imagem antiga removida: $oldFileName');
+                                    }
                                   }
+
+                                  // Limpar o estado da imagem
+                                  setState(() {
+                                    _selectedImage = null;
+                                    if (widget.memberData != null) {
+                                      widget.memberData!['imagemMembro'] = ''; // Remove a URL no caso de edição
+                                    }
+                                  });
+                                } catch (e) {
+                                  _showBanner('Erro ao remover a imagem.', const Color.fromARGB(255, 154, 27, 27));
+                                  print('Erro ao remover imagem: $e');
                                 }
-
-                                // Limpar o estado da imagem
-                                setState(() {
-                                  _selectedImage = null;
-                                  if (widget.memberData != null) {
-                                    widget.memberData!['imagemMembro'] = ''; // Remove a URL no caso de edição
-                                  }
-                                });
-                              } catch (e) {
-                                _showBanner('Erro ao remover a imagem.', const Color.fromARGB(255, 154, 27, 27));
-                                print('Erro ao remover imagem: $e');
-                              }
-                            },
-                            child: const Text(
-                              'Remover Foto',
-                              style: TextStyle(
-                                color: Colors.red,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500,
+                              },
+                              child: const Text(
+                                'Remover Foto',
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
                           ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 30),
+                  
                   Center(child: buildSectionTitle(context, 'Informações Pessoais')),
                   const SizedBox(height: 20),
                   Center(
@@ -1042,7 +1054,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                         if (_fieldErrors.isEmpty) {
                           bool success = await _saveMember();
                           if (success) {
-                            Navigator.push(
+                            Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => Members(
@@ -1051,6 +1063,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                                   successMessage: 'Membro salvo com sucesso!',
                                 ),
                               ),
+                              (route) => false, // Remove todas as rotas anteriores da pilha
                             );
                           }
                         } else {
