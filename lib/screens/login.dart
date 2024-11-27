@@ -1,9 +1,10 @@
+import 'package:softwareipj/app.dart';
+import 'package:softwareipj/screens/home.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart'; // Importa o pacote flutter_svg
-import 'package:softwareipj_app/screens/report.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/custom_button.dart';
-import 'dart:ui'; // Necessário para o BackdropFilter
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'dart:ui';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController loginController = TextEditingController();
@@ -11,136 +12,140 @@ class LoginScreen extends StatelessWidget {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final ValueNotifier<String> errorMessage = ValueNotifier<String>("");
 
-  LoginScreen({super.key});
+  final void Function(ThemeModeOptions) onThemeToggle;
+  final ValueNotifier<ThemeModeOptions> themeModeNotifier;
+  final ValueNotifier<bool> isTextFieldFocused = ValueNotifier<bool>(false); // Notifier para monitorar o foco dos campos
 
-  // Função de login, verifica as credenciais
-  void login(BuildContext context) async {
+  LoginScreen({
+    super.key,
+    required this.onThemeToggle,
+    required this.themeModeNotifier,
+  });
+
+  void login(BuildContext context) {
     String usuario = loginController.text;
     String senha = passwordController.text;
 
-    // Verificação de usuário e senha
-    if (usuario == "ipj" && senha == "ipj") {
-      // Navega para a tela Home usando o Navigator.push
-      Navigator.push(
+    // Simulação de login bem-sucedido com credenciais vazias (personalize conforme necessário)
+    if (usuario == "" && senha == "") {
+      Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const Report()),
+        MaterialPageRoute(
+          builder: (context) => HomeScreen(
+            onThemeToggle: onThemeToggle,
+            themeModeNotifier: themeModeNotifier,
+          ),
+        ),
       );
     } else {
-      // Exibe uma mensagem de erro
       errorMessage.value = "Usuário ou senha incorreto! Verifique suas informações e tente novamente.";
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Verifica se o tema é escuro ou claro
-    final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final bool isDarkTheme = Theme.of(context).brightness == Brightness.dark;
+    final Color backgroundWithOpacity = isDarkTheme ? Colors.black.withOpacity(0.75) : Colors.transparent;
 
-    // Define a cor de fundo com opacidade apenas no modo escuro
-    final Color backgroundWithOpacity = isDarkMode
-        ? Colors.black.withOpacity(0.75) // Escurece no modo escuro
-        : Colors.transparent; // Sem opacidade no modo claro (imagem original)
-
-    return Scaffold(
-      body: Stack(
-        children: [
-          // Imagem de fundo
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/Igreja_Fundo_Login.jpg',
-              fit: BoxFit.cover,
-            ),
-          ),
-          // Aplica desfoque e cor de fundo apenas no modo escuro
-          Positioned.fill(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0), // Efeito fosco para ambos os temas
-              child: Container(
-                color: backgroundWithOpacity, // Aplica o fundo escuro com opacidade apenas no modo escuro
-              ),
-            ),
-          ),
-          // Logo da empresa
-          Positioned(
-            top: 100,
-            left: 0,
-            right: 0,
-            child: Center(
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus(); // Esconde o teclado ao tocar fora dos campos
+        isTextFieldFocused.value = false; // Remove o foco ao tocar fora
+      },
+      child: Scaffold(
+        body: Stack(
+          children: [
+            Positioned.fill(
               child: Image.asset(
-                'assets/images/Logo_IPB.png',
-                height: 100,
-                color: Theme.of(context).primaryColor, // Acessa a cor definida no iconTheme
-
+                'assets/images/Igreja_Fundo_Login.jpg',
+                fit: BoxFit.cover,
               ),
             ),
-          ),
-          // Formulário de login
-          Center(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                child: Form(
-                  key: formKey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 150), // Espaço entre a logo e os campos
-                      // Campo de Login com largura ajustada
-                      SizedBox(
-                        width: 300, // Ajuste a largura do campo de texto aqui
-                        child: CustomTextField(
-                          controller: loginController,
-                          hintText: 'Login',
-                          obscureText: false,
-                          icon: SvgPicture.asset(
-                            'assets/images/user.svg',
-                            height: 24,
-                            color: Theme.of(context).primaryColor,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      // Campo de Senha com largura ajustada
-                      SizedBox(
-                        width: 300, // Ajuste a largura do campo de texto aqui
-                        child: CustomTextField(
-                          controller: passwordController,
-                          hintText: 'Senha',
-                          obscureText: true,
-                          icon: SvgPicture.asset(
-                            'assets/images/lock.svg',
-                            height: 24,
-                            color: Theme.of(context).primaryColor,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 40), // Espaço antes do botão de login
-                      CustomButton(
-                        text: 'Entrar',
-                        onPressed: () => login(context), // Chama a função login no onPressed
-                      ),
-                      const SizedBox(height: 20),
-                      ValueListenableBuilder(
-                        valueListenable: errorMessage,
-                        builder: (context, value, child) {
-                          return Text(
-                            textAlign: TextAlign.center, // Centraliza o texto
-                            value,
-                            style: const TextStyle(
-                              color: Colors.red,
-                              fontSize: 14,
-                              fontWeight: FontWeight.normal,
+            Positioned.fill(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                child: Container(color: backgroundWithOpacity),
+              ),
+            ),
+            Positioned(
+              top: 100,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Image.asset(
+                  'assets/images/Logo_IPB.png',
+                  height: 80,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+            ),
+            Center(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 150),
+                        SizedBox(
+                          width: 300,
+                          child: CustomTextField(
+                            controller: loginController,
+                            hintText: 'Login',
+                            obscureText: false,
+                            textInputAction: TextInputAction.next,
+                            icon: PhosphorIcon(
+                              Icons.person_rounded,
+                              color: Theme.of(context).primaryColor,
+                              size: 30,
                             ),
-                          );
-                        },
-                      ),
-                    ],
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: 300,
+                          child: CustomTextField(
+                            controller: passwordController,
+                            hintText: 'Senha',
+                            obscureText: true,
+                            textInputAction: TextInputAction.done,
+                            icon: PhosphorIcon(
+                              Icons.lock,
+                              color: Theme.of(context).primaryColor,
+                              size: 30,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 40),
+                        CustomButton(
+                          text: 'Entrar',
+                          onPressed: () => login(context),
+                        ),
+                        const SizedBox(height: 20),
+                        ValueListenableBuilder(
+                          valueListenable: errorMessage,
+                          builder: (context, value, child) {
+                            return Text(
+                              textAlign: TextAlign.center,
+                              value,
+                              style: const TextStyle(
+                                color: Colors.red,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

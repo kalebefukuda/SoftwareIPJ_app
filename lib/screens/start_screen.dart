@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
-import 'login.dart'; // Certifique-se de importar a tela de login
+import 'package:softwareipj/app.dart'; // Importar o arquivo que define ThemeModeOptions
+import 'login.dart'; // Importar a tela de login
 
 class StartScreen extends StatefulWidget {
-  const StartScreen({super.key});
+  final void Function(ThemeModeOptions) onThemeToggle;
+  final ValueNotifier<ThemeModeOptions> themeModeNotifier;
+
+  const StartScreen({
+    super.key,
+    required this.onThemeToggle,
+    required this.themeModeNotifier,
+  });
 
   @override
   _StartScreenState createState() => _StartScreenState();
@@ -20,7 +28,10 @@ class _StartScreenState extends State<StartScreen> {
         context,
         PageRouteBuilder(
           transitionDuration: const Duration(milliseconds: 600), // Duração da animação de transição
-          pageBuilder: (context, animation, secondaryAnimation) => LoginScreen(),
+          pageBuilder: (context, animation, secondaryAnimation) => LoginScreen(
+            onThemeToggle: widget.onThemeToggle,
+            themeModeNotifier: widget.themeModeNotifier,
+          ),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             // Animação de "dissolve" (fade)
             return FadeTransition(
@@ -37,12 +48,12 @@ class _StartScreenState extends State<StartScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Theme.of(context).appBarTheme.backgroundColor, // Usa a cor definida no AppBarTheme como fundo
+        color: Theme.of(context).scaffoldBackgroundColor, // Usa a cor de fundo do tema atual
         child: Center(
           child: Image.asset(
             "assets/images/Logo_IPB.png",
             height: 100,
-            color: Colors.white,
+            color: Theme.of(context).iconTheme.color, // Usa a cor do ícone do tema atual
           ),
         ),
       ),
