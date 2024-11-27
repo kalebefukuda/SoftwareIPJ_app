@@ -27,7 +27,7 @@ class LoginScreen extends StatelessWidget {
     String senha = passwordController.text;
 
     // Simulação de login bem-sucedido com credenciais vazias (personalize conforme necessário)
-    if (usuario == "" && senha == "") {
+    if (usuario == "ipj" && senha == "ipj") {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(

@@ -416,26 +416,6 @@ class _MembersState extends State<Members> {
     });
   }
 
-  int? _calculateAge(String? dateOfBirth) {
-    if (dateOfBirth == null || dateOfBirth.isEmpty) return null;
-
-    try {
-      final birthDate = _parseDate(dateOfBirth);
-      if (birthDate == null) return null;
-
-      final today = DateTime.now();
-      int age = today.year - birthDate.year;
-
-      if (today.month < birthDate.month || (today.month == birthDate.month && today.day < birthDate.day)) {
-        age--;
-      }
-      return age;
-    } catch (e) {
-      print('Erro ao calcular a idade: $e');
-      return null;
-    }
-  }
-
   DateTime? _parseDate(String date) {
     try {
       final parts = date.split('/');
