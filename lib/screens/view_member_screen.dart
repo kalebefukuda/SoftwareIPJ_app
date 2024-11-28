@@ -158,6 +158,9 @@ class _ViewMemberScreenState extends State<ViewMemberScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.memberData == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus(); // Esconde o teclado ao tocar fora dos campos
@@ -530,13 +533,17 @@ class _ViewMemberScreenState extends State<ViewMemberScreen> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  Flexible(
-                    child: CustomTextField(
-                      hintText: 'Forma',
-                      controller: formaAdmissaoController,
-                      obscureText: false,
-                      readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                    ),
+                  Row(
+                    children: [
+                      Flexible(
+                        child: CustomTextField(
+                          hintText: 'Forma',
+                          controller: formaAdmissaoController,
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 30),
                   Center(child: buildSectionTitle(context, 'Demissão')),
@@ -565,13 +572,17 @@ class _ViewMemberScreenState extends State<ViewMemberScreen> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  Flexible(
-                    child: CustomTextField(
-                      hintText: 'Forma',
-                      controller: formaDemissaoController,
-                      obscureText: false,
-                      readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                    ),
+                  Row(
+                    children: [
+                      Flexible(
+                        child: CustomTextField(
+                          hintText: 'Forma',
+                          controller: formaDemissaoController,
+                          obscureText: false,
+                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 30),
                   Center(child: buildSectionTitle(context, 'Rol Separado')),

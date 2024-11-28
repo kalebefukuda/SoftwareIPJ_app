@@ -879,21 +879,25 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  Flexible(
-                    child: CustomDropdown(
-                      labelText: 'Forma',
-                      controller: formaAdmissaoController,
-                      items: const [
-                        'Transferência',
-                        'Batismo',
-                        'Profissão de Fé',
-                        'Batismo e Profissão de Fé',
-                        'Jurisdição a pedido',
-                        'Jurisdição Ex-Officio',
-                        'Restauração',
-                        'Designação e Presbitério'
-                      ],
-                    ),
+                  Row(
+                    children: [
+                      Flexible(
+                        child: CustomDropdown(
+                          labelText: 'Forma',
+                          controller: formaAdmissaoController,
+                          items: const [
+                            'Transferência',
+                            'Batismo',
+                            'Profissão de Fé',
+                            'Batismo e Profissão de Fé',
+                            'Jurisdição a pedido',
+                            'Jurisdição Ex-Officio',
+                            'Restauração',
+                            'Designação e Presbitério'
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 30),
                   Center(child: buildSectionTitle(context, 'Demissão')),
@@ -920,21 +924,25 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  Flexible(
-                    child: CustomDropdown(
-                      labelText: 'Forma',
-                      controller: formaDemissaoController,
-                      items: const [
-                        'Transferência',
-                        'Batismo',
-                        'Profissão de Fé',
-                        'Batismo e Profissão de Fé',
-                        'Jurisdição a pedido',
-                        'Jurisdição Ex-Officio',
-                        'Restauração',
-                        'Designação e Presbitério'
-                      ],
-                    ),
+                  Row(
+                    children: [
+                      Flexible(
+                        child: CustomDropdown(
+                          labelText: 'Forma',
+                          controller: formaDemissaoController,
+                          items: const [
+                            'Transferência',
+                            'Batismo',
+                            'Profissão de Fé',
+                            'Batismo e Profissão de Fé',
+                            'Jurisdição a pedido',
+                            'Jurisdição Ex-Officio',
+                            'Restauração',
+                            'Designação e Presbitério'
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 30),
                   Center(child: buildSectionTitle(context, 'Rol Separado')),
