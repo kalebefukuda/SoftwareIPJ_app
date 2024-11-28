@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   phosphor_flutter: any
-  shared_preferences: ^2.0.15
+  shared_preferences: ^2.1.0
   google_fonts: ^4.0.3
   cupertino_icons: ^1.0.8
   flutter_svg: ^2.0.7  

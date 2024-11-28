@@ -7,6 +7,13 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Configuração para capturar erros globais
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    debugPrint("Erro capturado globalmente: ${details.exceptionAsString()}");
+    debugPrintStack(stackTrace: details.stack);
+  };
+
   try {
     // Carrega o arquivo de ambiente
     await dotenv.load(fileName: ".env");
@@ -24,8 +31,9 @@ Future<void> main() async {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-  } catch (e) {
-    debugPrint('$e');
+  } catch (e, stackTrace) {
+    debugPrint("Erro ao inicializar o aplicativo: $e");
+    debugPrintStack(stackTrace: stackTrace);
   }
 
   runApp(const App());
