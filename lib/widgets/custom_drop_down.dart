@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:softwareipj/widgets/screen_scale_wrapper.dart';
 
 class CustomDropdown extends StatefulWidget {
   final String labelText;
@@ -81,7 +82,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
           items: widget.items.map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
               value: value,
-              child: Text(value),
+              child: ScreenScaleWrapper(child: Text(value)),
             );
           }).toList(),
           dropdownColor: Theme.of(context).inputDecorationTheme.fillColor, // Cor do dropdown definida pelo tema

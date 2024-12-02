@@ -1,5 +1,5 @@
 // ignore_for_file: library_private_types_in_public_api
-
+import 'package:softwareipj/widgets/screen_scale_wrapper.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:softwareipj/screens/home.dart';
 
@@ -432,355 +432,363 @@ class _MembersState extends State<Members> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 90,
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(
-                builder: (context) => HomeScreen(
-                  onThemeToggle: widget.onThemeToggle,
-                  themeModeNotifier: widget.themeModeNotifier,
+    return ScreenScaleWrapper(
+      child: Scaffold(
+        appBar: AppBar(
+          toolbarHeight: 90,
+          backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HomeScreen(
+                    onThemeToggle: widget.onThemeToggle,
+                    themeModeNotifier: widget.themeModeNotifier,
+                  ),
                 ),
-              ),
-              (route) => false, // Remove todas as rotas da pilha
-            );
-          },
-          icon: const Icon(
-            Icons.chevron_left,
-            size: 30,
-            color: Appcolors.white,
+                (route) => false, // Remove todas as rotas da pilha
+              );
+            },
+            icon: const Icon(
+              Icons.chevron_left,
+              size: 30,
+              color: Appcolors.white,
+            ),
           ),
+          title: Text('Membros', style: Theme.of(context).textTheme.titleLarge),
+          centerTitle: true,
         ),
-        title: Text('Membros', style: Theme.of(context).textTheme.titleLarge),
-        centerTitle: true,
-      ),
-      body: GestureDetector(
-        onTap: _resetSlidePositions,
-        child: Stack(
-          children: [
-            ListView(
-              padding: const EdgeInsets.all(15.0),
-              children: [
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
+        body: GestureDetector(
+          onTap: _resetSlidePositions,
+          child: Stack(
+            children: [
+              ListView(
+                padding: const EdgeInsets.all(15.0),
+                children: [
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        GestureDetector(
+                          onTap: () => _toggleGenderFilter('Masculino'),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: _getFilterBackgroundColor(context, filterMen),
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            padding: filterMen ? const EdgeInsets.symmetric(vertical: 7.0, horizontal: 14) : const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15),
+                            child: Text(
+                              '$maleCount Homens',
+                              style: filterMen
+                                  ? Theme.of(context).textTheme.titleSmall
+                                  : Theme.of(context).textTheme.titleSmall?.copyWith(
+                                        fontWeight: FontWeight.w500,
+                                        color: Theme.of(context).colorScheme.onSecondary,
+                                        fontSize: 14,
+                                      ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        GestureDetector(
+                          onTap: () => _toggleGenderFilter('Feminino'),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: _getFilterBackgroundColor(context, filterWomen),
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            padding: filterWomen ? const EdgeInsets.symmetric(vertical: 7.0, horizontal: 14) : const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15),
+                            child: Text(
+                              '$femaleCount Mulheres',
+                              style: filterWomen
+                                  ? Theme.of(context).textTheme.titleSmall
+                                  : Theme.of(context).textTheme.titleSmall?.copyWith(
+                                        fontWeight: FontWeight.w500,
+                                        color: Theme.of(context).colorScheme.onSecondary,
+                                        fontSize: 14,
+                                      ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        GestureDetector(
+                          onTap: () => _toggleGenderFilter('SIM'),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: _getFilterBackgroundColor(context, filterCommunicant),
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            padding: filterCommunicant ? const EdgeInsets.symmetric(vertical: 7.0, horizontal: 14) : const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15),
+                            child: Text(
+                              '$yesCommunicantCount Comungantes',
+                              style: filterCommunicant
+                                  ? Theme.of(context).textTheme.titleSmall
+                                  : Theme.of(context).textTheme.titleSmall?.copyWith(
+                                        fontWeight: FontWeight.w500,
+                                        color: Theme.of(context).colorScheme.onSecondary,
+                                        fontSize: 14,
+                                      ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        GestureDetector(
+                          onTap: () => _toggleGenderFilter('NÃO'),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: _getFilterBackgroundColor(context, filterNonCommunicant),
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                            padding: filterNonCommunicant ? const EdgeInsets.symmetric(vertical: 7.0, horizontal: 14) : const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15),
+                            child: Text(
+                              '$noCommunicantCount Não Comungantes',
+                              style: filterNonCommunicant
+                                  ? Theme.of(context).textTheme.titleSmall
+                                  : Theme.of(context).textTheme.titleSmall?.copyWith(
+                                        fontWeight: FontWeight.w500,
+                                        color: Theme.of(context).colorScheme.onSecondary,
+                                        fontSize: 14,
+                                      ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      GestureDetector(
-                        onTap: () => _toggleGenderFilter('Masculino'),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: _getFilterBackgroundColor(context, filterMen),
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          padding: filterMen ? const EdgeInsets.symmetric(vertical: 7.0, horizontal: 14) : const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15),
-                          child: Text(
-                            '$maleCount Homens',
-                            style: filterMen
-                                ? Theme.of(context).textTheme.titleSmall
-                                : Theme.of(context).textTheme.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.w500,
-                                      color: Theme.of(context).colorScheme.onSecondary,
-                                      fontSize: 14,
-                                    ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      GestureDetector(
-                        onTap: () => _toggleGenderFilter('Feminino'),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: _getFilterBackgroundColor(context, filterWomen),
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          padding: filterWomen ? const EdgeInsets.symmetric(vertical: 7.0, horizontal: 14) : const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15),
-                          child: Text(
-                            '$femaleCount Mulheres',
-                            style: filterWomen
-                                ? Theme.of(context).textTheme.titleSmall
-                                : Theme.of(context).textTheme.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.w500,
-                                      color: Theme.of(context).colorScheme.onSecondary,
-                                      fontSize: 14,
-                                    ),
+                      Expanded(
+                        child: TextField(
+                          controller: _searchController,
+                          focusNode: _searchFocusNode,
+                          decoration: InputDecoration(
+                            hintText: 'Pesquisar',
+                            hintStyle: const TextStyle(
+                              fontSize: 17,
+                              color: Color(0xFFB5B5B5),
+                              fontWeight: FontWeight.w400,
+                            ),
+                            filled: true,
+                            contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 1),
+                            fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15),
+                              borderSide: BorderSide.none,
+                            ),
+                            prefixIcon: const Icon(
+                              Icons.search,
+                              size: 20,
+                              color: Color(0xFFB5B5B5),
+                            ),
                           ),
                         ),
                       ),
                       const SizedBox(width: 10),
-                      GestureDetector(
-                        onTap: () => _toggleGenderFilter('SIM'),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: _getFilterBackgroundColor(context, filterCommunicant),
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          padding: filterCommunicant ? const EdgeInsets.symmetric(vertical: 7.0, horizontal: 14) : const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15),
-                          child: Text(
-                            '$yesCommunicantCount Comungantes',
-                            style: filterCommunicant
-                                ? Theme.of(context).textTheme.titleSmall
-                                : Theme.of(context).textTheme.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.w500,
-                                      color: Theme.of(context).colorScheme.onSecondary,
+                      PopupMenuButton<String>(
+                        icon: Icon(
+                          PhosphorIcons.funnelSimple(),
+                          size: 25.0,
+                        ),
+                        onSelected: (value) {
+                          setState(() {
+                            _selectedSort = value; // Atualiza a seleção
+                          });
+
+                          if (value == 'Idade') {
+                            _sortByAge();
+                          } else if (value == 'Número de Rol') {
+                            _sortByRol();
+                          } else if (value == 'Alfabética') {
+                            _sortAlphabetically();
+                          }
+                        },
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            value: 'Idade',
+                            child: ScreenScaleWrapper(
+                              child: Text(
+                                'Idade (1-100)',
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                      color: _selectedSort == 'Idade' ? Theme.of(context).textTheme.titleMedium?.color : Colors.grey,
+                                      fontWeight: _selectedSort == 'Idade' ? FontWeight.w700 : FontWeight.w500,
                                       fontSize: 14,
                                     ),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      GestureDetector(
-                        onTap: () => _toggleGenderFilter('NÃO'),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: _getFilterBackgroundColor(context, filterNonCommunicant),
-                            borderRadius: BorderRadius.circular(10.0),
-                          ),
-                          padding: filterNonCommunicant ? const EdgeInsets.symmetric(vertical: 7.0, horizontal: 14) : const EdgeInsets.symmetric(vertical: 8.0, horizontal: 15),
-                          child: Text(
-                            '$noCommunicantCount Não Comungantes',
-                            style: filterNonCommunicant
-                                ? Theme.of(context).textTheme.titleSmall
-                                : Theme.of(context).textTheme.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.w500,
-                                      color: Theme.of(context).colorScheme.onSecondary,
+                          PopupMenuItem(
+                            value: 'Número de Rol',
+                            child: ScreenScaleWrapper(
+                              child: Text(
+                                'Número de Rol (0-999)',
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                      color: _selectedSort == 'Número de Rol' ? Theme.of(context).textTheme.titleMedium?.color : Colors.grey,
+                                      fontWeight: _selectedSort == 'Número de Rol' ? FontWeight.w700 : FontWeight.w500,
                                       fontSize: 14,
                                     ),
+                              ),
+                            ),
                           ),
+                          PopupMenuItem(
+                            value: 'Alfabética',
+                            child: ScreenScaleWrapper(
+                              child: Text(
+                                'Ordem Alfabética (A-Z)',
+                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                      color: _selectedSort == 'Alfabética' ? Theme.of(context).textTheme.titleMedium?.color : Colors.grey,
+                                      fontWeight: _selectedSort == 'Alfabética' ? FontWeight.w700 : FontWeight.w500,
+                                      fontSize: 14,
+                                    ),
+                              ),
+                            ),
+                          ),
+                        ],
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
                         ),
+                        offset: const Offset(0, 50),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _searchController,
-                        focusNode: _searchFocusNode,
-                        decoration: InputDecoration(
-                          hintText: 'Pesquisar',
-                          hintStyle: const TextStyle(
-                            fontSize: 17,
-                            color: Color(0xFFB5B5B5),
-                            fontWeight: FontWeight.w400,
-                          ),
-                          filled: true,
-                          contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 1),
-                          fillColor: Theme.of(context).inputDecorationTheme.fillColor,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                            borderSide: BorderSide.none,
-                          ),
-                          prefixIcon: const Icon(
-                            Icons.search,
-                            size: 20,
-                            color: Color(0xFFB5B5B5),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    PopupMenuButton<String>(
-                      icon: Icon(
-                        PhosphorIcons.funnelSimple(),
-                        size: 25.0,
-                      ),
-                      onSelected: (value) {
-                        setState(() {
-                          _selectedSort = value; // Atualiza a seleção
-                        });
-
-                        if (value == 'Idade') {
-                          _sortByAge();
-                        } else if (value == 'Número de Rol') {
-                          _sortByRol();
-                        } else if (value == 'Alfabética') {
-                          _sortAlphabetically();
-                        }
+                  const SizedBox(height: 16),
+                  Text(
+                    'Todos os membros:',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 17, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 16),
+                  ...filteredMembers.map((member) {
+                    String memberId = member['id'].toString();
+                    return GestureDetector(
+                      onHorizontalDragUpdate: (details) => _onHorizontalDragUpdate(details, memberId),
+                      onHorizontalDragEnd: (details) => _onHorizontalDragEnd(details, memberId),
+                      onTap: () {
+                        _viewMember(member);
                       },
-                      itemBuilder: (context) => [
-                        PopupMenuItem(
-                          value: 'Idade',
-                          child: Text(
-                            'Idade (1-100)',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: _selectedSort == 'Idade' ? Theme.of(context).textTheme.titleMedium?.color : Colors.grey,
-                                  fontWeight: _selectedSort == 'Idade' ? FontWeight.w700 : FontWeight.w500,
-                                  fontSize: 14,
+                      child: Stack(
+                        children: [
+                          Positioned.fill(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                GestureDetector(
+                                  onTap: () => _editMember(member),
+                                  child: Container(
+                                    margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF015B40),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: const Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                      child: Icon(
+                                        Icons.edit,
+                                        size: 18,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                          ),
-                        ),
-                        PopupMenuItem(
-                          value: 'Número de Rol',
-                          child: Text(
-                            'Número de Rol (0-999)',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: _selectedSort == 'Número de Rol' ? Theme.of(context).textTheme.titleMedium?.color : Colors.grey,
-                                  fontWeight: _selectedSort == 'Número de Rol' ? FontWeight.w700 : FontWeight.w500,
-                                  fontSize: 14,
+                                GestureDetector(
+                                  onTap: () async {
+                                    bool confirm = await _confirmDelete(context);
+                                    if (confirm) {
+                                      _deleteMember(member['id']);
+                                    }
+                                  },
+                                  child: Container(
+                                    margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                                    decoration: BoxDecoration(
+                                      color: const Color.fromARGB(255, 154, 27, 27),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: const Padding(
+                                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                      child: Icon(
+                                        Icons.delete,
+                                        size: 18,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
                                 ),
+                              ],
+                            ),
                           ),
-                        ),
-                        PopupMenuItem(
-                          value: 'Alfabética',
-                          child: Text(
-                            'Ordem Alfabética (A-Z)',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  color: _selectedSort == 'Alfabética' ? Theme.of(context).textTheme.titleMedium?.color : Colors.grey,
-                                  fontWeight: _selectedSort == 'Alfabética' ? FontWeight.w700 : FontWeight.w500,
-                                  fontSize: 14,
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            transform: Matrix4.translationValues(slidePositions[memberId] ?? 0.0, 0, 0),
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                CircleAvatar(
+                                  radius: 28,
+                                  backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
+                                  backgroundImage: (member['imagemMembro'] != null && member['imagemMembro'] is String)
+                                      ? NetworkImage(member['imagemMembro']) // Usa a URL pública
+                                      : const AssetImage('assets/images/avatar_placeholder.png') as ImageProvider,
                                 ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        member['nomeCompleto'] ?? 'Nome não disponível',
+                                        style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 16),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        children: [
+                                          Icon(
+                                            Icons.phone_iphone_rounded,
+                                            color: const Color(0xFFB5B5B5),
+                                            size: 16,
+                                          ),
+                                          Text(
+                                            member['celular'] ?? 'Telefone não disponível',
+                                            style: const TextStyle(),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
+                        ],
                       ),
-                      offset: const Offset(0, 50),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Todos os membros:',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 17, fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 16),
-                ...filteredMembers.map((member) {
-                  String memberId = member['id'].toString();
-                  return GestureDetector(
-                    onHorizontalDragUpdate: (details) => _onHorizontalDragUpdate(details, memberId),
-                    onHorizontalDragEnd: (details) => _onHorizontalDragEnd(details, memberId),
-                    onTap: () {
-                      _viewMember(member);
-                    },
-                    child: Stack(
-                      children: [
-                        Positioned.fill(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              GestureDetector(
-                                onTap: () => _editMember(member),
-                                child: Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF015B40),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: const Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                    child: Icon(
-                                      Icons.edit,
-                                      size: 18,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () async {
-                                  bool confirm = await _confirmDelete(context);
-                                  if (confirm) {
-                                    _deleteMember(member['id']);
-                                  }
-                                },
-                                child: Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                                  decoration: BoxDecoration(
-                                    color: const Color.fromARGB(255, 154, 27, 27),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: const Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                    child: Icon(
-                                      Icons.delete,
-                                      size: 18,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          transform: Matrix4.translationValues(slidePositions[memberId] ?? 0.0, 0, 0),
-                          color: Theme.of(context).scaffoldBackgroundColor,
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              CircleAvatar(
-                                radius: 28,
-                                backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
-                                backgroundImage: (member['imagemMembro'] != null && member['imagemMembro'] is String)
-                                    ? NetworkImage(member['imagemMembro']) // Usa a URL pública
-                                    : const AssetImage('assets/images/avatar_placeholder.png') as ImageProvider,
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      member['nomeCompleto'] ?? 'Nome não disponível',
-                                      style: Theme.of(context).textTheme.titleMedium?.copyWith(fontSize: 16),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          Icons.phone_iphone_rounded,
-                                          color: const Color(0xFFB5B5B5),
-                                          size: 16,
-                                        ),
-                                        Text(
-                                          member['celular'] ?? 'Telefone não disponível',
-                                          style: const TextStyle(),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-                const SizedBox(height: 100),
-              ],
-            ),
-            if (_isBannerVisible)
-              Positioned(
-                top: 10,
-                right: 0,
-                child: CustomBanner(
-                  message: _bannerMessage,
-                  backgroundColor: _bannerColor,
-                  onDismissed: _hideBanner,
-                ),
+                    );
+                  }).toList(),
+                  const SizedBox(height: 100),
+                ],
               ),
-            BottomSidebar(
-              currentIndex: currentIndex,
-              onTabTapped: onTabTapped,
-              onThemeToggle: widget.onThemeToggle,
-              themeModeNotifier: widget.themeModeNotifier,
-              isKeyboardVisible: MediaQuery.of(context).viewInsets.bottom != 0,
-            ),
-          ],
+              if (_isBannerVisible)
+                Positioned(
+                  top: 10,
+                  right: 0,
+                  child: CustomBanner(
+                    message: _bannerMessage,
+                    backgroundColor: _bannerColor,
+                    onDismissed: _hideBanner,
+                  ),
+                ),
+              BottomSidebar(
+                currentIndex: currentIndex,
+                onTabTapped: onTabTapped,
+                onThemeToggle: widget.onThemeToggle,
+                themeModeNotifier: widget.themeModeNotifier,
+                isKeyboardVisible: MediaQuery.of(context).viewInsets.bottom != 0,
+              ),
+            ],
+          ),
         ),
       ),
     );

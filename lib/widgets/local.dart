@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'screen_scale_wrapper.dart';
 
 class LocalField extends StatefulWidget {
   final bool obscureText;
@@ -186,7 +187,7 @@ class _LocalFieldState extends State<LocalField> {
                 items: widget.states.map<DropdownMenuItem<String>>((String value) {
                   return DropdownMenuItem<String>(
                     value: value,
-                    child: Text(value),
+                    child: ScreenScaleWrapper(child: Text(value)),
                   );
                 }).toList(),
                 dropdownColor: Theme.of(context).inputDecorationTheme.fillColor, // Ajusta a cor do dropdown

@@ -1,4 +1,5 @@
 // ignore_for_file: unused_local_variable
+import 'package:softwareipj/widgets/screen_scale_wrapper.dart';
 import '../app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -409,693 +410,695 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        FocusScope.of(context).unfocus(); // Esconde o teclado ao tocar fora dos campos
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 90,
-          backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-          scrolledUnderElevation: 0,
-          // automaticallyImplyLeading: false, //Desabilita o botão de qualquer jeito, ignorando a biblioteca do FLUTTER
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(
-              Icons.chevron_left,
-              size: 30,
-              color: Appcolors.white,
+    return ScreenScaleWrapper(
+      child: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus(); // Esconde o teclado ao tocar fora dos campos
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            toolbarHeight: 90,
+            backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+            scrolledUnderElevation: 0,
+            // automaticallyImplyLeading: false, //Desabilita o botão de qualquer jeito, ignorando a biblioteca do FLUTTER
+            leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(
+                Icons.chevron_left,
+                size: 30,
+                color: Appcolors.white,
+              ),
             ),
+            title: Text(
+              'Cadastro',
+              style: Theme.of(context).textTheme.titleLarge, // Usa o estilo do tema para o AppBar
+            ),
+            centerTitle: true,
           ),
-          title: Text(
-            'Cadastro',
-            style: Theme.of(context).textTheme.titleLarge, // Usa o estilo do tema para o AppBar
-          ),
-          centerTitle: true,
-        ),
-        body: Stack(
-          key: _formKey, // Associa a chave do formulário
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(23.0, 0.0, 23.0, 0.0), // Adiciona um padding inferior maior
-              child: ListView(
-                controller: _scrollController, // Adicione o controlador aqui
-                children: [
-                  const SizedBox(height: 30),
-                  // Adicionando o círculo de foto no início
-                  MouseRegion(
-                    cursor: SystemMouseCursors.click,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Coloca a imagem como fundo do Stack
-                        Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            GestureDetector(
-                              onTap: _pickImage, // Função para selecionar a imagem
-                              child: CircleAvatar(
-                                radius: 70,
-                                backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
-                                child: ClipOval(
-                                  child: _selectedImage != null
-                                      ? Image.file(
-                                          _selectedImage!,
-                                          width: 140,
-                                          height: 140,
-                                          fit: BoxFit.cover,
-                                        )
-                                      : (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty)
-                                          ? Image.network(
-                                              widget.memberData!['imagemMembro'],
-                                              width: 140,
-                                              height: 140,
-                                              fit: BoxFit.cover,
-                                              errorBuilder: (context, error, stackTrace) => SvgPicture.asset(
+          body: Stack(
+            key: _formKey, // Associa a chave do formulário
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(23.0, 0.0, 23.0, 0.0), // Adiciona um padding inferior maior
+                child: ListView(
+                  controller: _scrollController, // Adicione o controlador aqui
+                  children: [
+                    const SizedBox(height: 30),
+                    // Adicionando o círculo de foto no início
+                    MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          // Coloca a imagem como fundo do Stack
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              GestureDetector(
+                                onTap: _pickImage, // Função para selecionar a imagem
+                                child: CircleAvatar(
+                                  radius: 70,
+                                  backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
+                                  child: ClipOval(
+                                    child: _selectedImage != null
+                                        ? Image.file(
+                                            _selectedImage!,
+                                            width: 140,
+                                            height: 140,
+                                            fit: BoxFit.cover,
+                                          )
+                                        : (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty)
+                                            ? Image.network(
+                                                widget.memberData!['imagemMembro'],
+                                                width: 140,
+                                                height: 140,
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error, stackTrace) => SvgPicture.asset(
+                                                  'assets/images/user-round.svg',
+                                                  height: 50,
+                                                  width: 50,
+                                                  color: Theme.of(context).iconTheme.color,
+                                                ),
+                                              )
+                                            : SvgPicture.asset(
                                                 'assets/images/user-round.svg',
                                                 height: 50,
                                                 width: 50,
                                                 color: Theme.of(context).iconTheme.color,
                                               ),
-                                            )
-                                          : SvgPicture.asset(
-                                              'assets/images/user-round.svg',
-                                              height: 50,
-                                              width: 50,
-                                              color: Theme.of(context).iconTheme.color,
-                                            ),
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: 40), // Espaçamento fixo para "Informações Pessoais"
-                          ],
-                        ),
-
-                        // Botão "Remover Foto"
-                        if (_selectedImage != null || (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty))
-                          Positioned(
-                            bottom: -5, // Posiciona o botão logo abaixo do CircleAvatar
-                            child: TextButton(
-                              onPressed: () async {
-                                try {
-                                  // Remover imagem associada ao membro
-                                  if (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty) {
-                                    final oldFileName = widget.memberData!['imagemMembro'].split('/').last;
-                                    final deleteResponse = await Supabase.instance.client.storage.from('membros_storage').remove([
-                                      oldFileName
-                                    ]);
-
-                                    if (deleteResponse.isEmpty) {
-                                      print('Nenhum arquivo foi excluído. Verifique se o arquivo existe: $oldFileName');
-                                    } else {
-                                      print('Imagem antiga removida: $oldFileName');
-                                    }
-                                  }
-
-                                  // Limpar o estado da imagem
-                                  setState(() {
-                                    _selectedImage = null;
-                                    if (widget.memberData != null) {
-                                      widget.memberData!['imagemMembro'] = ''; // Remove a URL no caso de edição
-                                    }
-                                  });
-                                } catch (e) {
-                                  _showBanner('Erro ao remover a imagem.', const Color.fromARGB(255, 154, 27, 27));
-                                  print('Erro ao remover imagem: $e');
-                                }
-                              },
-                              child: const Text(
-                                'Remover Foto',
-                                style: TextStyle(
-                                  color: Colors.red,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
+                              const SizedBox(height: 40), // Espaçamento fixo para "Informações Pessoais"
+                            ],
                           ),
-                      ],
-                    ),
-                  ),
-                  
-                  Center(child: buildSectionTitle(context, 'Informações Pessoais')),
-                  const SizedBox(height: 20),
-                  Center(
-                    child: CustomCapitalizedTextField(
-                      controller: nomeCompletoController,
-                      hintText: 'Nome Completo',
-                      textInputAction: TextInputAction.next,
-                      borderColor: _fieldErrors['nomeCompleto'] == true ? Colors.red : null,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomDropdown(
-                          labelText: 'Comungante',
-                          controller: comunganteController,
-                          items: const [
-                            'SIM',
-                            'NÃO'
-                          ],
-                          hintText: 'Comungante',
-                          borderColor: _fieldErrors['comungante'] == true ? Colors.red : null,
-                        ),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        child: CustomTextField(
-                          controller: numeroRolController,
-                          hintText: 'Numero de Rol',
-                          obscureText: false,
-                          textInputAction: TextInputAction.next,
-                          keyboardType: TextInputType.number, // Apenas números
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(3), // Limita a 3 caracteres
-                          ],
-                          onChanged: (value) async {
-                            // Verifica duplicação ao alterar o valor
-                            if (value.isNotEmpty) {
-                              bool isDuplicate = await _isNumeroRolDuplicado(value);
-                              setState(() {
-                                _fieldErrors['numeroRol'] = isDuplicate; // Define o erro em caso de duplicação
-                              });
-                            } else {
-                              setState(() {
-                                _fieldErrors['numeroRol'] = true; // Erro se estiver vazio
-                              });
-                            }
-                          },
-                          borderColor: _fieldErrors['numeroRol'] == true ? Colors.red : null, // Mostra a borda vermelha em caso de erro
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomDropdown(
-                          labelText: 'Sexo',
-                          controller: sexoController,
-                          items: const [
-                            'Masculino',
-                            'Feminino'
-                          ],
-                          borderColor: _fieldErrors['sexo'] == true ? Colors.red : null,
-                        ),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        child: CustomDateTextField(
-                          controller: dataNascimentoController,
-                          hintText: 'Data de nascimento',
-                          borderColor: _fieldErrors['dataNascimento'] == true ? Colors.red : null,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  LocalField(
-                    cityController: cidadeNascimentoController,
-                    stateController: estadoNascimentoController,
-                    obscureText: false,
-                    textInputAction: TextInputAction.next,
-                    onCityChanged: (value) {
-                      final capitalized = capitalize(value);
-                      if (capitalized != value) {
-                        cidadeNascimentoController.value = cidadeNascimentoController.value.copyWith(
-                          text: capitalized,
-                          selection: TextSelection.collapsed(offset: capitalized.length),
-                        );
-                      }
-                    },
-                    cityLabelText: 'Cidade Nasc.', // Personaliza o rótulo
-                    stateLabelText: 'UF Nasc.', // Personaliza o rótulo
-                  ),
-                  const SizedBox(height: 20),
-                  CustomCapitalizedTextField(
-                    controller: nomePaiController,
-                    hintText: 'Nome do Pai',
-                    textInputAction: TextInputAction.next,
-                  ),
-                  const SizedBox(height: 20),
-                  CustomCapitalizedTextField(
-                    controller: nomeMaeController,
-                    hintText: 'Nome da Mãe',
-                    textInputAction: TextInputAction.next,
-                  ),
-                  const SizedBox(height: 20),
-                  CustomCapitalizedTextField(
-                    controller: escolaridadeController,
-                    hintText: 'Escolaridade',
-                    textInputAction: TextInputAction.next,
-                  ),
-                  const SizedBox(height: 20),
-                  CustomCapitalizedTextField(
-                    controller: profissaoController,
-                    hintText: 'Profissão',
-                    textInputAction: TextInputAction.next,
-                  ),
-                  const SizedBox(height: 20),
-                  CustomTextField(
-                    controller: emailController,
-                    hintText: 'E-mail',
-                    obscureText: false,
-                    keyboardType: TextInputType.emailAddress, // Teclado de email
-                    textInputAction: TextInputAction.next,
-                    validator: (value) {
-                      if (value == null || value.isEmpty || !isValidEmail(value)) {
-                        return 'Por favor, insira um email válido';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomTextField(
-                          controller: telefoneController,
-                          hintText: 'Telefone',
-                          obscureText: false,
-                          keyboardType: TextInputType.phone, // Teclado de telefone
-                          inputFormatters: [
-                            PhoneInputFormatter(), // Utiliza o formatter personalizado
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        child: CustomTextField(
-                          controller: celularController,
-                          hintText: 'Celular',
-                          obscureText: false,
-                          keyboardType: TextInputType.phone, // Teclado de telefone
-                          inputFormatters: [
-                            PhoneInputFormatter(), // Utiliza o formatter personalizado
-                          ],
-                          borderColor: _fieldErrors['celular'] == true ? Colors.red : null,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 30),
-                  Center(child: buildSectionTitle(context, 'Localização Atual')),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomCepTextField(
-                          controller: cepController,
-                          textInputAction: TextInputAction.next,
-                          onEnderecoEncontrado: (endereco) {
-                            setState(() {
-                              bairroController.text = endereco['bairro'] ?? '';
-                              enderecotController.text = endereco['logradouro'] ?? '';
-                              cidadeAtualController.text = endereco['localidade'] ?? '';
-                              estadoAtualController.text = endereco['uf'] ?? '';
-                            });
-                          },
-                          onCepNaoEncontrado: () => _showBanner('CEP não encontrado.', const Color.fromARGB(255, 93, 14, 14)),
-                          onErro: () => _showBanner('Erro de conexão. Verifique sua internet.', const Color.fromARGB(255, 93, 14, 14)),
-                        ),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        child: CustomTextField(
-                          controller: bairroController,
-                          hintText: 'Bairro',
-                          obscureText: false,
-                          textInputAction: TextInputAction.next,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  CustomTextField(
-                    controller: enderecotController,
-                    hintText: 'Endereço',
-                    obscureText: false,
-                    textInputAction: TextInputAction.next,
-                  ),
-                  const SizedBox(height: 20),
-                  CustomTextField(
-                    controller: complementoController,
-                    hintText: 'Complemento',
-                    obscureText: false,
-                    textInputAction: TextInputAction.next,
-                  ),
-                  const SizedBox(height: 20),
-                  LocalField(
-                    cityController: cidadeAtualController,
-                    stateController: estadoAtualController,
-                    obscureText: false,
-                    textInputAction: TextInputAction.next,
-                    onCityChanged: (value) {
-                      final capitalized = capitalize(value);
-                      if (capitalized != value) {
-                        cidadeAtualController.value = cidadeAtualController.value.copyWith(
-                          text: capitalized,
-                          selection: TextSelection.collapsed(offset: capitalized.length),
-                        );
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 30),
-                  Center(child: buildSectionTitle(context, 'Outras informações')),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomDropdown(
-                          labelText: 'Local Residência',
-                          controller: residenciaController,
-                          items: const [
-                            'Sede',
-                            'Fora'
-                          ],
-                          borderColor: _fieldErrors['residenciaLocal'] == true ? Colors.red : null,
-                        ),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        child: CustomDropdown(
-                          labelText: 'Estado Civil',
-                          controller: estadoCivilController,
-                          items: const [
-                            'Solteiro(a)',
-                            'Casado(a)',
-                            'Viuvo(a)',
-                            'Divorciado(a)',
-                            'Outros'
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  CustomDropdown(
-                      labelText: 'Religião Procedente',
-                      items: const [
-                        'Reformada',
-                        'Pentecostal',
-                        'Neo-Pentecostal',
-                        'Católica Romana',
-                        'Espiritismos e Assemelhados',
-                        'Outros'
-                      ],
-                      controller: religiaoController),
-                  const SizedBox(height: 30),
-                  Center(child: buildSectionTitle(context, 'Batismo')),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        flex: 1,
-                        child: CustomDateTextField(
-                          controller: dataBatismoController,
-                          hintText: 'Data',
-                        ),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        flex: 2,
-                        child: CustomCapitalizedTextField(
-                          controller: oficianteBatismoController,
-                          hintText: 'Oficiante',
-                          textInputAction: TextInputAction.next,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Center(child: buildSectionTitle(context, 'Profissão de Fé')),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        flex: 1,
-                        child: CustomDateTextField(controller: dataProfissaoController, hintText: 'Data'),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        flex: 2,
-                        child: CustomCapitalizedTextField(
-                          controller: oficianteProfissaoController,
-                          hintText: 'Oficiante',
-                          textInputAction: TextInputAction.next,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Center(child: buildSectionTitle(context, 'Admissão')),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        flex: 1,
-                        child: CustomDateTextField(controller: dataAdmissaoController, hintText: 'Data'),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        flex: 2,
-                        child: CustomTextField(
-                          controller: ataAdmissaoController,
-                          hintText: 'Ata',
-                          obscureText: false,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomDropdown(
-                          labelText: 'Forma',
-                          controller: formaAdmissaoController,
-                          items: const [
-                            'Transferência',
-                            'Batismo',
-                            'Profissão de Fé',
-                            'Batismo e Profissão de Fé',
-                            'Jurisdição a pedido',
-                            'Jurisdição Ex-Officio',
-                            'Restauração',
-                            'Designação e Presbitério'
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Center(child: buildSectionTitle(context, 'Demissão')),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        flex: 1,
-                        child: CustomDateTextField(controller: dataDemissaoController, hintText: 'Data'),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        flex: 2,
-                        child: CustomTextField(
-                          controller: ataDemissaoController,
-                          hintText: 'Ata',
-                          obscureText: false,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomDropdown(
-                          labelText: 'Forma',
-                          controller: formaDemissaoController,
-                          items: const [
-                            'Transferência',
-                            'Batismo',
-                            'Profissão de Fé',
-                            'Batismo e Profissão de Fé',
-                            'Jurisdição a pedido',
-                            'Jurisdição Ex-Officio',
-                            'Restauração',
-                            'Designação e Presbitério'
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Center(child: buildSectionTitle(context, 'Rol Separado')),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomDateTextField(controller: dataRolSeparadoController, hintText: 'Data'),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        child: CustomTextField(
-                          controller: ataRolSeparadoController,
-                          hintText: 'Ata',
-                          obscureText: false,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        child: CustomDateTextField(
-                          controller: casamentoRolSeparadoController,
-                          hintText: 'Casamento',
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomDateTextField(controller: dataDiscRolSeparadoController, hintText: 'Data Disc.'),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        child: CustomTextField(
-                          controller: ataDiscRolSeparadoController,
-                          hintText: 'Ata Disc.',
-                          obscureText: false,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        child: CustomTextField(
-                          controller: discRolSeparadoController,
-                          hintText: 'Disciplina',
-                          obscureText: false,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Center(child: buildSectionTitle(context, 'Eleições Diácono')),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomDateTextField(controller: dataDiacController, hintText: 'Data'),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        child: CustomDateTextField(controller: reeleitoDiac1Controller, hintText: 'Reeleito em'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomDateTextField(controller: reeleitoDiac2Controller, hintText: 'Reeleito em'),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        child: CustomDateTextField(controller: reeleitoDiac3Controller, hintText: 'Reeleito em'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Center(child: buildSectionTitle(context, 'Eleições Presbitero')),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomDateTextField(controller: dataPresbController, hintText: 'Data'),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        child: CustomDateTextField(controller: reeleitoPresb1Controller, hintText: 'Reeleito em'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomDateTextField(controller: reeleitoPresb2Controller, hintText: 'Reeleito em'),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        child: CustomDateTextField(controller: reeleitoPresb3Controller, hintText: 'Reeleito em'),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Center(
-                    child: CustomButton(
-                      text: 'Salvar',
-                      onPressed: () async {
-                        _validateFields(); // Valida os campos obrigatórios
-                        if (_fieldErrors.isEmpty) {
-                          bool success = await _saveMember();
-                          if (success) {
-                            Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => Members(
-                                  onThemeToggle: widget.onThemeToggle,
-                                  themeModeNotifier: widget.themeModeNotifier,
-                                  successMessage: 'Membro salvo com sucesso!',
+      
+                          // Botão "Remover Foto"
+                          if (_selectedImage != null || (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty))
+                            Positioned(
+                              bottom: -5, // Posiciona o botão logo abaixo do CircleAvatar
+                              child: TextButton(
+                                onPressed: () async {
+                                  try {
+                                    // Remover imagem associada ao membro
+                                    if (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty) {
+                                      final oldFileName = widget.memberData!['imagemMembro'].split('/').last;
+                                      final deleteResponse = await Supabase.instance.client.storage.from('membros_storage').remove([
+                                        oldFileName
+                                      ]);
+      
+                                      if (deleteResponse.isEmpty) {
+                                        print('Nenhum arquivo foi excluído. Verifique se o arquivo existe: $oldFileName');
+                                      } else {
+                                        print('Imagem antiga removida: $oldFileName');
+                                      }
+                                    }
+      
+                                    // Limpar o estado da imagem
+                                    setState(() {
+                                      _selectedImage = null;
+                                      if (widget.memberData != null) {
+                                        widget.memberData!['imagemMembro'] = ''; // Remove a URL no caso de edição
+                                      }
+                                    });
+                                  } catch (e) {
+                                    _showBanner('Erro ao remover a imagem.', const Color.fromARGB(255, 154, 27, 27));
+                                    print('Erro ao remover imagem: $e');
+                                  }
+                                },
+                                child: const Text(
+                                  'Remover Foto',
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ),
-                              (route) => false, // Remove todas as rotas anteriores da pilha
-                            );
-                          }
-                        } else {
-                          _showBanner('Preencha os campos obrigatórios.', Color.fromARGB(255, 154, 27, 27));
+                            ),
+                        ],
+                      ),
+                    ),
+                    
+                    Center(child: buildSectionTitle(context, 'Informações Pessoais')),
+                    const SizedBox(height: 20),
+                    Center(
+                      child: CustomCapitalizedTextField(
+                        controller: nomeCompletoController,
+                        hintText: 'Nome Completo',
+                        textInputAction: TextInputAction.next,
+                        borderColor: _fieldErrors['nomeCompleto'] == true ? Colors.red : null,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomDropdown(
+                            labelText: 'Comungante',
+                            controller: comunganteController,
+                            items: const [
+                              'SIM',
+                              'NÃO'
+                            ],
+                            hintText: 'Comungante',
+                            borderColor: _fieldErrors['comungante'] == true ? Colors.red : null,
+                          ),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          child: CustomTextField(
+                            controller: numeroRolController,
+                            hintText: 'Numero de Rol',
+                            obscureText: false,
+                            textInputAction: TextInputAction.next,
+                            keyboardType: TextInputType.number, // Apenas números
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(3), // Limita a 3 caracteres
+                            ],
+                            onChanged: (value) async {
+                              // Verifica duplicação ao alterar o valor
+                              if (value.isNotEmpty) {
+                                bool isDuplicate = await _isNumeroRolDuplicado(value);
+                                setState(() {
+                                  _fieldErrors['numeroRol'] = isDuplicate; // Define o erro em caso de duplicação
+                                });
+                              } else {
+                                setState(() {
+                                  _fieldErrors['numeroRol'] = true; // Erro se estiver vazio
+                                });
+                              }
+                            },
+                            borderColor: _fieldErrors['numeroRol'] == true ? Colors.red : null, // Mostra a borda vermelha em caso de erro
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomDropdown(
+                            labelText: 'Sexo',
+                            controller: sexoController,
+                            items: const [
+                              'Masculino',
+                              'Feminino'
+                            ],
+                            borderColor: _fieldErrors['sexo'] == true ? Colors.red : null,
+                          ),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          child: CustomDateTextField(
+                            controller: dataNascimentoController,
+                            hintText: 'Data de nascimento',
+                            borderColor: _fieldErrors['dataNascimento'] == true ? Colors.red : null,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    LocalField(
+                      cityController: cidadeNascimentoController,
+                      stateController: estadoNascimentoController,
+                      obscureText: false,
+                      textInputAction: TextInputAction.next,
+                      onCityChanged: (value) {
+                        final capitalized = capitalize(value);
+                        if (capitalized != value) {
+                          cidadeNascimentoController.value = cidadeNascimentoController.value.copyWith(
+                            text: capitalized,
+                            selection: TextSelection.collapsed(offset: capitalized.length),
+                          );
+                        }
+                      },
+                      cityLabelText: 'Cidade Nasc.', // Personaliza o rótulo
+                      stateLabelText: 'UF Nasc.', // Personaliza o rótulo
+                    ),
+                    const SizedBox(height: 20),
+                    CustomCapitalizedTextField(
+                      controller: nomePaiController,
+                      hintText: 'Nome do Pai',
+                      textInputAction: TextInputAction.next,
+                    ),
+                    const SizedBox(height: 20),
+                    CustomCapitalizedTextField(
+                      controller: nomeMaeController,
+                      hintText: 'Nome da Mãe',
+                      textInputAction: TextInputAction.next,
+                    ),
+                    const SizedBox(height: 20),
+                    CustomCapitalizedTextField(
+                      controller: escolaridadeController,
+                      hintText: 'Escolaridade',
+                      textInputAction: TextInputAction.next,
+                    ),
+                    const SizedBox(height: 20),
+                    CustomCapitalizedTextField(
+                      controller: profissaoController,
+                      hintText: 'Profissão',
+                      textInputAction: TextInputAction.next,
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                      controller: emailController,
+                      hintText: 'E-mail',
+                      obscureText: false,
+                      keyboardType: TextInputType.emailAddress, // Teclado de email
+                      textInputAction: TextInputAction.next,
+                      validator: (value) {
+                        if (value == null || value.isEmpty || !isValidEmail(value)) {
+                          return 'Por favor, insira um email válido';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomTextField(
+                            controller: telefoneController,
+                            hintText: 'Telefone',
+                            obscureText: false,
+                            keyboardType: TextInputType.phone, // Teclado de telefone
+                            inputFormatters: [
+                              PhoneInputFormatter(), // Utiliza o formatter personalizado
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          child: CustomTextField(
+                            controller: celularController,
+                            hintText: 'Celular',
+                            obscureText: false,
+                            keyboardType: TextInputType.phone, // Teclado de telefone
+                            inputFormatters: [
+                              PhoneInputFormatter(), // Utiliza o formatter personalizado
+                            ],
+                            borderColor: _fieldErrors['celular'] == true ? Colors.red : null,
+                          ),
+                        ),
+                      ],
+                    ),
+      
+                    const SizedBox(height: 30),
+                    Center(child: buildSectionTitle(context, 'Localização Atual')),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomCepTextField(
+                            controller: cepController,
+                            textInputAction: TextInputAction.next,
+                            onEnderecoEncontrado: (endereco) {
+                              setState(() {
+                                bairroController.text = endereco['bairro'] ?? '';
+                                enderecotController.text = endereco['logradouro'] ?? '';
+                                cidadeAtualController.text = endereco['localidade'] ?? '';
+                                estadoAtualController.text = endereco['uf'] ?? '';
+                              });
+                            },
+                            onCepNaoEncontrado: () => _showBanner('CEP não encontrado.', const Color.fromARGB(255, 93, 14, 14)),
+                            onErro: () => _showBanner('Erro de conexão. Verifique sua internet.', const Color.fromARGB(255, 93, 14, 14)),
+                          ),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          child: CustomTextField(
+                            controller: bairroController,
+                            hintText: 'Bairro',
+                            obscureText: false,
+                            textInputAction: TextInputAction.next,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                      controller: enderecotController,
+                      hintText: 'Endereço',
+                      obscureText: false,
+                      textInputAction: TextInputAction.next,
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                      controller: complementoController,
+                      hintText: 'Complemento',
+                      obscureText: false,
+                      textInputAction: TextInputAction.next,
+                    ),
+                    const SizedBox(height: 20),
+                    LocalField(
+                      cityController: cidadeAtualController,
+                      stateController: estadoAtualController,
+                      obscureText: false,
+                      textInputAction: TextInputAction.next,
+                      onCityChanged: (value) {
+                        final capitalized = capitalize(value);
+                        if (capitalized != value) {
+                          cidadeAtualController.value = cidadeAtualController.value.copyWith(
+                            text: capitalized,
+                            selection: TextSelection.collapsed(offset: capitalized.length),
+                          );
                         }
                       },
                     ),
-                  ),
-                  const SizedBox(height: 100), //Esse Widget é para dar uma espaçamento final para a sidebar não sobrepor os itens da tela
-                ],
-              ),
-            ),
-            BottomSidebar(currentIndex: currentIndex, onTabTapped: onTabTapped, onThemeToggle: widget.onThemeToggle, themeModeNotifier: widget.themeModeNotifier, isKeyboardVisible: MediaQuery.of(context).viewInsets.bottom != 0),
-            if (_isBannerVisible)
-              Positioned(
-                top: 10,
-                right: 0,
-                child: CustomBanner(
-                  message: _bannerMessage, // Usa a mensagem do estado
-                  backgroundColor: _bannerColor, // Usa a cor do estado
-                  onDismissed: _hideBanner, // Callback para ocultar o banner após a animação,
+                    const SizedBox(height: 30),
+                    Center(child: buildSectionTitle(context, 'Outras informações')),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomDropdown(
+                            labelText: 'Local Residência',
+                            controller: residenciaController,
+                            items: const [
+                              'Sede',
+                              'Fora'
+                            ],
+                            borderColor: _fieldErrors['residenciaLocal'] == true ? Colors.red : null,
+                          ),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          child: CustomDropdown(
+                            labelText: 'Estado Civil',
+                            controller: estadoCivilController,
+                            items: const [
+                              'Solteiro(a)',
+                              'Casado(a)',
+                              'Viuvo(a)',
+                              'Divorciado(a)',
+                              'Outros'
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    CustomDropdown(
+                        labelText: 'Religião Procedente',
+                        items: const [
+                          'Reformada',
+                          'Pentecostal',
+                          'Neo-Pentecostal',
+                          'Católica Romana',
+                          'Espiritismos e Assemelhados',
+                          'Outros'
+                        ],
+                        controller: religiaoController),
+                    const SizedBox(height: 30),
+                    Center(child: buildSectionTitle(context, 'Batismo')),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          flex: 1,
+                          child: CustomDateTextField(
+                            controller: dataBatismoController,
+                            hintText: 'Data',
+                          ),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          flex: 2,
+                          child: CustomCapitalizedTextField(
+                            controller: oficianteBatismoController,
+                            hintText: 'Oficiante',
+                            textInputAction: TextInputAction.next,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                    Center(child: buildSectionTitle(context, 'Profissão de Fé')),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          flex: 1,
+                          child: CustomDateTextField(controller: dataProfissaoController, hintText: 'Data'),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          flex: 2,
+                          child: CustomCapitalizedTextField(
+                            controller: oficianteProfissaoController,
+                            hintText: 'Oficiante',
+                            textInputAction: TextInputAction.next,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                    Center(child: buildSectionTitle(context, 'Admissão')),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          flex: 1,
+                          child: CustomDateTextField(controller: dataAdmissaoController, hintText: 'Data'),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          flex: 2,
+                          child: CustomTextField(
+                            controller: ataAdmissaoController,
+                            hintText: 'Ata',
+                            obscureText: false,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomDropdown(
+                            labelText: 'Forma',
+                            controller: formaAdmissaoController,
+                            items: const [
+                              'Transferência',
+                              'Batismo',
+                              'Profissão de Fé',
+                              'Batismo e Profissão de Fé',
+                              'Jurisdição a pedido',
+                              'Jurisdição Ex-Officio',
+                              'Restauração',
+                              'Designação e Presbitério'
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                    Center(child: buildSectionTitle(context, 'Demissão')),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          flex: 1,
+                          child: CustomDateTextField(controller: dataDemissaoController, hintText: 'Data'),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          flex: 2,
+                          child: CustomTextField(
+                            controller: ataDemissaoController,
+                            hintText: 'Ata',
+                            obscureText: false,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomDropdown(
+                            labelText: 'Forma',
+                            controller: formaDemissaoController,
+                            items: const [
+                              'Transferência',
+                              'Batismo',
+                              'Profissão de Fé',
+                              'Batismo e Profissão de Fé',
+                              'Jurisdição a pedido',
+                              'Jurisdição Ex-Officio',
+                              'Restauração',
+                              'Designação e Presbitério'
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                    Center(child: buildSectionTitle(context, 'Rol Separado')),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomDateTextField(controller: dataRolSeparadoController, hintText: 'Data'),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          child: CustomTextField(
+                            controller: ataRolSeparadoController,
+                            hintText: 'Ata',
+                            obscureText: false,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          child: CustomDateTextField(
+                            controller: casamentoRolSeparadoController,
+                            hintText: 'Casamento',
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomDateTextField(controller: dataDiscRolSeparadoController, hintText: 'Data Disc.'),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          child: CustomTextField(
+                            controller: ataDiscRolSeparadoController,
+                            hintText: 'Ata Disc.',
+                            obscureText: false,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          child: CustomTextField(
+                            controller: discRolSeparadoController,
+                            hintText: 'Disciplina',
+                            obscureText: false,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                    Center(child: buildSectionTitle(context, 'Eleições Diácono')),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomDateTextField(controller: dataDiacController, hintText: 'Data'),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          child: CustomDateTextField(controller: reeleitoDiac1Controller, hintText: 'Reeleito em'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomDateTextField(controller: reeleitoDiac2Controller, hintText: 'Reeleito em'),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          child: CustomDateTextField(controller: reeleitoDiac3Controller, hintText: 'Reeleito em'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                    Center(child: buildSectionTitle(context, 'Eleições Presbitero')),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomDateTextField(controller: dataPresbController, hintText: 'Data'),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          child: CustomDateTextField(controller: reeleitoPresb1Controller, hintText: 'Reeleito em'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomDateTextField(controller: reeleitoPresb2Controller, hintText: 'Reeleito em'),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          child: CustomDateTextField(controller: reeleitoPresb3Controller, hintText: 'Reeleito em'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                    Center(
+                      child: CustomButton(
+                        text: 'Salvar',
+                        onPressed: () async {
+                          _validateFields(); // Valida os campos obrigatórios
+                          if (_fieldErrors.isEmpty) {
+                            bool success = await _saveMember();
+                            if (success) {
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => Members(
+                                    onThemeToggle: widget.onThemeToggle,
+                                    themeModeNotifier: widget.themeModeNotifier,
+                                    successMessage: 'Membro salvo com sucesso!',
+                                  ),
+                                ),
+                                (route) => false, // Remove todas as rotas anteriores da pilha
+                              );
+                            }
+                          } else {
+                            _showBanner('Preencha os campos obrigatórios.', Color.fromARGB(255, 154, 27, 27));
+                          }
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 100), //Esse Widget é para dar uma espaçamento final para a sidebar não sobrepor os itens da tela
+                  ],
                 ),
               ),
-          ],
+              BottomSidebar(currentIndex: currentIndex, onTabTapped: onTabTapped, onThemeToggle: widget.onThemeToggle, themeModeNotifier: widget.themeModeNotifier, isKeyboardVisible: MediaQuery.of(context).viewInsets.bottom != 0),
+              if (_isBannerVisible)
+                Positioned(
+                  top: 10,
+                  right: 0,
+                  child: CustomBanner(
+                    message: _bannerMessage, // Usa a mensagem do estado
+                    backgroundColor: _bannerColor, // Usa a cor do estado
+                    onDismissed: _hideBanner, // Callback para ocultar o banner após a animação,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

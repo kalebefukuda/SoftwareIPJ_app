@@ -1,3 +1,4 @@
+import 'package:softwareipj/widgets/screen_scale_wrapper.dart';
 import 'package:softwareipj/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -161,620 +162,622 @@ class _ViewMemberScreenState extends State<ViewMemberScreen> {
     if (widget.memberData == null) {
       return const Center(child: CircularProgressIndicator());
     }
-    return GestureDetector(
-      onTap: () {
-        FocusScope.of(context).unfocus(); // Esconde o teclado ao tocar fora dos campos
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 90,
-          backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-          scrolledUnderElevation: 0,
-          // automaticallyImplyLeading: false, //Desabilita o botão de qualquer jeito, ignorando a biblioteca do FLUTTER
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(
-              Icons.chevron_left,
-              size: 30,
-              color: Appcolors.white,
+    return ScreenScaleWrapper(
+      child: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus(); // Esconde o teclado ao tocar fora dos campos
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            toolbarHeight: 90,
+            backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+            scrolledUnderElevation: 0,
+            // automaticallyImplyLeading: false, //Desabilita o botão de qualquer jeito, ignorando a biblioteca do FLUTTER
+            leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(
+                Icons.chevron_left,
+                size: 30,
+                color: Appcolors.white,
+              ),
             ),
+            title: Text(
+              'Cadastro',
+              style: Theme.of(context).textTheme.titleLarge, // Usa o estilo do tema para o AppBar
+            ),
+            centerTitle: true,
           ),
-          title: Text(
-            'Cadastro',
-            style: Theme.of(context).textTheme.titleLarge, // Usa o estilo do tema para o AppBar
-          ),
-          centerTitle: true,
-        ),
-        body: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(23.0, 0.0, 23.0, 0.0), // Adiciona um padding inferior maior
-              child: ListView(
-                children: [
-                  const SizedBox(height: 20),
-                  // Adicionando o círculo de foto no início
-                  MouseRegion(
-                    cursor: SystemMouseCursors.click, // Define o cursor como 'pointer' ao passar o mouse
-                    child: GestureDetector(
-                      onTap: widget.isReadOnly ? null : _pickImage, // Desabilita a seleção de imagem se for apenas leitura
-                      child: CircleAvatar(
-                        radius: 70,
-                        backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
-                        child: ClipOval(
-                          child: (widget.memberData != null && (widget.memberData?['imagemMembro'] ?? '').isNotEmpty)
-                              ? Image.network(
-                                  widget.memberData?['imagemMembro'] ?? '',
-                                  width: 140,
-                                  height: 140,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) => SvgPicture.asset(
+          body: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(23.0, 0.0, 23.0, 0.0), // Adiciona um padding inferior maior
+                child: ListView(
+                  children: [
+                    const SizedBox(height: 20),
+                    // Adicionando o círculo de foto no início
+                    MouseRegion(
+                      cursor: SystemMouseCursors.click, // Define o cursor como 'pointer' ao passar o mouse
+                      child: GestureDetector(
+                        onTap: widget.isReadOnly ? null : _pickImage, // Desabilita a seleção de imagem se for apenas leitura
+                        child: CircleAvatar(
+                          radius: 70,
+                          backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
+                          child: ClipOval(
+                            child: (widget.memberData != null && (widget.memberData?['imagemMembro'] ?? '').isNotEmpty)
+                                ? Image.network(
+                                    widget.memberData?['imagemMembro'] ?? '',
+                                    width: 140,
+                                    height: 140,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) => SvgPicture.asset(
+                                      'assets/images/user-round.svg',
+                                      height: 50,
+                                      width: 50,
+                                      color: Theme.of(context).iconTheme.color,
+                                    ),
+                                  )
+                                : SvgPicture.asset(
                                     'assets/images/user-round.svg',
                                     height: 50,
                                     width: 50,
                                     color: Theme.of(context).iconTheme.color,
                                   ),
-                                )
-                              : SvgPicture.asset(
-                                  'assets/images/user-round.svg',
-                                  height: 50,
-                                  width: 50,
-                                  color: Theme.of(context).iconTheme.color,
-                                ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  Center(child: buildSectionTitle(context, 'Informações Pessoais')),
-                  const SizedBox(height: 20),
-                  Center(
-                    child: CustomTextField(
-                      controller: nomeCompletoController,
-                      hintText: 'Nome Completo',
-                      obscureText: false,
-                      readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomTextField(
-                          hintText: 'Comungante',
-                          controller: comunganteController,
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        child: CustomTextField(
-                          controller: numeroRolController,
-                          hintText: 'Numero de Rol',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomTextField(
-                          hintText: 'Sexo',
-                          controller: sexoController,
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        child: CustomTextField(
-                          controller: dataNascimentoController,
-                          hintText: 'Data de nascimento',
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                          obscureText: false,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child: CustomTextField(
-                          hintText: 'Cidade Nasc.',
-                          controller: cidadeNascimentoController,
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Expanded(
-                        flex: 1,
-                        child: CustomTextField(
-                          hintText: 'UF Nasc.',
-                          controller: estadoNascimentoController,
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  CustomTextField(
-                    controller: nomePaiController,
-                    hintText: 'Nome do Pai',
-                    obscureText: false,
-                    readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                  ),
-                  const SizedBox(height: 20),
-                  CustomTextField(
-                    controller: nomeMaeController,
-                    hintText: 'Nome da Mãe',
-                    obscureText: false,
-                    readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                  ),
-                  const SizedBox(height: 20),
-                  CustomTextField(
-                    controller: escolaridadeController,
-                    hintText: 'Escolaridade',
-                    obscureText: false,
-                    readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                  ),
-                  const SizedBox(height: 20),
-                  CustomTextField(
-                    controller: profissaoController,
-                    hintText: 'Profissão',
-                    obscureText: false,
-                    readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                  ),
-                  const SizedBox(height: 20),
-                  CustomTextField(
-                    controller: emailController,
-                    hintText: 'E-mail',
-                    obscureText: false,
-                    readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomTextField(
-                          controller: telefoneController,
-                          hintText: 'Telefone',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        child: CustomTextField(
-                          controller: celularController,
-                          hintText: 'Celular',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Center(child: buildSectionTitle(context, 'Localização Atual')),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomTextField(
-                          controller: cepController,
-                          hintText: 'CEP',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        child: CustomTextField(
-                          controller: bairroController,
-                          hintText: 'Bairro',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  CustomTextField(
-                    controller: enderecotController,
-                    hintText: 'Endereço',
-                    obscureText: false,
-                    readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                  ),
-                  const SizedBox(height: 20),
-                  CustomTextField(
-                    controller: complementoController,
-                    hintText: 'Complemento',
-                    obscureText: false,
-                    readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 2,
-                        child: CustomTextField(
-                          hintText: 'Cidade',
-                          controller: cidadeAtualController,
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Expanded(
-                        flex: 1,
-                        child: CustomTextField(
-                          hintText: 'UF',
-                          controller: estadoAtualController,
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Center(child: buildSectionTitle(context, 'Outras informações')),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomTextField(
-                          hintText: 'Local Residência',
-                          controller: residenciaController,
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        child: CustomTextField(
-                          hintText: 'Estado Civil',
-                          controller: estadoCivilController,
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  CustomTextField(
-                      hintText: 'Religião Procedente',
-                      obscureText: false,
-                      readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                      controller: religiaoController),
-                  const SizedBox(height: 30),
-                  Center(child: buildSectionTitle(context, 'Batismo')),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        flex: 1,
-                        child: CustomTextField(
-                          controller: dataBatismoController,
-                          hintText: 'Data',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        flex: 2,
-                        child: CustomTextField(
-                          controller: oficianteBatismoController,
-                          hintText: 'Oficiante',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Center(child: buildSectionTitle(context, 'Profissão de Fé')),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        flex: 1,
-                        child: CustomTextField(
-                          controller: dataProfissaoController,
-                          hintText: 'Data',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        flex: 2,
-                        child: CustomTextField(
-                          controller: oficianteProfissaoController,
-                          hintText: 'Oficiante',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Center(child: buildSectionTitle(context, 'Admissão')),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        flex: 1,
-                        child: CustomTextField(
-                          controller: dataAdmissaoController,
-                          hintText: 'Data',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      Flexible(
-                        flex: 2,
-                        child: CustomTextField(
-                          controller: ataAdmissaoController,
-                          hintText: 'Ata',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomTextField(
-                          hintText: 'Forma',
-                          controller: formaAdmissaoController,
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Center(child: buildSectionTitle(context, 'Demissão')),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        flex: 1,
-                        child: CustomTextField(
-                          controller: dataDemissaoController,
-                          hintText: 'Data',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      Flexible(
-                        flex: 2,
-                        child: CustomTextField(
-                          controller: ataDemissaoController,
-                          hintText: 'Ata',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomTextField(
-                          hintText: 'Forma',
-                          controller: formaDemissaoController,
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Center(child: buildSectionTitle(context, 'Rol Separado')),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomTextField(
-                          controller: dataRolSeparadoController,
-                          hintText: 'Data',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      Flexible(
-                        child: CustomTextField(
-                          controller: ataRolSeparadoController,
-                          hintText: 'Ata',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        child: CustomTextField(
-                          controller: casamentoRolSeparadoController,
-                          hintText: 'Casamento',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar',
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomTextField(
-                          controller: dataDiscRolSeparadoController,
-                          hintText: 'Data Disc.',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        child: CustomTextField(
-                          controller: ataDiscRolSeparadoController,
-                          hintText: 'Ata Disc.',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                      const SizedBox(width: 20), // Espaço entre os dois campos
-                      Flexible(
-                        child: CustomTextField(
-                          controller: discRolSeparadoController,
-                          hintText: 'Disciplina',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Center(child: buildSectionTitle(context, 'Eleições Diácono')),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomTextField(
-                          controller: dataDiacController,
-                          hintText: 'Data',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      Flexible(
-                        child: CustomTextField(
-                          controller: reeleitoDiac1Controller,
-                          hintText: 'Reeleito em',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomTextField(
-                          controller: reeleitoDiac2Controller,
-                          hintText: 'Reeleito em',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      Flexible(
-                        child: CustomTextField(
-                          controller: reeleitoDiac3Controller,
-                          hintText: 'Reeleito em',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Center(child: buildSectionTitle(context, 'Eleições Presbitero')),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomTextField(
-                          controller: dataPresbController,
-                          hintText: 'Data',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      Flexible(
-                        child: CustomTextField(
-                          controller: reeleitoPresb1Controller,
-                          hintText: 'Reeleito em',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Flexible(
-                        child: CustomTextField(
-                          controller: reeleitoPresb2Controller,
-                          hintText: 'Reeleito em',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                      Flexible(
-                        child: CustomTextField(
-                          controller: reeleitoPresb3Controller,
-                          hintText: 'Reeleito em',
-                          obscureText: false,
-                          readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  Center(
-                    child: CustomButton(
-                      text: 'Editar',
-                      onPressed: () {
-                        // Navegue para a tela de edição do membro com os dados atuais do membro
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CreateMembersScreen(
-                              memberData: widget.memberData, // Passe os dados do membro para a tela de edição
-                              onThemeToggle: widget.onThemeToggle, // Passe a função de alternar tema
-                              themeModeNotifier: widget.themeModeNotifier, // Passe o ValueNotifier para o modo escuro
-                            ),
                           ),
-                        );
-                      },
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 100), //Esse Widget é para dar uma espaçamento final para a sidebar não sobrepor os itens da tela
-                ],
-              ),
-            ),
-            BottomSidebar(currentIndex: currentIndex, onTabTapped: onTabTapped, onThemeToggle: widget.onThemeToggle, themeModeNotifier: widget.themeModeNotifier, isKeyboardVisible: MediaQuery.of(context).viewInsets.bottom != 0),
-            if (_isBannerVisible)
-              Positioned(
-                top: 10, // Posiciona o banner próximo ao topo
-                right: 0, // Alinha o banner à direita
-                child: CustomBanner(
-                  message: _bannerMessage, // Usa a mensagem do estado
-                  backgroundColor: _bannerColor, // Usa a cor do estado
-                  onDismissed: _hideBanner, // Callback para ocultar o banner após a animação,
+                    const SizedBox(height: 30),
+                    Center(child: buildSectionTitle(context, 'Informações Pessoais')),
+                    const SizedBox(height: 20),
+                    Center(
+                      child: CustomTextField(
+                        controller: nomeCompletoController,
+                        hintText: 'Nome Completo',
+                        obscureText: false,
+                        readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomTextField(
+                            hintText: 'Comungante',
+                            controller: comunganteController,
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          child: CustomTextField(
+                            controller: numeroRolController,
+                            hintText: 'Numero de Rol',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomTextField(
+                            hintText: 'Sexo',
+                            controller: sexoController,
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          child: CustomTextField(
+                            controller: dataNascimentoController,
+                            hintText: 'Data de nascimento',
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                            obscureText: false,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: CustomTextField(
+                            hintText: 'Cidade Nasc.',
+                            controller: cidadeNascimentoController,
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Expanded(
+                          flex: 1,
+                          child: CustomTextField(
+                            hintText: 'UF Nasc.',
+                            controller: estadoNascimentoController,
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                      controller: nomePaiController,
+                      hintText: 'Nome do Pai',
+                      obscureText: false,
+                      readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                      controller: nomeMaeController,
+                      hintText: 'Nome da Mãe',
+                      obscureText: false,
+                      readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                      controller: escolaridadeController,
+                      hintText: 'Escolaridade',
+                      obscureText: false,
+                      readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                      controller: profissaoController,
+                      hintText: 'Profissão',
+                      obscureText: false,
+                      readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                      controller: emailController,
+                      hintText: 'E-mail',
+                      obscureText: false,
+                      readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomTextField(
+                            controller: telefoneController,
+                            hintText: 'Telefone',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          child: CustomTextField(
+                            controller: celularController,
+                            hintText: 'Celular',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                    Center(child: buildSectionTitle(context, 'Localização Atual')),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomTextField(
+                            controller: cepController,
+                            hintText: 'CEP',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          child: CustomTextField(
+                            controller: bairroController,
+                            hintText: 'Bairro',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                      controller: enderecotController,
+                      hintText: 'Endereço',
+                      obscureText: false,
+                      readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                      controller: complementoController,
+                      hintText: 'Complemento',
+                      obscureText: false,
+                      readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: CustomTextField(
+                            hintText: 'Cidade',
+                            controller: cidadeAtualController,
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Expanded(
+                          flex: 1,
+                          child: CustomTextField(
+                            hintText: 'UF',
+                            controller: estadoAtualController,
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                    Center(child: buildSectionTitle(context, 'Outras informações')),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomTextField(
+                            hintText: 'Local Residência',
+                            controller: residenciaController,
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          child: CustomTextField(
+                            hintText: 'Estado Civil',
+                            controller: estadoCivilController,
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    CustomTextField(
+                        hintText: 'Religião Procedente',
+                        obscureText: false,
+                        readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                        controller: religiaoController),
+                    const SizedBox(height: 30),
+                    Center(child: buildSectionTitle(context, 'Batismo')),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          flex: 1,
+                          child: CustomTextField(
+                            controller: dataBatismoController,
+                            hintText: 'Data',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          flex: 2,
+                          child: CustomTextField(
+                            controller: oficianteBatismoController,
+                            hintText: 'Oficiante',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                    Center(child: buildSectionTitle(context, 'Profissão de Fé')),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          flex: 1,
+                          child: CustomTextField(
+                            controller: dataProfissaoController,
+                            hintText: 'Data',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          flex: 2,
+                          child: CustomTextField(
+                            controller: oficianteProfissaoController,
+                            hintText: 'Oficiante',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                    Center(child: buildSectionTitle(context, 'Admissão')),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          flex: 1,
+                          child: CustomTextField(
+                            controller: dataAdmissaoController,
+                            hintText: 'Data',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Flexible(
+                          flex: 2,
+                          child: CustomTextField(
+                            controller: ataAdmissaoController,
+                            hintText: 'Ata',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomTextField(
+                            hintText: 'Forma',
+                            controller: formaAdmissaoController,
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                    Center(child: buildSectionTitle(context, 'Demissão')),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          flex: 1,
+                          child: CustomTextField(
+                            controller: dataDemissaoController,
+                            hintText: 'Data',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Flexible(
+                          flex: 2,
+                          child: CustomTextField(
+                            controller: ataDemissaoController,
+                            hintText: 'Ata',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomTextField(
+                            hintText: 'Forma',
+                            controller: formaDemissaoController,
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                    Center(child: buildSectionTitle(context, 'Rol Separado')),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomTextField(
+                            controller: dataRolSeparadoController,
+                            hintText: 'Data',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Flexible(
+                          child: CustomTextField(
+                            controller: ataRolSeparadoController,
+                            hintText: 'Ata',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          child: CustomTextField(
+                            controller: casamentoRolSeparadoController,
+                            hintText: 'Casamento',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar',
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomTextField(
+                            controller: dataDiscRolSeparadoController,
+                            hintText: 'Data Disc.',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          child: CustomTextField(
+                            controller: ataDiscRolSeparadoController,
+                            hintText: 'Ata Disc.',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                        const SizedBox(width: 20), // Espaço entre os dois campos
+                        Flexible(
+                          child: CustomTextField(
+                            controller: discRolSeparadoController,
+                            hintText: 'Disciplina',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                    Center(child: buildSectionTitle(context, 'Eleições Diácono')),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomTextField(
+                            controller: dataDiacController,
+                            hintText: 'Data',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Flexible(
+                          child: CustomTextField(
+                            controller: reeleitoDiac1Controller,
+                            hintText: 'Reeleito em',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomTextField(
+                            controller: reeleitoDiac2Controller,
+                            hintText: 'Reeleito em',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Flexible(
+                          child: CustomTextField(
+                            controller: reeleitoDiac3Controller,
+                            hintText: 'Reeleito em',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                    Center(child: buildSectionTitle(context, 'Eleições Presbitero')),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomTextField(
+                            controller: dataPresbController,
+                            hintText: 'Data',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Flexible(
+                          child: CustomTextField(
+                            controller: reeleitoPresb1Controller,
+                            hintText: 'Reeleito em',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Flexible(
+                          child: CustomTextField(
+                            controller: reeleitoPresb2Controller,
+                            hintText: 'Reeleito em',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                        const SizedBox(width: 20),
+                        Flexible(
+                          child: CustomTextField(
+                            controller: reeleitoPresb3Controller,
+                            hintText: 'Reeleito em',
+                            obscureText: false,
+                            readOnly: widget.isReadOnly, // Use a flag para habilitar/desabilitar
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                    Center(
+                      child: CustomButton(
+                        text: 'Editar',
+                        onPressed: () {
+                          // Navegue para a tela de edição do membro com os dados atuais do membro
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CreateMembersScreen(
+                                memberData: widget.memberData, // Passe os dados do membro para a tela de edição
+                                onThemeToggle: widget.onThemeToggle, // Passe a função de alternar tema
+                                themeModeNotifier: widget.themeModeNotifier, // Passe o ValueNotifier para o modo escuro
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 100), //Esse Widget é para dar uma espaçamento final para a sidebar não sobrepor os itens da tela
+                  ],
                 ),
               ),
-          ],
+              BottomSidebar(currentIndex: currentIndex, onTabTapped: onTabTapped, onThemeToggle: widget.onThemeToggle, themeModeNotifier: widget.themeModeNotifier, isKeyboardVisible: MediaQuery.of(context).viewInsets.bottom != 0),
+              if (_isBannerVisible)
+                Positioned(
+                  top: 10, // Posiciona o banner próximo ao topo
+                  right: 0, // Alinha o banner à direita
+                  child: CustomBanner(
+                    message: _bannerMessage, // Usa a mensagem do estado
+                    backgroundColor: _bannerColor, // Usa a cor do estado
+                    onDismissed: _hideBanner, // Callback para ocultar o banner após a animação,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

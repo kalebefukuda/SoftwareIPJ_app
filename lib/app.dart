@@ -55,95 +55,81 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<ThemeModeOptions>(
-      valueListenable: themeModeNotifier,
-      builder: (context, themeMode, child) {
-        return Builder(
-          builder: (BuildContext context) {
-            final mediaQuery = MediaQuery.of(context);
-            return MediaQuery(
-              // Mantém as propriedades originais do MediaQuery, ajustando apenas o textScaleFactor
-              data: mediaQuery.copyWith(textScaleFactor: 0.8),
-              child: MaterialApp(
-                // Tema claro
-                theme: ThemeData(
-                  fontFamily: 'Poppins',
-                  scaffoldBackgroundColor: const Color(0xFFFCF9F6),
-                  primaryColor: const Color(0xFF015B40),
-                  brightness: Brightness.light,
-                  textTheme: const TextTheme(
-                    bodyLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: Colors.black),
-                    bodyMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: Colors.grey),
-                    bodySmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xFF015B40)),
-                    titleLarge: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white),
-                    titleMedium: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Color(0xFF015B40)),
-                    titleSmall: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Color(0xFF015B40)),
-                  ),
-                  appBarTheme: const AppBarTheme(
-                    backgroundColor: Color(0xFF015B40),
-                  ),
-                  inputDecorationTheme: const InputDecorationTheme(
-                    fillColor: Color(0xFFE7E7E7),
-                    filled: true,
-                  ),
-                  iconTheme: const IconThemeData(color: Color(0xFF015B40)),
-                  colorScheme: const ColorScheme.light(
-                    primary: Color(0xFF015B40),
-                    secondary: Color.fromARGB(255, 0, 145, 101),
-                    tertiary: Color.fromARGB(255, 109, 109, 109),
-                    onSecondary: Colors.black,
-                    onTertiary: Color.fromARGB(255, 226, 177, 0),
-                  ),
-                ),
+    return MaterialApp(
+      // Tema claro
+      theme: ThemeData(
+        fontFamily: 'Poppins',
+        scaffoldBackgroundColor: const Color(0xFFFCF9F6),
+        primaryColor: const Color(0xFF015B40),
+        brightness: Brightness.light,
+        textTheme: const TextTheme(
+          bodyLarge: TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: Colors.black),
+          bodyMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: Colors.grey),
+          bodySmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xFF015B40)),
+          titleLarge: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white),
+          titleMedium: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Color(0xFF015B40)),
+          titleSmall: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Color(0xFF015B40)),
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF015B40),
+        ),
+        inputDecorationTheme: const InputDecorationTheme(
+          fillColor: Color(0xFFE7E7E7),
+          filled: true,
+        ),
+        iconTheme: const IconThemeData(color: Color(0xFF015B40)),
+        colorScheme: const ColorScheme.light(
+          primary: Color(0xFF015B40),
+          secondary: Color.fromARGB(255, 0, 145, 101),
+          tertiary: Color.fromARGB(255, 109, 109, 109),
+          onSecondary: Colors.black,          
+          onTertiary: Color.fromARGB(255, 226, 177, 0),
+        ),
+      ),
 
-                // Tema escuro
-                darkTheme: ThemeData(
-                  fontFamily: 'Poppins',
-                  scaffoldBackgroundColor: const Color.fromARGB(255, 0, 0, 0),
-                  primaryColor: const Color.fromARGB(255, 0, 145, 101),
-                  brightness: Brightness.dark,
-                  textTheme: const TextTheme(
-                    bodyLarge: TextStyle(fontSize: 14, color: Colors.white),
-                    bodyMedium: TextStyle(fontSize: 14, color: Colors.grey),
-                    bodySmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white),
-                    titleLarge: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white),
-                    titleMedium: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.white),
-                    titleSmall: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Colors.black),
-                  ),
-                  appBarTheme: const AppBarTheme(
-                    backgroundColor: Color.fromARGB(255, 0, 0, 0),
-                  ),
-                  inputDecorationTheme: const InputDecorationTheme(
-                    fillColor: Color(0xFF1F1F1F),
-                    filled: true,
-                  ),
-                  iconTheme: const IconThemeData(color: Colors.white),
-                  colorScheme: const ColorScheme.dark(
-                    primary: Color.fromARGB(255, 45, 45, 45),
-                    secondary: Color(0xFF015B40),
-                    tertiary: Color.fromARGB(255, 186, 186, 186),
-                    onSecondary: Colors.white,
-                    onTertiary: Color.fromARGB(255, 75, 75, 75),
-                  ),
-                ),
-                debugShowCheckedModeBanner: false,
-                // Definindo o modo de tema com base na escolha do usuário
-                themeMode: themeMode == ThemeModeOptions.light
-                    ? ThemeMode.light
-                    : themeMode == ThemeModeOptions.dark
-                        ? ThemeMode.dark
-                        : ThemeMode.system,
+      // Tema escuro
+      darkTheme: ThemeData(
+        fontFamily: 'Poppins',
+        scaffoldBackgroundColor: const Color.fromARGB(255, 0, 0, 0),
+        primaryColor: const Color.fromARGB(255, 0, 145, 101),
+        brightness: Brightness.dark,
+        textTheme: const TextTheme(
+          bodyLarge: TextStyle(fontSize: 14, color: Colors.white),
+          bodyMedium: TextStyle(fontSize: 14, color: Colors.grey),
+          bodySmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white),
+          titleLarge: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white),
+          titleMedium: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.white),
+          titleSmall: TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Colors.black),
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color.fromARGB(255, 0, 0, 0),
+        ),
+        inputDecorationTheme: const InputDecorationTheme(
+          fillColor: Color(0xFF1F1F1F),
+          filled: true,
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
+        colorScheme: const ColorScheme.dark(
+          primary: Color.fromARGB(255, 45, 45, 45),
+          secondary: Color(0xFF015B40),
+          tertiary: Color.fromARGB(255, 186, 186, 186),
+          onSecondary: Colors.white,
+          onTertiary: Color.fromARGB(255, 75, 75, 75),
+        ),
+      ),
+      debugShowCheckedModeBanner: false,
+      // Definindo o modo de tema com base na escolha do usuário
+      themeMode: currentThemeMode == ThemeModeOptions.light
+          ? ThemeMode.light
+          : currentThemeMode == ThemeModeOptions.dark
+              ? ThemeMode.dark
+              : ThemeMode.system,
 
-                // Definindo a tela inicial
-                home: StartScreen(
-                  onThemeToggle: _toggleTheme,
-                  themeModeNotifier: themeModeNotifier,
-                ),
-              ),
-            );
-          },
-        );
-      },
+      // Definindo a tela inicial
+      home: StartScreen(
+        onThemeToggle: _toggleTheme,
+        themeModeNotifier: themeModeNotifier,
+      ),
     );
   }
 }
