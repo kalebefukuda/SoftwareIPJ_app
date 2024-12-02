@@ -265,8 +265,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
 
   Future<bool> _saveMember() async {
     try {
-      String? imageUrl;
-      final user = Supabase.instance.client.auth.currentUser;
+      String? imageUrl = widget.memberData?['imagemMembro']; // Inicialmente, utiliza a imagem existente.
 
       // Verificar se há uma nova imagem para fazer upload
       if (_selectedImage != null) {
@@ -335,7 +334,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
 
       // Verifica se é uma edição ou criação
       if (widget.memberData != null) {
-        // É uma edição, então faz update
+        // É uma edição, então faz update.
         final response = await Supabase.instance.client.from('membros').update(memberData).eq('id', widget.memberData!['id']).select();
 
         if (response.isEmpty) {
@@ -344,7 +343,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
 
         _showBanner('Membro atualizado com sucesso!', const Color(0xFF015B40));
       } else {
-        // É uma criação, então insere um novo registro
+        // É uma criação, então insere um novo registro.
         final response = await Supabase.instance.client.from('membros').insert(memberData).select();
 
         if (response.isEmpty) {
@@ -494,7 +493,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                               const SizedBox(height: 40), // Espaçamento fixo para "Informações Pessoais"
                             ],
                           ),
-      
+
                           // Botão "Remover Foto"
                           if (_selectedImage != null || (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty))
                             Positioned(
@@ -508,14 +507,14 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                                       final deleteResponse = await Supabase.instance.client.storage.from('membros_storage').remove([
                                         oldFileName
                                       ]);
-      
+
                                       if (deleteResponse.isEmpty) {
                                         print('Nenhum arquivo foi excluído. Verifique se o arquivo existe: $oldFileName');
                                       } else {
                                         print('Imagem antiga removida: $oldFileName');
                                       }
                                     }
-      
+
                                     // Limpar o estado da imagem
                                     setState(() {
                                       _selectedImage = null;
@@ -541,7 +540,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                         ],
                       ),
                     ),
-                    
+
                     Center(child: buildSectionTitle(context, 'Informações Pessoais')),
                     const SizedBox(height: 20),
                     Center(
@@ -706,7 +705,7 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                         ),
                       ],
                     ),
-      
+
                     const SizedBox(height: 30),
                     Center(child: buildSectionTitle(context, 'Localização Atual')),
                     const SizedBox(height: 20),
