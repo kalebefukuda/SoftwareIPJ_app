@@ -150,25 +150,23 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
     if (numeroRolController.text.trim().isEmpty) {
       _fieldErrors['numeroRol'] = true;
     }
+    if (numeroRolController.text.trim().isNotEmpty) {
+      bool isDuplicate = await _isNumeroRolDuplicado(numeroRolController.text);
+      if (isDuplicate) {
+        _fieldErrors['numeroRol'] = true;
+      }
+    }
     if (residenciaController.text.trim().isEmpty) {
-      _fieldErrors['residenciaLocal'] = true;
+      _fieldErrors['celular'] = true;
     }
     if (celularController.text.trim().isEmpty) {
-      _fieldErrors['celular'] = true;
+      _fieldErrors['residenciaLocal'] = true;
     }
     if (comunganteController.text.trim().isEmpty) {
       _fieldErrors['comungante'] = true;
     }
     if (sexoController.text.trim().isEmpty) {
       _fieldErrors['sexo'] = true;
-    }
-
-    // Verifica duplicidade do número de rol
-    if (numeroRolController.text.trim().isNotEmpty) {
-      bool isDuplicate = await _isNumeroRolDuplicado(numeroRolController.text);
-      if (isDuplicate) {
-        _fieldErrors['numeroRol'] = true;
-      }
     }
 
     // Após validar, role para o primeiro campo com erro
@@ -265,6 +263,14 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
 
   Future<bool> _saveMember() async {
     try {
+      // Valida os campos antes de tentar salvar
+      await _validateFields();
+
+      if (_fieldErrors.isNotEmpty) {
+        _showBanner('Numero de rol já existente! Selecione outro.', const Color.fromARGB(255, 154, 27, 27));
+        return false;
+      }
+
       String? imageUrl = widget.memberData?['imagemMembro']; // Inicialmente, utiliza a imagem existente.
 
       // Verificar se há uma nova imagem para fazer upload
