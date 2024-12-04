@@ -207,6 +207,7 @@ class _ViewMemberScreenState extends State<ViewMemberScreen> {
                           child: ClipOval(
                             child: (widget.memberData != null && (widget.memberData?['imagemMembro'] ?? '').isNotEmpty)
                                 ? Image.network(
+                                  
                                     widget.memberData?['imagemMembro'] ?? '',
                                     width: 140,
                                     height: 140,

@@ -1,8 +1,9 @@
 // ignore_for_file: library_private_types_in_public_api
+import 'package:flutter_svg/svg.dart';
 import 'package:softwareipj/widgets/screen_scale_wrapper.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:softwareipj/screens/home.dart';
-
+import 'package:cached_network_image/cached_network_image.dart'; // Import necessário
 import '../app.dart';
 import 'package:softwareipj/screens/view_member_screen.dart';
 import 'package:softwareipj/screens/create_members.dart';
@@ -13,6 +14,7 @@ import '../services/member_service.dart';
 import '../widgets/custom_banner.dart';
 import 'package:diacritic/diacritic.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../services/custom_cache_manager.dart';
 
 class Members extends StatefulWidget {
   final Function(ThemeModeOptions) onThemeToggle;
@@ -129,6 +131,17 @@ class _MembersState extends State<Members> {
 
         filteredMembers = List.from(membersData);
       });
+
+      // Pré-carregar as imagens no cache (verificando antes se já estão cacheadas)
+      for (var member in membersData) {
+        final imageUrl = member['imagemMembro'];
+        if (imageUrl != null && imageUrl.isNotEmpty) {
+          final cachedFile = await CustomCacheManager.instance.getFileFromCache(imageUrl);
+          if (cachedFile == null) {
+            await CustomCacheManager.instance.downloadFile(imageUrl);
+          }
+        }
+      }
     } catch (e) {
       print("Erro ao buscar membros: $e");
       _showBanner('Erro ao buscar membros', const Color.fromARGB(255, 154, 27, 27));
@@ -727,11 +740,37 @@ class _MembersState extends State<Members> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 CircleAvatar(
-                                  radius: 28,
+                                  radius: 28, // Ajuste do tamanho geral do avatar
                                   backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
-                                  backgroundImage: (member['imagemMembro'] != null && member['imagemMembro'] is String)
-                                      ? NetworkImage(member['imagemMembro']) // Usa a URL pública
-                                      : const AssetImage('assets/images/avatar_placeholder.png') as ImageProvider,
+                                  child: ClipOval(
+                                    child: CachedNetworkImage(
+                                      imageUrl: member['imagemMembro'] ?? '', // URL da imagem
+                                      cacheManager: CustomCacheManager.instance, // Cache personalizado
+                                      placeholder: (context, url) => SizedBox(
+                                        width: 56, // Tamanho do indicador de progresso
+                                        height: 56,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 3.0,
+                                          valueColor: AlwaysStoppedAnimation<Color>(
+                                            Theme.of(context).colorScheme.secondary, // Cor do indicador
+                                          ),
+                                        ),
+                                      ),
+                                      errorWidget: (context, url, error) => Padding(
+                                        padding: const EdgeInsets.all(15.0),
+                                        child: SizedBox(
+                                          child: SvgPicture.asset(
+                                            'assets/images/user-round.svg', // Imagem de fallback SVG
+                                            fit: BoxFit.contain,
+                                            color: Theme.of(context).iconTheme.color,
+                                          ),
+                                        ),
+                                      ),
+                                      width: 56, // Dimensão da imagem carregada
+                                      height: 56,
+                                      fit: BoxFit.cover, // Ajuste para cobrir o espaço
+                                    ),
+                                  ),
                                 ),
                                 const SizedBox(width: 16),
                                 Expanded(

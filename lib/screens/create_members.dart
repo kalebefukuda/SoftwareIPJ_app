@@ -150,12 +150,6 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
     if (numeroRolController.text.trim().isEmpty) {
       _fieldErrors['numeroRol'] = true;
     }
-    if (numeroRolController.text.trim().isNotEmpty) {
-      bool isDuplicate = await _isNumeroRolDuplicado(numeroRolController.text);
-      if (isDuplicate) {
-        _fieldErrors['numeroRol'] = true;
-      }
-    }
     if (residenciaController.text.trim().isEmpty) {
       _fieldErrors['celular'] = true;
     }
@@ -167,6 +161,12 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
     }
     if (sexoController.text.trim().isEmpty) {
       _fieldErrors['sexo'] = true;
+    }
+    if (numeroRolController.text.trim().isNotEmpty) {
+      bool isDuplicate = await _isNumeroRolDuplicado(numeroRolController.text);
+      if (isDuplicate) {
+        _fieldErrors['numeroRol'] = true;
+      }
     }
 
     // Após validar, role para o primeiro campo com erro

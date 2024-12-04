@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:softwareipj/screens/start_screen.dart';
+import 'package:softwareipj/services/custom_cache_manager.dart';
 
 // Enum para os modos de tema
 enum ThemeModeOptions {
@@ -26,6 +27,12 @@ class _AppState extends State<App> {
     super.initState();
     themeModeNotifier = ValueNotifier<ThemeModeOptions>(currentThemeMode);
     _loadThemePreference();
+  }
+
+  @override
+  void dispose() {
+    CustomCacheManager.instance.clearCache();
+    super.dispose();
   }
 
   // Carregar a preferência do tema salva
@@ -82,7 +89,7 @@ class _AppState extends State<App> {
           primary: Color(0xFF015B40),
           secondary: Color.fromARGB(255, 0, 145, 101),
           tertiary: Color.fromARGB(255, 109, 109, 109),
-          onSecondary: Colors.black,          
+          onSecondary: Colors.black,
           onTertiary: Color.fromARGB(255, 226, 177, 0),
         ),
       ),
