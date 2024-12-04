@@ -1,4 +1,6 @@
 // ignore_for_file: library_private_types_in_public_api
+import 'dart:io';
+
 import 'package:flutter_svg/svg.dart';
 import 'package:softwareipj/widgets/screen_scale_wrapper.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -32,7 +34,7 @@ class Members extends StatefulWidget {
   _MembersState createState() => _MembersState();
 }
 
-class _MembersState extends State<Members> {
+class _MembersState extends State<Members> with AutomaticKeepAliveClientMixin<Members> {
   int currentIndex = 2;
   List<Map<String, dynamic>> membersData = [];
   List<Map<String, dynamic>> filteredMembers = [];
@@ -49,12 +51,33 @@ class _MembersState extends State<Members> {
   bool filterCommunicant = false;
   bool filterNonCommunicant = false;
   final MemberService memberService = MemberService();
-
   bool _isBannerVisible = false;
   String _bannerMessage = '';
   Color _bannerColor = Colors.green;
-
   String? _selectedSort; // Variável para armazenar o tipo de ordenação selecionado
+
+  Map<String, File> memoryCache = {};
+
+  Future<File?> _getCachedImage(String? url) async {
+    if (url == null || url.isEmpty) return null;
+
+    // Verifique o cache em memória primeiro
+    if (memoryCache.containsKey(url)) {
+      return memoryCache[url];
+    }
+
+    // Se não estiver no cache em memória, use o cache no disco
+    final cachedFile = await CustomCacheManager.instance.getFileFromCache(url);
+    if (cachedFile != null) {
+      memoryCache[url] = cachedFile.file; // Adicione ao cache em memória
+      return cachedFile.file;
+    }
+
+    // Se não estiver no cache, faça o download
+    final downloadedFile = await CustomCacheManager.instance.getSingleFile(url);
+    memoryCache[url] = downloadedFile; // Adicione ao cache em memória
+    return downloadedFile;
+  }
 
   @override
   void initState() {
@@ -104,12 +127,12 @@ class _MembersState extends State<Members> {
     _resetSlidePositions();
   }
 
-  @override
-  void dispose() {
-    _searchFocusNode.dispose();
-    _searchController.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _searchFocusNode.dispose();
+  //   _searchController.dispose();
+  //   super.dispose();
+  // }
 
   Future<void> _fetchMembers() async {
     try {
@@ -132,13 +155,16 @@ class _MembersState extends State<Members> {
         filteredMembers = List.from(membersData);
       });
 
-      // Pré-carregar as imagens no cache (verificando antes se já estão cacheadas)
+      // Pré-carregamento opcional (somente se necessário garantir o cache):
       for (var member in membersData) {
         final imageUrl = member['imagemMembro'];
         if (imageUrl != null && imageUrl.isNotEmpty) {
           final cachedFile = await CustomCacheManager.instance.getFileFromCache(imageUrl);
-          if (cachedFile == null) {
-            await CustomCacheManager.instance.downloadFile(imageUrl);
+          if (cachedFile != null) {
+            print('Imagem já em cache: $imageUrl');
+          } else {
+            print('Imagem não encontrada no cache: $imageUrl. Fazendo download...');
+            await CustomCacheManager.instance.getSingleFile(imageUrl);
           }
         }
       }
@@ -444,7 +470,11 @@ class _MembersState extends State<Members> {
   }
 
   @override
+  bool get wantKeepAlive => true; // Garante que o estado será preservado.
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context); // Adicione isso para o mixin funcionar corretamente.
     return ScreenScaleWrapper(
       child: Scaffold(
         appBar: AppBar(
@@ -744,31 +774,29 @@ class _MembersState extends State<Members> {
                                   backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
                                   child: ClipOval(
                                     child: CachedNetworkImage(
-                                      imageUrl: member['imagemMembro'] ?? '', // URL da imagem
+                                      imageUrl: member['imagemMembro'] ?? '',
                                       cacheManager: CustomCacheManager.instance, // Cache personalizado
                                       placeholder: (context, url) => SizedBox(
-                                        width: 56, // Tamanho do indicador de progresso
+                                        width: 56,
                                         height: 56,
                                         child: CircularProgressIndicator(
                                           strokeWidth: 3.0,
                                           valueColor: AlwaysStoppedAnimation<Color>(
-                                            Theme.of(context).colorScheme.secondary, // Cor do indicador
+                                            Theme.of(context).colorScheme.secondary,
                                           ),
                                         ),
                                       ),
                                       errorWidget: (context, url, error) => Padding(
-                                        padding: const EdgeInsets.all(15.0),
-                                        child: SizedBox(
-                                          child: SvgPicture.asset(
-                                            'assets/images/user-round.svg', // Imagem de fallback SVG
-                                            fit: BoxFit.contain,
-                                            color: Theme.of(context).iconTheme.color,
-                                          ),
+                                        padding: const EdgeInsets.all(12.0),
+                                        child: SvgPicture.asset(
+                                          'assets/images/user-round.svg',
+                                          fit: BoxFit.contain,
+                                          color: Theme.of(context).iconTheme.color,
                                         ),
                                       ),
-                                      width: 56, // Dimensão da imagem carregada
+                                      width: 56,
                                       height: 56,
-                                      fit: BoxFit.cover, // Ajuste para cobrir o espaço
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
                                 ),

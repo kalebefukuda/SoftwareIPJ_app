@@ -1,3 +1,5 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:softwareipj/services/custom_cache_manager.dart';
 import 'package:softwareipj/widgets/screen_scale_wrapper.dart';
 import 'package:softwareipj/app.dart';
 import 'package:flutter/material.dart';
@@ -159,9 +161,8 @@ class _ViewMemberScreenState extends State<ViewMemberScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.memberData == null) {
-      return const Center(child: CircularProgressIndicator());
-    }
+    final imageUrl = widget.memberData?['imagemMembro'];
+
     return ScreenScaleWrapper(
       child: GestureDetector(
         onTap: () {
@@ -202,29 +203,38 @@ class _ViewMemberScreenState extends State<ViewMemberScreen> {
                       child: GestureDetector(
                         onTap: widget.isReadOnly ? null : _pickImage, // Desabilita a seleção de imagem se for apenas leitura
                         child: CircleAvatar(
-                          radius: 70,
+                          radius: 70, // Tamanho maior para tela de detalhes
                           backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
-                          child: ClipOval(
-                            child: (widget.memberData != null && (widget.memberData?['imagemMembro'] ?? '').isNotEmpty)
-                                ? Image.network(
-                                  
-                                    widget.memberData?['imagemMembro'] ?? '',
-                                    width: 140,
-                                    height: 140,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) => SvgPicture.asset(
-                                      'assets/images/user-round.svg',
-                                      height: 50,
-                                      width: 50,
-                                      color: Theme.of(context).iconTheme.color,
+                          child: CircleAvatar(
+                            radius: 70,
+                            backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
+                            child: ClipOval(
+                              child: CachedNetworkImage(
+                                imageUrl: imageUrl ?? '',
+                                cacheManager: CustomCacheManager.instance,
+                                placeholder: (context, url) => SizedBox(
+                                  width: 160,
+                                  height: 160,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 3.0,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Theme.of(context).colorScheme.secondary,
                                     ),
-                                  )
-                                : SvgPicture.asset(
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) => Padding(
+                                  padding: const EdgeInsets.all(20.0),
+                                  child: SvgPicture.asset(
                                     'assets/images/user-round.svg',
-                                    height: 50,
-                                    width: 50,
+                                    fit: BoxFit.contain,
                                     color: Theme.of(context).iconTheme.color,
                                   ),
+                                ),
+                                width: 160,
+                                height: 160,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
                           ),
                         ),
                       ),

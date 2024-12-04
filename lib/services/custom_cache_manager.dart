@@ -7,9 +7,9 @@ class CustomCacheManager extends CacheManager {
       : super(
           Config(
             key,
-            stalePeriod: const Duration(days: 7), // Tempo de validade do cache
-            maxNrOfCacheObjects: 100, // Número máximo de objetos em cache
-            fileService: HttpFileService(), // Serviço HTTP padrão
+            stalePeriod: const Duration(days: 7),
+            maxNrOfCacheObjects: 100,
+            fileService: HttpFileService(),
           ),
         );
 

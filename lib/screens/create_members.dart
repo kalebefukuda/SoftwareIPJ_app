@@ -1,4 +1,6 @@
 // ignore_for_file: unused_local_variable
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:softwareipj/services/custom_cache_manager.dart';
 import 'package:softwareipj/widgets/screen_scale_wrapper.dart';
 import '../app.dart';
 import 'package:flutter/material.dart';
@@ -464,35 +466,50 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                               GestureDetector(
                                 onTap: _pickImage, // Função para selecionar a imagem
                                 child: CircleAvatar(
-                                  radius: 70,
+                                  radius: 70, // Tamanho do círculo maior
                                   backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
-                                  child: ClipOval(
-                                    child: _selectedImage != null
-                                        ? Image.file(
-                                            _selectedImage!,
-                                            width: 140,
-                                            height: 140,
-                                            fit: BoxFit.cover,
-                                          )
-                                        : (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty)
-                                            ? Image.network(
-                                                widget.memberData!['imagemMembro'],
-                                                width: 140,
-                                                height: 140,
-                                                fit: BoxFit.cover,
-                                                errorBuilder: (context, error, stackTrace) => SvgPicture.asset(
+                                  child: CircleAvatar(
+                                    radius: 70,
+                                    backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
+                                    child: ClipOval(
+                                      child: _selectedImage != null
+                                          ? Image.file(
+                                              _selectedImage!,
+                                              width: 140,
+                                              height: 140,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty)
+                                              ? CachedNetworkImage(
+                                                  imageUrl: widget.memberData!['imagemMembro']!,
+                                                  cacheManager: CustomCacheManager.instance,
+                                                  placeholder: (context, url) => SizedBox(
+                                                    width: 140,
+                                                    height: 140,
+                                                    child: CircularProgressIndicator(
+                                                      strokeWidth: 3.0,
+                                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                                        Theme.of(context).colorScheme.secondary,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  errorWidget: (context, url, error) => SvgPicture.asset(
+                                                    'assets/images/user-round.svg',
+                                                    height: 50,
+                                                    width: 50,
+                                                    color: Theme.of(context).iconTheme.color,
+                                                  ),
+                                                  width: 140,
+                                                  height: 140,
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : SvgPicture.asset(
                                                   'assets/images/user-round.svg',
                                                   height: 50,
                                                   width: 50,
                                                   color: Theme.of(context).iconTheme.color,
                                                 ),
-                                              )
-                                            : SvgPicture.asset(
-                                                'assets/images/user-round.svg',
-                                                height: 50,
-                                                width: 50,
-                                                color: Theme.of(context).iconTheme.color,
-                                              ),
+                                    ),
                                   ),
                                 ),
                               ),
