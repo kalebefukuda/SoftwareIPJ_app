@@ -207,10 +207,67 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
     );
   }
 
+  Map<String, dynamic>? _localMemberData;
+
   @override
   void initState() {
     super.initState();
 
+    _localMemberData = widget.memberData != null
+        ? {
+            ...widget.memberData!
+          }
+        : null;
+
+    if (_localMemberData != null) {
+      nomeCompletoController.text = _localMemberData!['nomeCompleto'] ?? '';
+      comunganteController.text = _localMemberData!['comungante'] ?? '';
+      numeroRolController.text = _localMemberData!['numeroRol']?.toString() ?? '';
+      dataNascimentoController.text = _localMemberData!['dataNascimento'] ?? '';
+      sexoController.text = _localMemberData!['sexo'] ?? '';
+      cidadeNascimentoController.text = _localMemberData!['cidadeNascimento'] ?? '';
+      estadoNascimentoController.text = _localMemberData!['estadoNascimento'] ?? '';
+      nomePaiController.text = _localMemberData!['nomePai'] ?? '';
+      nomeMaeController.text = _localMemberData!['nomeMae'] ?? '';
+      escolaridadeController.text = _localMemberData!['escolaridade'] ?? '';
+      profissaoController.text = _localMemberData!['profissao'] ?? '';
+      emailController.text = _localMemberData!['email'] ?? '';
+      telefoneController.text = _localMemberData!['telefone'] ?? '';
+      celularController.text = _localMemberData!['celular'] ?? '';
+      cepController.text = _localMemberData!['cep'] ?? '';
+      bairroController.text = _localMemberData!['bairro'] ?? '';
+      enderecotController.text = _localMemberData!['endereco'] ?? '';
+      complementoController.text = _localMemberData!['complemento'] ?? '';
+      cidadeAtualController.text = _localMemberData!['cidadeAtual'] ?? '';
+      estadoAtualController.text = _localMemberData!['estadoAtual'] ?? '';
+      residenciaController.text = _localMemberData!['residencia'] ?? '';
+      estadoCivilController.text = _localMemberData!['estadoCivil'] ?? '';
+      religiaoController.text = _localMemberData!['religiao'] ?? '';
+      dataBatismoController.text = _localMemberData!['dataBatismo'] ?? '';
+      oficianteBatismoController.text = _localMemberData!['oficianteBatismo'] ?? '';
+      dataProfissaoController.text = _localMemberData!['dataProfissao'] ?? '';
+      oficianteProfissaoController.text = _localMemberData!['oficianteProfissao'] ?? '';
+      dataAdmissaoController.text = _localMemberData!['dataAdmissao'] ?? '';
+      ataAdmissaoController.text = _localMemberData!['ataAdmissao'] ?? '';
+      formaAdmissaoController.text = _localMemberData!['formaAdmissao'] ?? '';
+      dataDemissaoController.text = _localMemberData!['dataDemissao'] ?? '';
+      ataDemissaoController.text = _localMemberData!['ataDemissao'] ?? '';
+      formaDemissaoController.text = _localMemberData!['formaDemissao'] ?? '';
+      dataRolSeparadoController.text = _localMemberData!['dataRolSeparado'] ?? '';
+      ataRolSeparadoController.text = _localMemberData!['ataRolSeparado'] ?? '';
+      casamentoRolSeparadoController.text = _localMemberData!['casamentoRolSeparado'] ?? '';
+      dataDiscRolSeparadoController.text = _localMemberData!['dataDiscRolSeparado'] ?? '';
+      ataDiscRolSeparadoController.text = _localMemberData!['ataDiscRolSeparado'] ?? '';
+      discRolSeparadoController.text = _localMemberData!['discRolSeparado'] ?? '';
+      dataDiacController.text = _localMemberData!['dataDiac'] ?? '';
+      reeleitoDiac1Controller.text = _localMemberData!['reeleitoDiac1'] ?? '';
+      reeleitoDiac2Controller.text = _localMemberData!['reeleitoDiac2'] ?? '';
+      reeleitoDiac3Controller.text = _localMemberData!['reeleitoDiac3'] ?? '';
+      dataPresbController.text = _localMemberData!['dataPresb'] ?? '';
+      reeleitoPresb1Controller.text = _localMemberData!['reeleitoPresb1'] ?? '';
+      reeleitoPresb2Controller.text = _localMemberData!['reeleitoPresb2'] ?? '';
+      reeleitoPresb3Controller.text = _localMemberData!['reeleitoPresb3'] ?? '';
+    }
     // Se houver memberData, preencha os controladores com os dados do membro
     if (widget.memberData != null) {
       nomeCompletoController.text = widget.memberData!['nomeCompleto'] ?? '';
@@ -359,6 +416,14 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
         }
 
         _showBanner('Membro salvo com sucesso!', const Color(0xFF015B40));
+      }
+
+      if (_selectedImage == null && widget.memberData != null && widget.memberData!['imagemMembro'] != null) {
+        // Remova a imagem antiga somente se não houver uma nova imagem e o salvamento estiver confirmado
+        final oldFileName = widget.memberData!['imagemMembro'].split('/').last;
+        await Supabase.instance.client.storage.from('membros_storage').remove([
+          oldFileName
+        ]);
       }
 
       return true;
@@ -526,16 +591,12 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                                   try {
                                     // Remover imagem associada ao membro
                                     if (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty) {
-                                      final oldFileName = widget.memberData!['imagemMembro'].split('/').last;
-                                      final deleteResponse = await Supabase.instance.client.storage.from('membros_storage').remove([
-                                        oldFileName
-                                      ]);
-
-                                      if (deleteResponse.isEmpty) {
-                                        print('Nenhum arquivo foi excluído. Verifique se o arquivo existe: $oldFileName');
-                                      } else {
-                                        print('Imagem antiga removida: $oldFileName');
-                                      }
+                                      setState(() {
+                                        _selectedImage = null; // Remove a imagem selecionada localmente
+                                        if (widget.memberData != null) {
+                                          widget.memberData!['imagemMembro'] = ''; // Atualiza o estado local
+                                        }
+                                      });
                                     }
 
                                     // Limpar o estado da imagem

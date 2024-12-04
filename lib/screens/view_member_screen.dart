@@ -209,31 +209,36 @@ class _ViewMemberScreenState extends State<ViewMemberScreen> {
                             radius: 70,
                             backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
                             child: ClipOval(
-                              child: CachedNetworkImage(
-                                imageUrl: imageUrl ?? '',
-                                cacheManager: CustomCacheManager.instance,
-                                placeholder: (context, url) => SizedBox(
-                                  width: 160,
-                                  height: 160,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 3.0,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Theme.of(context).colorScheme.secondary,
+                              child: imageUrl != null && imageUrl.isNotEmpty
+                                  ? CachedNetworkImage(
+                                      imageUrl: imageUrl,
+                                      cacheManager: CustomCacheManager.instance,
+                                      placeholder: (context, url) => SizedBox(
+                                        width: 160,
+                                        height: 160,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 3.0,
+                                          valueColor: AlwaysStoppedAnimation<Color>(
+                                            Theme.of(context).colorScheme.secondary,
+                                          ),
+                                        ),
+                                      ),
+                                      errorWidget: (context, url, error) => SvgPicture.asset(
+                                        'assets/images/user-round.svg',
+                                        width: 50,
+                                        height: 50,
+                                        color: Theme.of(context).iconTheme.color,
+                                      ),
+                                      width: 160,
+                                      height: 160,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : SvgPicture.asset(
+                                      'assets/images/user-round.svg',
+                                      width: 50,
+                                      height: 50,
+                                      color: Theme.of(context).iconTheme.color,
                                     ),
-                                  ),
-                                ),
-                                errorWidget: (context, url, error) => Padding(
-                                  padding: const EdgeInsets.all(20.0),
-                                  child: SvgPicture.asset(
-                                    'assets/images/user-round.svg',
-                                    fit: BoxFit.contain,
-                                    color: Theme.of(context).iconTheme.color,
-                                  ),
-                                ),
-                                width: 160,
-                                height: 160,
-                                fit: BoxFit.cover,
-                              ),
                             ),
                           ),
                         ),
