@@ -12,6 +12,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: Setup Flutter
+      uses: subosito/flutter_action_setup@v2
+      with:
+        channel: stable
+        flutter-version-file: pubspec.yaml
+      - run: flutter --version
+
 
       - name: Install dependencies
         run: flutter pub get
