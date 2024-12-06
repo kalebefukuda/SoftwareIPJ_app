@@ -1,0 +1,51 @@
+CREATE TABLE membros (
+    id SERIAL PRIMARY KEY, -- Identificador único para cada membro
+    nomeCompleto TEXT, -- Nome completo do membro
+    comungante TEXT, -- Informações sobre comungante (SIM/NÃO)
+    numeroRol INTEGER, -- Número do Rol (como é número, utilizamos INTEGER)
+    dataNascimento TEXT, -- Data de nascimento
+    sexo TEXT, -- Gênero do membro
+    cidadeNascimento TEXT, -- Cidade de nascimento
+    estadoNascimento TEXT, -- Estado de nascimento
+    nomePai TEXT, -- Nome do pai
+    nomeMae TEXT, -- Nome da mãe
+    escolaridade TEXT, -- Escolaridade
+    profissao TEXT, -- Profissão
+    email TEXT, -- E-mail
+    telefone TEXT, -- Telefone
+    celular TEXT, -- Celular
+    cep TEXT, -- CEP
+    bairro TEXT, -- Bairro
+    endereco TEXT, -- Endereço
+    complemento TEXT, -- Complemento
+    cidadeAtual TEXT, -- Cidade atual
+    estadoAtual TEXT, -- Estado atual
+    residencia TEXT, -- Local de residência
+    estadoCivil TEXT, -- Estado civil
+    religiao TEXT, -- Religião
+    dataBatismo TEXT, -- Data do batismo
+    oficianteBatismo TEXT, -- Oficiante do batismo
+    dataProfissao TEXT, -- Data da profissão de fé
+    oficianteProfissao TEXT, -- Oficiante da profissão de fé
+    dataAdmissao TEXT, -- Data de admissão
+    ataAdmissao TEXT, -- Ata de admissão
+    formaAdmissao TEXT, -- Forma de admissão
+    dataDemissao TEXT, -- Data de demissão
+    ataDemissao TEXT, -- Ata de demissão
+    formaDemissao TEXT, -- Forma de demissão
+    dataRolSeparado TEXT, -- Data do Rol separado
+    ataRolSeparado TEXT, -- Ata do Rol separado
+    casamentoRolSeparado TEXT, -- Informações sobre casamento no Rol separado
+    dataDiscRolSeparado TEXT, -- Data de disciplina no Rol separado
+    ataDiscRolSeparado TEXT, -- Ata de disciplina no Rol separado
+    discRolSeparado TEXT, -- Disciplina no Rol separado
+    dataDiac TEXT, -- Data da eleição como diácono
+    reeleitoDiac1 TEXT, -- Reeleição 1 para diácono
+    reeleitoDiac2 TEXT, -- Reeleição 2 para diácono
+    reeleitoDiac3 TEXT, -- Reeleição 3 para diácono
+    dataPresb TEXT, -- Data da eleição como presbítero
+    reeleitoPresb1 TEXT, -- Reeleição 1 para presbítero
+    reeleitoPresb2 TEXT, -- Reeleição 2 para presbítero
+    reeleitoPresb3 TEXT, -- Reeleição 3 para presbítero
+    imagemMembro TEXT -- URL da imagem (Base64 ou link público) 
+);
