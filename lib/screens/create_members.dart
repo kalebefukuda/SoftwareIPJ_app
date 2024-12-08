@@ -1,4 +1,6 @@
 // ignore_for_file: unused_local_variable
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:softwareipj/services/custom_cache_manager.dart';
 import 'package:softwareipj/widgets/screen_scale_wrapper.dart';
 import '../app.dart';
 import 'package:flutter/material.dart';
@@ -150,12 +152,6 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
     if (numeroRolController.text.trim().isEmpty) {
       _fieldErrors['numeroRol'] = true;
     }
-    if (numeroRolController.text.trim().isNotEmpty) {
-      bool isDuplicate = await _isNumeroRolDuplicado(numeroRolController.text);
-      if (isDuplicate) {
-        _fieldErrors['numeroRol'] = true;
-      }
-    }
     if (residenciaController.text.trim().isEmpty) {
       _fieldErrors['celular'] = true;
     }
@@ -167,6 +163,12 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
     }
     if (sexoController.text.trim().isEmpty) {
       _fieldErrors['sexo'] = true;
+    }
+    if (numeroRolController.text.trim().isNotEmpty) {
+      bool isDuplicate = await _isNumeroRolDuplicado(numeroRolController.text);
+      if (isDuplicate) {
+        _fieldErrors['numeroRol'] = true;
+      }
     }
 
     // Após validar, role para o primeiro campo com erro
@@ -205,10 +207,67 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
     );
   }
 
+  Map<String, dynamic>? _localMemberData;
+
   @override
   void initState() {
     super.initState();
 
+    _localMemberData = widget.memberData != null
+        ? {
+            ...widget.memberData!
+          }
+        : null;
+
+    if (_localMemberData != null) {
+      nomeCompletoController.text = _localMemberData!['nomeCompleto'] ?? '';
+      comunganteController.text = _localMemberData!['comungante'] ?? '';
+      numeroRolController.text = _localMemberData!['numeroRol']?.toString() ?? '';
+      dataNascimentoController.text = _localMemberData!['dataNascimento'] ?? '';
+      sexoController.text = _localMemberData!['sexo'] ?? '';
+      cidadeNascimentoController.text = _localMemberData!['cidadeNascimento'] ?? '';
+      estadoNascimentoController.text = _localMemberData!['estadoNascimento'] ?? '';
+      nomePaiController.text = _localMemberData!['nomePai'] ?? '';
+      nomeMaeController.text = _localMemberData!['nomeMae'] ?? '';
+      escolaridadeController.text = _localMemberData!['escolaridade'] ?? '';
+      profissaoController.text = _localMemberData!['profissao'] ?? '';
+      emailController.text = _localMemberData!['email'] ?? '';
+      telefoneController.text = _localMemberData!['telefone'] ?? '';
+      celularController.text = _localMemberData!['celular'] ?? '';
+      cepController.text = _localMemberData!['cep'] ?? '';
+      bairroController.text = _localMemberData!['bairro'] ?? '';
+      enderecotController.text = _localMemberData!['endereco'] ?? '';
+      complementoController.text = _localMemberData!['complemento'] ?? '';
+      cidadeAtualController.text = _localMemberData!['cidadeAtual'] ?? '';
+      estadoAtualController.text = _localMemberData!['estadoAtual'] ?? '';
+      residenciaController.text = _localMemberData!['residencia'] ?? '';
+      estadoCivilController.text = _localMemberData!['estadoCivil'] ?? '';
+      religiaoController.text = _localMemberData!['religiao'] ?? '';
+      dataBatismoController.text = _localMemberData!['dataBatismo'] ?? '';
+      oficianteBatismoController.text = _localMemberData!['oficianteBatismo'] ?? '';
+      dataProfissaoController.text = _localMemberData!['dataProfissao'] ?? '';
+      oficianteProfissaoController.text = _localMemberData!['oficianteProfissao'] ?? '';
+      dataAdmissaoController.text = _localMemberData!['dataAdmissao'] ?? '';
+      ataAdmissaoController.text = _localMemberData!['ataAdmissao'] ?? '';
+      formaAdmissaoController.text = _localMemberData!['formaAdmissao'] ?? '';
+      dataDemissaoController.text = _localMemberData!['dataDemissao'] ?? '';
+      ataDemissaoController.text = _localMemberData!['ataDemissao'] ?? '';
+      formaDemissaoController.text = _localMemberData!['formaDemissao'] ?? '';
+      dataRolSeparadoController.text = _localMemberData!['dataRolSeparado'] ?? '';
+      ataRolSeparadoController.text = _localMemberData!['ataRolSeparado'] ?? '';
+      casamentoRolSeparadoController.text = _localMemberData!['casamentoRolSeparado'] ?? '';
+      dataDiscRolSeparadoController.text = _localMemberData!['dataDiscRolSeparado'] ?? '';
+      ataDiscRolSeparadoController.text = _localMemberData!['ataDiscRolSeparado'] ?? '';
+      discRolSeparadoController.text = _localMemberData!['discRolSeparado'] ?? '';
+      dataDiacController.text = _localMemberData!['dataDiac'] ?? '';
+      reeleitoDiac1Controller.text = _localMemberData!['reeleitoDiac1'] ?? '';
+      reeleitoDiac2Controller.text = _localMemberData!['reeleitoDiac2'] ?? '';
+      reeleitoDiac3Controller.text = _localMemberData!['reeleitoDiac3'] ?? '';
+      dataPresbController.text = _localMemberData!['dataPresb'] ?? '';
+      reeleitoPresb1Controller.text = _localMemberData!['reeleitoPresb1'] ?? '';
+      reeleitoPresb2Controller.text = _localMemberData!['reeleitoPresb2'] ?? '';
+      reeleitoPresb3Controller.text = _localMemberData!['reeleitoPresb3'] ?? '';
+    }
     // Se houver memberData, preencha os controladores com os dados do membro
     if (widget.memberData != null) {
       nomeCompletoController.text = widget.memberData!['nomeCompleto'] ?? '';
@@ -359,6 +418,14 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
         _showBanner('Membro salvo com sucesso!', const Color(0xFF015B40));
       }
 
+      if (_selectedImage == null && widget.memberData != null && widget.memberData!['imagemMembro'] != null) {
+        // Remova a imagem antiga somente se não houver uma nova imagem e o salvamento estiver confirmado
+        final oldFileName = widget.memberData!['imagemMembro'].split('/').last;
+        await Supabase.instance.client.storage.from('membros_storage').remove([
+          oldFileName
+        ]);
+      }
+
       return true;
     } catch (e) {
       _showBanner('Erro ao salvar membro.', const Color.fromARGB(255, 154, 27, 27));
@@ -464,35 +531,50 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                               GestureDetector(
                                 onTap: _pickImage, // Função para selecionar a imagem
                                 child: CircleAvatar(
-                                  radius: 70,
+                                  radius: 70, // Tamanho do círculo maior
                                   backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
-                                  child: ClipOval(
-                                    child: _selectedImage != null
-                                        ? Image.file(
-                                            _selectedImage!,
-                                            width: 140,
-                                            height: 140,
-                                            fit: BoxFit.cover,
-                                          )
-                                        : (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty)
-                                            ? Image.network(
-                                                widget.memberData!['imagemMembro'],
-                                                width: 140,
-                                                height: 140,
-                                                fit: BoxFit.cover,
-                                                errorBuilder: (context, error, stackTrace) => SvgPicture.asset(
+                                  child: CircleAvatar(
+                                    radius: 70,
+                                    backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
+                                    child: ClipOval(
+                                      child: _selectedImage != null
+                                          ? Image.file(
+                                              _selectedImage!,
+                                              width: 140,
+                                              height: 140,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty)
+                                              ? CachedNetworkImage(
+                                                  imageUrl: widget.memberData!['imagemMembro']!,
+                                                  cacheManager: CustomCacheManager.instance,
+                                                  placeholder: (context, url) => SizedBox(
+                                                    width: 140,
+                                                    height: 140,
+                                                    child: CircularProgressIndicator(
+                                                      strokeWidth: 3.0,
+                                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                                        Theme.of(context).colorScheme.secondary,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  errorWidget: (context, url, error) => SvgPicture.asset(
+                                                    'assets/images/user-round.svg',
+                                                    height: 50,
+                                                    width: 50,
+                                                    color: Theme.of(context).iconTheme.color,
+                                                  ),
+                                                  width: 140,
+                                                  height: 140,
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : SvgPicture.asset(
                                                   'assets/images/user-round.svg',
                                                   height: 50,
                                                   width: 50,
                                                   color: Theme.of(context).iconTheme.color,
                                                 ),
-                                              )
-                                            : SvgPicture.asset(
-                                                'assets/images/user-round.svg',
-                                                height: 50,
-                                                width: 50,
-                                                color: Theme.of(context).iconTheme.color,
-                                              ),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -509,16 +591,12 @@ class _CreateMembersScreenState extends State<CreateMembersScreen> {
                                   try {
                                     // Remover imagem associada ao membro
                                     if (widget.memberData != null && widget.memberData!['imagemMembro'] != null && widget.memberData!['imagemMembro'].isNotEmpty) {
-                                      final oldFileName = widget.memberData!['imagemMembro'].split('/').last;
-                                      final deleteResponse = await Supabase.instance.client.storage.from('membros_storage').remove([
-                                        oldFileName
-                                      ]);
-
-                                      if (deleteResponse.isEmpty) {
-                                        print('Nenhum arquivo foi excluído. Verifique se o arquivo existe: $oldFileName');
-                                      } else {
-                                        print('Imagem antiga removida: $oldFileName');
-                                      }
+                                      setState(() {
+                                        _selectedImage = null; // Remove a imagem selecionada localmente
+                                        if (widget.memberData != null) {
+                                          widget.memberData!['imagemMembro'] = ''; // Atualiza o estado local
+                                        }
+                                      });
                                     }
 
                                     // Limpar o estado da imagem

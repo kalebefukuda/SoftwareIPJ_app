@@ -1,8 +1,11 @@
 // ignore_for_file: library_private_types_in_public_api
+import 'dart:io';
+
+import 'package:flutter_svg/svg.dart';
 import 'package:softwareipj/widgets/screen_scale_wrapper.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:softwareipj/screens/home.dart';
-
+import 'package:cached_network_image/cached_network_image.dart'; // Import necessário
 import '../app.dart';
 import 'package:softwareipj/screens/view_member_screen.dart';
 import 'package:softwareipj/screens/create_members.dart';
@@ -13,6 +16,7 @@ import '../services/member_service.dart';
 import '../widgets/custom_banner.dart';
 import 'package:diacritic/diacritic.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../services/custom_cache_manager.dart';
 
 class Members extends StatefulWidget {
   final Function(ThemeModeOptions) onThemeToggle;
@@ -30,7 +34,7 @@ class Members extends StatefulWidget {
   _MembersState createState() => _MembersState();
 }
 
-class _MembersState extends State<Members> {
+class _MembersState extends State<Members> with AutomaticKeepAliveClientMixin<Members> {
   int currentIndex = 2;
   List<Map<String, dynamic>> membersData = [];
   List<Map<String, dynamic>> filteredMembers = [];
@@ -47,12 +51,33 @@ class _MembersState extends State<Members> {
   bool filterCommunicant = false;
   bool filterNonCommunicant = false;
   final MemberService memberService = MemberService();
-
   bool _isBannerVisible = false;
   String _bannerMessage = '';
   Color _bannerColor = Colors.green;
-
   String? _selectedSort; // Variável para armazenar o tipo de ordenação selecionado
+
+  Map<String, File> memoryCache = {};
+
+  Future<File?> _getCachedImage(String? url) async {
+    if (url == null || url.isEmpty) return null;
+
+    // Verifique o cache em memória primeiro
+    if (memoryCache.containsKey(url)) {
+      return memoryCache[url];
+    }
+
+    // Se não estiver no cache em memória, use o cache no disco
+    final cachedFile = await CustomCacheManager.instance.getFileFromCache(url);
+    if (cachedFile != null) {
+      memoryCache[url] = cachedFile.file; // Adicione ao cache em memória
+      return cachedFile.file;
+    }
+
+    // Se não estiver no cache, faça o download
+    final downloadedFile = await CustomCacheManager.instance.getSingleFile(url);
+    memoryCache[url] = downloadedFile; // Adicione ao cache em memória
+    return downloadedFile;
+  }
 
   @override
   void initState() {
@@ -102,12 +127,12 @@ class _MembersState extends State<Members> {
     _resetSlidePositions();
   }
 
-  @override
-  void dispose() {
-    _searchFocusNode.dispose();
-    _searchController.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   _searchFocusNode.dispose();
+  //   _searchController.dispose();
+  //   super.dispose();
+  // }
 
   Future<void> _fetchMembers() async {
     try {
@@ -129,6 +154,20 @@ class _MembersState extends State<Members> {
 
         filteredMembers = List.from(membersData);
       });
+
+      // Pré-carregamento opcional (somente se necessário garantir o cache):
+      for (var member in membersData) {
+        final imageUrl = member['imagemMembro'];
+        if (imageUrl != null && imageUrl.isNotEmpty) {
+          final cachedFile = await CustomCacheManager.instance.getFileFromCache(imageUrl);
+          if (cachedFile != null) {
+            print('Imagem já em cache: $imageUrl');
+          } else {
+            print('Imagem não encontrada no cache: $imageUrl. Fazendo download...');
+            await CustomCacheManager.instance.getSingleFile(imageUrl);
+          }
+        }
+      }
     } catch (e) {
       print("Erro ao buscar membros: $e");
       _showBanner('Erro ao buscar membros', const Color.fromARGB(255, 154, 27, 27));
@@ -431,7 +470,11 @@ class _MembersState extends State<Members> {
   }
 
   @override
+  bool get wantKeepAlive => true; // Garante que o estado será preservado.
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context); // Adicione isso para o mixin funcionar corretamente.
     return ScreenScaleWrapper(
       child: Scaffold(
         appBar: AppBar(
@@ -727,11 +770,35 @@ class _MembersState extends State<Members> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 CircleAvatar(
-                                  radius: 28,
+                                  radius: 28, // Ajuste do tamanho geral do avatar
                                   backgroundColor: Theme.of(context).inputDecorationTheme.fillColor,
-                                  backgroundImage: (member['imagemMembro'] != null && member['imagemMembro'] is String)
-                                      ? NetworkImage(member['imagemMembro']) // Usa a URL pública
-                                      : const AssetImage('assets/images/avatar_placeholder.png') as ImageProvider,
+                                  child: ClipOval(
+                                    child: CachedNetworkImage(
+                                      imageUrl: member['imagemMembro'] ?? '',
+                                      cacheManager: CustomCacheManager.instance, // Cache personalizado
+                                      placeholder: (context, url) => SizedBox(
+                                        width: 56,
+                                        height: 56,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 3.0,
+                                          valueColor: AlwaysStoppedAnimation<Color>(
+                                            Theme.of(context).colorScheme.secondary,
+                                          ),
+                                        ),
+                                      ),
+                                      errorWidget: (context, url, error) => Padding(
+                                        padding: const EdgeInsets.all(12.0),
+                                        child: SvgPicture.asset(
+                                          'assets/images/user-round.svg',
+                                          fit: BoxFit.contain,
+                                          color: Theme.of(context).iconTheme.color,
+                                        ),
+                                      ),
+                                      width: 56,
+                                      height: 56,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
                                 ),
                                 const SizedBox(width: 16),
                                 Expanded(
